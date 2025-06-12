@@ -1,0 +1,11 @@
+# Ignore pour frontend
+frontCourtConnect/node_modules/
+frontCourtConnect/.expo/
+
+
+#backend 
+
+
+# Dépendances PHP
+courtConnectApi/vendor/
+
