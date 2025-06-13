@@ -3,7 +3,7 @@ import OrangeButton from "../shared/OrangeButton";
 import colors from "../style/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function HomeScreen({ onLogout }) {
+export default function HomeScreen({ navigation, onLogout }) {
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
     onLogout();
@@ -11,7 +11,10 @@ export default function HomeScreen({ onLogout }) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.darkBlue }]}>
-      <OrangeButton title="Get Started" />
+      <OrangeButton
+        title="Get Started"
+        onPress={() => navigation.navigate("Map")}
+      />
       <OrangeButton title="Logout" onPress={handleLogout} />
     </View>
   );
