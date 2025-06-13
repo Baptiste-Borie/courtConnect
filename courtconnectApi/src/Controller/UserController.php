@@ -44,7 +44,7 @@ final class UserController extends AbstractController
         $dto->image_url = $data['imageUrl'];
         $dto->trustability = $data['trustability'];
 
-        $user = $userManager->addUser($dto);
+        $user = $userManager->updateUser($dto, $user);
 
         if (!$user) {
             return $this->json(['message' => 'Erreur lors de la mise à jour du user.'], 500);
