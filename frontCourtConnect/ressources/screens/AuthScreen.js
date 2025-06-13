@@ -5,16 +5,53 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrangeButton from "../shared/OrangeButton";
 import colors from "../style/color";
 
-const RegisterScreen = ({ navigation }) => {
+const AuthScreen = ({ onLogin }) => {
+  const [isLogin, setIsLogin] = useState(false); // false = inscription par défaut
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
-    console.log("Inscription avec :", email, password);
+  const handleSubmit = async () => {
+    const route = isLogin ? "login" : "register";
+    const url = `https://courtconnect.alwaysdata.net/api/${route}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log(
+          `✅ ${isLogin ? "Connexion" : "Inscription"} réussie`,
+          data
+        );
+
+        if (isLogin) {
+          await AsyncStorage.setItem("token", data.token);
+          onLogin();
+        } else {
+          Alert.alert(
+            "Succès",
+            "Inscription réussie, connectez-vous maintenant."
+          );
+          setIsLogin(true);
+        }
+      } else {
+        Alert.alert("Erreur", data.message || "Une erreur est survenue.");
+      }
+    } catch (error) {
+      console.error("❌ Erreur réseau :", error);
+      Alert.alert("Erreur réseau", "Veuillez réessayer plus tard.");
+    }
   };
 
   return (
@@ -39,10 +76,15 @@ const RegisterScreen = ({ navigation }) => {
         />
       </View>
 
-      <OrangeButton title="S'inscrire" onPress={handleRegister} />
+      <OrangeButton
+        title={isLogin ? "Se connecter" : "S'inscrire"}
+        onPress={handleSubmit}
+      />
 
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.link}>Se connecter</Text>
+      <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
+        <Text style={styles.link}>
+          {isLogin ? "Créer un compte" : "Déjà inscrit ? Se connecter"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -83,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default AuthScreen;
