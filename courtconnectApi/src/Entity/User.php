@@ -21,7 +21,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private ?string $username = null;
 
     /**
