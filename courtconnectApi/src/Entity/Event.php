@@ -21,7 +21,7 @@ class Event
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column]
     private ?\DateTimeInterface $date_heure = null;
 
     #[ORM\Column(type: 'integer')]

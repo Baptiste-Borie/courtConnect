@@ -41,7 +41,7 @@ class Terrain
     #[Groups(['terrain'])]
     private ?float $longitude = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column]
     #[Groups(['terrain'])]
     private ?\DateTimeImmutable $created_at = null;
 
