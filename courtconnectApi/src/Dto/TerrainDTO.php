@@ -12,7 +12,7 @@ class TerrainDTO
     public $latitude;
     public $longitude;
     public $createdAt;
-    public $sol;
+    public $typeSol;
     public $nbPanier;
     public $typeFilet;
     public $typePanier;
