@@ -21,15 +21,33 @@ final class UserController extends AbstractController
         $dto = new UserDTO();
         $dto->username = $data['username'];
         $dto->password = $passwordHasher->hashPassword($user, $data['password']);
-        $dto->nom = $data['nom'];
-        $dto->prenom = $data['prenom'];
-        $dto->image_url = $data['imageUrl'];
-        $dto->trustability = $data['trustability'];
 
         $user = $userManager->addUser($dto);
 
         if (!$user) {
             return $this->json(['message' => 'Erreur lors de la création du user.'], 500);
+        }
+
+        return $this->json($user, 200, [], ['groups' => ['user']]);
+    }
+
+    #[Route('/api/updateUser', name: 'app_update_user')]
+    public function updateUser(Request $request, UserManager $userManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $user = $this->getUser();
+        $data = json_decode($request->getContent(), true);
+        $dto = new UserDTO();
+        $dto->username = $data['username'];
+//        $dto->password = $passwordHasher->hashPassword($user, $data['password']);
+        $dto->nom = $data['nom'];
+        $dto->prenom = $data['prenom'];
+        $dto->image_url = $data['imageUrl'];
+        $dto->trustability = $data['trustability'];
+
+        $user = $userManager->updateUser($dto, $user);
+
+        if (!$user) {
+            return $this->json(['message' => 'Erreur lors de la mise à jour du user.'], 500);
         }
 
         return $this->json($user, 200, [], ['groups' => ['user']]);

@@ -19,11 +19,7 @@ class UserManager
         $newUser->setUsername($userDTO->username);
         $newUser->setRoles(["ROLE_USER"]);
         $newUser->setPassword($userDTO->password);
-        $newUser->setNom($userDTO->nom);
-        $newUser->setPrenom($userDTO->prenom);
-        $newUser->setPseudo($userDTO->pseudo);
-        $newUser->setImageUrl($userDTO->image_url);
-        $newUser->setTrustability($userDTO->trustability);
+        $newUser->setTrustability(0);
 
         $this->em->persist($newUser);
         $this->em->flush();
@@ -32,6 +28,28 @@ class UserManager
             $this->em->persist($newUser);
             $this->em->flush();
             return $newUser;
+        } catch (\Exception $e) {
+            return null;
+        }
+
+    }
+
+    public function updateUser(UserDTO $userDTO, User $user) {
+
+        $user->setUsername($userDTO->username);
+//        $user->setPassword($userDTO->password);
+        $user->setNom($userDTO->nom);
+        $user->setPrenom($userDTO->prenom);
+        $user->setPseudo($userDTO->pseudo);
+        $user->setImageUrl($userDTO->image_url);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
+            return $user;
         } catch (\Exception $e) {
             return null;
         }
