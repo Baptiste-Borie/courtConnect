@@ -6,6 +6,7 @@ use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -13,31 +14,36 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['all_events'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['all_events'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['all_events'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['all_events'])]
     private ?\DateTimeImmutable $date_heure = null;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['all_events'])]
     private ?int $max_joueurs = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $niveau = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $type = null;
+    #[Groups(['all_events'])]
+    private ?int $niveau = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
+    #[Groups(['all_events'])]
     private ?User $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
+    #[Groups(['all_events'])]
     private ?Terrain $terrain = null;
 
     /**
@@ -47,7 +53,13 @@ class Event
     private Collection $joueurs;
 
     #[ORM\Column(length: 255)]
-    private ?string $etat = null;
+    #[Groups(['all_events'])]
+    private ?int $etat = null;
+
+    #[ORM\ManyToOne(inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'type_event', referencedColumnName: 'id')]
+    #[Groups(['all_events'])]
+    private ?TypeEvent $type_event = null;
 
     public function __construct()
     {
@@ -83,12 +95,12 @@ class Event
         return $this;
     }
 
-    public function getDateHeure(): ?\DateTime
+    public function getDateHeure(): \DateTimeImmutable
     {
         return $this->date_heure;
     }
 
-    public function setDateHeure(\DateTime $date_heure): static
+    public function setDateHeure(\DateTimeImmutable $date_heure): static
     {
         $this->date_heure = $date_heure;
 
@@ -107,26 +119,14 @@ class Event
         return $this;
     }
 
-    public function getNiveau(): ?string
+    public function getNiveau(): ?int
     {
         return $this->niveau;
     }
 
-    public function setNiveau(string $niveau): static
+    public function setNiveau(int $niveau): static
     {
         $this->niveau = $niveau;
-
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
 
         return $this;
     }
@@ -179,14 +179,26 @@ class Event
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): ?int
     {
         return $this->etat;
     }
 
-    public function setEtat(string $etat): static
+    public function setEtat(int $etat): static
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getTypeEvent(): ?TypeEvent
+    {
+        return $this->type_event;
+    }
+
+    public function setTypeEvent(?TypeEvent $type_event): static
+    {
+        $this->type_event = $type_event;
 
         return $this;
     }

@@ -23,7 +23,7 @@ class TerrainManager
         $newTerrain->setLatitude($terrainDTO->latitude);
         $newTerrain->setLongitude($terrainDTO->longitude);
         $newTerrain->setCreatedAt(new \DateTimeImmutable());
-        $newTerrain->setSol($terrainDTO->sol);
+        $newTerrain->setTypeSol($terrainDTO->typeSol);
         $newTerrain->setNbPanier($terrainDTO->nbPanier);
         $newTerrain->setTypeFilet($terrainDTO->typeFilet);
         $newTerrain->setTypePanier($terrainDTO->typePanier);
@@ -41,6 +41,37 @@ class TerrainManager
             $this->em->persist($newTerrain);
             $this->em->flush();
             return $newTerrain;
+        } catch (\Exception $e) {
+            return null;
+        }
+
+    }
+
+    public function updateTerrain(TerrainDTO $terrainDTO, Terrain $terrain) {
+
+        $terrain->setNom($terrainDTO->nom);
+        $terrain->setAdresse($terrainDTO->adresse);
+        $terrain->setVille($terrainDTO->ville);
+        $terrain->setCodePostal($terrainDTO->codePostal);
+        $terrain->setLatitude($terrainDTO->latitude);
+        $terrain->setLongitude($terrainDTO->longitude);
+        $terrain->setTypeSol($terrainDTO->typeSol);
+        $terrain->setNbPanier($terrainDTO->nbPanier);
+        $terrain->setTypeFilet($terrainDTO->typeFilet);
+        $terrain->setTypePanier($terrainDTO->typePanier);
+        $terrain->setUsure($terrainDTO->usure);
+        $terrain->setSpectateur($terrainDTO->spectateur);
+        $terrain->setCreatedBy($terrainDTO->createdBy);
+        $terrain->setRemarque($terrainDTO->remarque);
+        $terrain->setImageUrl($terrainDTO->image_url);
+
+        $this->em->persist($terrain);
+        $this->em->flush();
+
+        try {
+            $this->em->persist($terrain);
+            $this->em->flush();
+            return $terrain;
         } catch (\Exception $e) {
             return null;
         }

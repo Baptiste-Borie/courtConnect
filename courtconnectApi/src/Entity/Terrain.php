@@ -45,17 +45,9 @@ class Terrain
     #[Groups(['terrain'])]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
-    private ?string $sol = null;
-
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(type: 'integer')]
     #[Groups(['terrain'])]
     private ?int $nb_panier = null;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
-    private ?string $type_filet = null;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(['terrain'])]
@@ -81,15 +73,11 @@ class Terrain
 
     #[ORM\Column(length: 255)]
     #[Groups(['terrain'])]
-    private ?string $etat = null;
+    private ?int $etat = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['terrain'])]
     private ?string $remarque = null;
-
-    #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
-    private ?string $type_panier = null;
 
     #[ORM\Column(type: 'integer')]
     #[Groups(['terrain'])]
@@ -98,6 +86,21 @@ class Terrain
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['terrain'])]
     private ?string $image_url = null;
+
+    #[ORM\ManyToOne(inversedBy: 'terrains')]
+    #[Groups(['terrain'])]
+    #[ORM\JoinColumn(name: 'type_filet', referencedColumnName: 'id')]
+    private ?TypeFilet $type_filet = null;
+
+    #[ORM\ManyToOne(inversedBy: 'terrains')]
+    #[Groups(['terrain'])]
+    #[ORM\JoinColumn(name: 'type_panier', referencedColumnName: 'id')]
+    private ?TypePanier $type_panier = null;
+
+    #[ORM\ManyToOne(inversedBy: 'terrains')]
+    #[Groups(['terrain'])]
+    #[ORM\JoinColumn(name: 'type_sol', referencedColumnName: 'id')]
+    private ?TypeSol $type_sol = null;
 
     public function __construct()
     {
@@ -194,18 +197,6 @@ class Terrain
         return $this;
     }
 
-    public function getSol(): ?string
-    {
-        return $this->sol;
-    }
-
-    public function setSol(string $sol): static
-    {
-        $this->sol = $sol;
-
-        return $this;
-    }
-
     public function getNbPanier(): ?int
     {
         return $this->nb_panier;
@@ -218,12 +209,12 @@ class Terrain
         return $this;
     }
 
-    public function getTypeFilet(): ?bool
+    public function getTypeFilet(): ?TypeFilet
     {
         return $this->type_filet;
     }
 
-    public function setTypeFilet(string $filet): static
+    public function setTypeFilet(TypeFilet $filet): static
     {
         $this->type_filet = $filet;
 
@@ -332,18 +323,6 @@ class Terrain
         return $this;
     }
 
-    public function getTypePanier(): ?string
-    {
-        return $this->type_panier;
-    }
-
-    public function setTypePanier(string $type_panier): static
-    {
-        $this->type_panier = $type_panier;
-
-        return $this;
-    }
-
     public function getUsure(): ?int
     {
         return $this->usure;
@@ -364,6 +343,30 @@ class Terrain
     public function setImageUrl(string $image): static
     {
         $this->image_url = $image;
+
+        return $this;
+    }
+
+    public function getTypePanier(): ?TypePanier
+    {
+        return $this->type_panier;
+    }
+
+    public function setTypePanier(?TypePanier $type_panier): static
+    {
+        $this->type_panier = $type_panier;
+
+        return $this;
+    }
+
+    public function getTypeSol(): ?TypeSol
+    {
+        return $this->type_sol;
+    }
+
+    public function setTypeSol(?TypeSol $type_sol): static
+    {
+        $this->type_sol = $type_sol;
 
         return $this;
     }
