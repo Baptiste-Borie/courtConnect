@@ -21,6 +21,7 @@ class TerrainDTO
     public $etat;
     public $remarque;
     public $usure;
+    public $image_url;
 
 
 }

@@ -89,7 +89,7 @@ class Terrain
     #[ORM\Column(type: 'integer')]
     private ?int $usure = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $image_url = null;
 
     public function __construct()

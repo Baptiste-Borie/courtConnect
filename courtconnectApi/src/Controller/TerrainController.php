@@ -54,6 +54,7 @@ class TerrainController extends AbstractController
         $dto->createdBy = $user;
         $dto->remarque = $data['remarque'];
         $dto->usure = $data['usure'];
+        $dto->image_url = $data['usure'];
 
         $terrain = $terrainManager->addTerrain($dto);
 

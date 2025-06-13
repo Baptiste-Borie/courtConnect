@@ -32,6 +32,7 @@ class TerrainManager
         $newTerrain->setCreatedBy($terrainDTO->createdBy);
         $newTerrain->setEtat(0);
         $newTerrain->setRemarque($terrainDTO->remarque);
+        $newTerrain->setImageUrl($terrainDTO->image_url);
 
         $this->em->persist($newTerrain);
         $this->em->flush();
