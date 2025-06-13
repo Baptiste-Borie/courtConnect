@@ -17,7 +17,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
@@ -28,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private array $roles = [];
 
     /**
@@ -38,19 +38,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'user'])]
     private ?string $image_url = null;
 
     /**
@@ -190,14 +190,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPhotoProfil(): ?string
+    public function getImageUrl(): ?string
     {
-        return $this->photo_profil;
+        return $this->image_url;
     }
 
-    public function setPhotoProfil(?string $photo_profil): static
+    public function setImageUrl(?string $image_url): static
     {
-        $this->photo_profil = $photo_profil;
+        $this->image_url = $image_url;
 
         return $this;
     }

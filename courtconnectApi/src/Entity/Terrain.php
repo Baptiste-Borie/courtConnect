@@ -53,7 +53,7 @@ class Terrain
     #[Groups(['terrain'])]
     private ?int $nb_panier = null;
 
-    #[ORM\Column(type: 'float')]
+    #[ORM\Column(length: 255)]
     #[Groups(['terrain'])]
     private ?string $type_filet = null;
 
@@ -62,8 +62,9 @@ class Terrain
     private ?bool $spectateur = null;
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
-    #[Groups(['terrain'])]
+    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
     private ?User $created_by = null;
+
 
     /**
      * @var Collection<int, Event>
