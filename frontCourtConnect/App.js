@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import AuthScreen from "./ressources/screens/AuthScreen";
 import HomeScreen from "./ressources/screens/HomeScreen";
+import MapScreen from "./ressources/screens/MapScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,32 +20,37 @@ export default function App() {
       setIsAuthenticated(!!token);
       setLoading(false);
     };
-
     checkToken();
   }, []);
 
   if (loading) return null;
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <Stack.Screen name="Home">
-            {(props) => (
-              <HomeScreen
-                {...props}
-                onLogout={() => setIsAuthenticated(false)}
-              />
-            )}
-          </Stack.Screen>
-        ) : (
-          <Stack.Screen name="Auth">
-            {(props) => (
-              <AuthScreen {...props} onLogin={() => setIsAuthenticated(true)} />
-            )}
-          </Stack.Screen>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isAuthenticated ? (
+            <Stack.Screen name="Home">
+              {(props) => (
+                <HomeScreen
+                  {...props}
+                  onLogout={() => setIsAuthenticated(false)}
+                />
+              )}
+            </Stack.Screen>
+          ) : (
+            <Stack.Screen name="Auth">
+              {(props) => (
+                <AuthScreen
+                  {...props}
+                  onLogin={() => setIsAuthenticated(true)}
+                />
+              )}
+            </Stack.Screen>
+          )}
+          <Stack.Screen name="Map" component={MapScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
