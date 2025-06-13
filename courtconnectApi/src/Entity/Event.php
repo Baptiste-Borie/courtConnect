@@ -22,7 +22,7 @@ class Event
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?\DateTimeInterface $date_heure = null;
+    private ?\DateTimeImmutable $date_heure = null;
 
     #[ORM\Column(type: 'integer')]
     private ?int $max_joueurs = null;
@@ -34,6 +34,7 @@ class Event
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
     private ?User $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
