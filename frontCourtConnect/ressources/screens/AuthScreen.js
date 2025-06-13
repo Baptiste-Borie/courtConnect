@@ -17,8 +17,8 @@ const AuthScreen = ({ onLogin }) => {
   const [password, setPassword] = useState("");
 
   const handleSubmit = async () => {
-    const route = isLogin ? "login" : "register";
-    const url = `https://courtconnect.alwaysdata.net/api/${route}`;
+    const route = isLogin ? "api/login" : "register";
+    const url = `https://courtconnect.alwaysdata.net/${route}`;
 
     try {
       const response = await fetch(url, {
@@ -27,7 +27,16 @@ const AuthScreen = ({ onLogin }) => {
         body: JSON.stringify({ username: email, password }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("❌ Réponse non JSON :", text);
+        throw new Error("Réponse invalide reçue du serveur.");
+      }
 
       if (response.ok) {
         console.log(
