@@ -40,7 +40,7 @@ class TerrainController extends AbstractController
         }
 
         $dto = new TerrainDTO();
-        $dto->nom = $data['noma'];
+        $dto->nom = $data['nom'];
         $dto->adresse = $data['adresse'];
         $dto->ville = $data['ville'];
         $dto->codePostal = $data['codePostal'];
