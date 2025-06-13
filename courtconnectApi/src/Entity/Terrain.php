@@ -63,6 +63,7 @@ class Terrain
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
     #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
+    #[Groups(['terrain'])]
     private ?User $created_by = null;
 
 
@@ -79,18 +80,23 @@ class Terrain
     private Collection $favori;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['terrain'])]
     private ?string $etat = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['terrain'])]
     private ?string $remarque = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['terrain'])]
     private ?string $type_panier = null;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['terrain'])]
     private ?int $usure = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['terrain'])]
     private ?string $image_url = null;
 
     public function __construct()
