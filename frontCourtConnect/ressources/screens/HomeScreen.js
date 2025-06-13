@@ -1,5 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import OrangeButton from "../shared/OrangeButton";
+import PageLayout from "../shared/PageLayout";
 import colors from "../style/color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -10,18 +11,18 @@ export default function HomeScreen({ navigation, onLogout }) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.darkBlue }]}>
+    <PageLayout style={styles.content}>
       <OrangeButton
         title="Get Started"
         onPress={() => navigation.navigate("Map")}
       />
       <OrangeButton title="Logout" onPress={handleLogout} />
-    </View>
+    </PageLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
     gap: 20,
     alignItems: "center",

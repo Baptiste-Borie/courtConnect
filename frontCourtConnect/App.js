@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { StatusBar } from "react-native";
+
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -26,31 +28,26 @@ export default function App() {
   if (loading) return null;
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {isAuthenticated ? (
-            <Stack.Screen name="Home">
-              {(props) => (
-                <HomeScreen
-                  {...props}
-                  onLogout={() => setIsAuthenticated(false)}
-                />
-              )}
-            </Stack.Screen>
-          ) : (
-            <Stack.Screen name="Auth">
-              {(props) => (
-                <AuthScreen
-                  {...props}
-                  onLogin={() => setIsAuthenticated(true)}
-                />
-              )}
-            </Stack.Screen>
-          )}
-          <Stack.Screen name="Map" component={MapScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isAuthenticated ? (
+          <Stack.Screen name="Home">
+            {(props) => (
+              <HomeScreen
+                {...props}
+                onLogout={() => setIsAuthenticated(false)}
+              />
+            )}
+          </Stack.Screen>
+        ) : (
+          <Stack.Screen name="Auth">
+            {(props) => (
+              <AuthScreen {...props} onLogin={() => setIsAuthenticated(true)} />
+            )}
+          </Stack.Screen>
+        )}
+        <Stack.Screen name="Map" component={MapScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
