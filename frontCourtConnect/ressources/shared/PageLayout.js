@@ -22,7 +22,7 @@ const PageLayout = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
   },
   content: {
     flex: 1,

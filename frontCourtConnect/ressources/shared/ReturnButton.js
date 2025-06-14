@@ -1,4 +1,5 @@
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import colors from "../constants/color";
 
 const ReturnButton = ({ title, onPress, style }) => {
   return (
@@ -13,7 +14,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparant",
   },
   text: {
-    color: "#232543",
+    color: colors.darkBlue,
     fontSize: 16,
     fontWeight: "500",
   },
