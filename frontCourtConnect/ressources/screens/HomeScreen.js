@@ -1,8 +1,8 @@
 import { StyleSheet, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import OrangeButton from "../shared/OrangeButton";
 import PageLayout from "../shared/PageLayout";
-import colors from "../style/color";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen({ navigation, onLogout }) {
   const handleLogout = async () => {

@@ -1,10 +1,10 @@
-import React from "react";
-import { View, StyleSheet, Button } from "react-native";
+import { StyleSheet } from "react-native";
+
 import MapBox from "../shared/MapBox";
 import ReturnButton from "../shared/ReturnButton";
-import { SafeAreaView } from "react-native-safe-area-context";
 import PageLayout from "../shared/PageLayout";
 import colors from "../style/color";
+
 const MapScreen = ({ navigation }) => {
   return (
     <PageLayout style={styles.container}>

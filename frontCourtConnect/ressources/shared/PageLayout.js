@@ -1,6 +1,5 @@
-import React from "react";
 import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import Header from "./Header";
 import Footer from "./Footer";
 import colors from "../style/color";
@@ -23,7 +22,7 @@ const PageLayout = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F21",
+    backgroundColor: "#FFFFFF",
   },
   content: {
     flex: 1,

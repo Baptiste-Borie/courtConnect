@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "react-native";
-
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AuthContext from "./ressources/context/AuthContext";
 
+import AuthContext from "./ressources/context/AuthContext";
 import AuthScreen from "./ressources/screens/AuthScreen";
 import HomeScreen from "./ressources/screens/HomeScreen";
 import MapScreen from "./ressources/screens/MapScreen";

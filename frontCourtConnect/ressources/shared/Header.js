@@ -1,8 +1,7 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+
 import colors from "../constants/color";
-import assets from "../constants/assets";
 import ReturnButton from "./ReturnButton";
 
 const Header = () => {

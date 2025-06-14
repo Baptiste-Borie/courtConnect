@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import colors from "../constants/color";
 import assets from "../constants/assets";
 import AuthContext from "../context/AuthContext";

@@ -1,4 +1,3 @@
-import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 const ReturnButton = ({ title, onPress }) => {
@@ -24,6 +23,5 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 });
-
 
 export default ReturnButton;
