@@ -3,12 +3,13 @@ import { StyleSheet, View } from "react-native";
 import OrangeButton from "../../shared/OrangeButton";
 import PageLayout from "../../shared/PageLayout";
 import AccountScreenHeader from "./AccountScreenHeader";
+import AccountScreenMainContent from "./AccountScreenMainContent";
 
 export default function HomeScreen({ navigation, onLogout }) {
   return (
     <PageLayout style={styles.content}>
       <AccountScreenHeader style={styles.header} />
-      <OrangeButton title="Accc" onPress={() => navigation.navigate("Map")} />
+      <AccountScreenMainContent />
     </PageLayout>
   );
 }
