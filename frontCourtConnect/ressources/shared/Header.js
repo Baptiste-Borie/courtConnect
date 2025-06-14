@@ -1,10 +1,20 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import colors from "../style/color";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import colors from "../constants/color";
+import assets from "../constants/assets";
+import ReturnButton from "./ReturnButton";
 
 const Header = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
+      <ReturnButton
+        onPress={() => {
+          navigation.navigate("Map");
+        }}
+      />
       <Text style={styles.text}>CourtConnect</Text>
     </View>
   );

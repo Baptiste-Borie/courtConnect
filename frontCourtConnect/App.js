@@ -4,6 +4,7 @@ import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AuthContext from "./ressources/context/AuthContext";
 
 import AuthScreen from "./ressources/screens/AuthScreen";
 import HomeScreen from "./ressources/screens/HomeScreen";
@@ -27,32 +28,37 @@ export default function App() {
   if (loading) return null;
 
   return (
-    <NavigationContainer>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+      <NavigationContainer>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <Stack.Screen name="Home">
-            {(props) => (
-              <HomeScreen
-                {...props}
-                onLogout={() => setIsAuthenticated(false)}
-              />
-            )}
-          </Stack.Screen>
-        ) : (
-          <Stack.Screen name="Auth">
-            {(props) => (
-              <AuthScreen {...props} onLogin={() => setIsAuthenticated(true)} />
-            )}
-          </Stack.Screen>
-        )}
-        <Stack.Screen name="Map" component={MapScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Map" component={MapScreen} />
+          {isAuthenticated ? (
+            <Stack.Screen name="Home">
+              {(props) => (
+                <HomeScreen
+                  {...props}
+                  onLogout={() => setIsAuthenticated(false)}
+                />
+              )}
+            </Stack.Screen>
+          ) : (
+            <Stack.Screen name="Auth">
+              {(props) => (
+                <AuthScreen
+                  {...props}
+                  onLogin={() => setIsAuthenticated(true)}
+                />
+              )}
+            </Stack.Screen>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }

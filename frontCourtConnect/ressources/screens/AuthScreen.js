@@ -10,6 +10,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrangeButton from "../shared/OrangeButton";
 import colors from "../style/color";
+import PageLayout from "../shared/PageLayout";
 
 const AuthScreen = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(false); // false = inscription par défaut
@@ -64,7 +65,7 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <PageLayout style={styles.container}>
       <Text style={styles.title}>CourtConnect</Text>
 
       <View style={styles.inputContainer}>
@@ -95,7 +96,7 @@ const AuthScreen = ({ onLogin }) => {
           {isLogin ? "Créer un compte" : "Déjà inscrit ? Se connecter"}
         </Text>
       </TouchableOpacity>
-    </View>
+    </PageLayout>
   );
 };
 

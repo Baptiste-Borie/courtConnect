@@ -1,13 +1,38 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import colors from "../style/color";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import colors from "../constants/color";
+import assets from "../constants/assets";
+import AuthContext from "../context/AuthContext";
 
 const Footer = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
+  const { isAuthenticated } = useContext(AuthContext);
+
   const isActive = (name) => route.name === name;
+
+  if (!isAuthenticated) {
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Auth")}
+          style={styles.navItem}
+        >
+          <Image
+            source={
+              isActive("Auth")
+                ? assets.icons.person_active
+                : assets.icons.person
+            }
+            style={styles.icon}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -17,9 +42,7 @@ const Footer = () => {
       >
         <Image
           source={
-            isActive("Home")
-              ? require("../../assets/Home_orange.png")
-              : require("../../assets/Home.png")
+            isActive("Home") ? assets.icons.home_active : assets.icons.home
           }
           style={styles.icon}
         />
@@ -32,14 +55,12 @@ const Footer = () => {
         style={styles.navItem}
       >
         <Image
-          source={
-            isActive("Map")
-              ? require("../../assets/Map_orange.png")
-              : require("../../assets/Map.png")
-          }
+          source={isActive("Map") ? assets.icons.map_active : assets.icons.map}
           style={styles.icon}
         />
       </TouchableOpacity>
+
+      <View style={styles.separator} />
     </View>
   );
 };
@@ -51,6 +72,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 80,
     backgroundColor: colors.lightBlue,
+    paddingBottom: 10,
     borderTopWidth: 3,
     borderTopColor: colors.orange,
   },
