@@ -1,4 +1,3 @@
-import React from "react";
 import { View, StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
@@ -7,6 +6,7 @@ const MapBox = ({ width = "100%", height = 200, region, markers = [] }) => {
     <View style={{ width, height }}>
       <MapView
         style={StyleSheet.absoluteFill}
+        userInterfaceStyle="dark"
         initialRegion={
           region || {
             latitude: 48.8566, // C'est centré sur Paris par défaut mais je te laisse le changer

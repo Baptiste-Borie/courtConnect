@@ -1,5 +1,6 @@
-import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
+
+import colors from "../constants/color";
 
 const OrangeButton = ({ title, onPress }) => {
   return (
@@ -11,7 +12,7 @@ const OrangeButton = ({ title, onPress }) => {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#FC7518",
+    backgroundColor: colors.orange,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 25,
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   text: {
-    color: "#FFFFFF",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "500",
   },

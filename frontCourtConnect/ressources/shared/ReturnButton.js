@@ -1,9 +1,9 @@
-import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import colors from "../constants/color";
 
-const ReturnButton = ({ title, onPress }) => {
+const ReturnButton = ({ title, onPress, style }) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
       <Text style={styles.text}>← RETOUR</Text>
     </TouchableOpacity>
   );
@@ -12,18 +12,12 @@ const ReturnButton = ({ title, onPress }) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "transparant",
-    paddingVertical: 25,
-    borderRadius: 25,
-    position: "absolute",
-    top: 50,
-    left: 20,
   },
   text: {
-    color: "#232543",
+    color: colors.darkBlue,
     fontSize: 16,
     fontWeight: "500",
   },
 });
-
 
 export default ReturnButton;
