@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -29,6 +28,12 @@ export default function App() {
 
   return (
     <NavigationContainer>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
           <Stack.Screen name="Home">

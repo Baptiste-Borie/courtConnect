@@ -1,10 +1,13 @@
 import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import colors from "../style/color";
 
 const Footer = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
+  const isActive = (name) => route.name === name;
 
   return (
     <View style={styles.container}>
@@ -12,7 +15,14 @@ const Footer = () => {
         onPress={() => navigation.navigate("Home")}
         style={styles.navItem}
       >
-        <Text style={styles.text}>Accueil</Text>
+        <Image
+          source={
+            isActive("Home")
+              ? require("../../assets/Home_orange.png")
+              : require("../../assets/Home.png")
+          }
+          style={styles.icon}
+        />
       </TouchableOpacity>
 
       <View style={styles.separator} />
@@ -21,7 +31,14 @@ const Footer = () => {
         onPress={() => navigation.navigate("Map")}
         style={styles.navItem}
       >
-        <Text style={styles.text}>Carte</Text>
+        <Image
+          source={
+            isActive("Map")
+              ? require("../../assets/Map_orange.png")
+              : require("../../assets/Map.png")
+          }
+          style={styles.icon}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -34,21 +51,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 80,
     backgroundColor: colors.lightBlue,
+    borderTopWidth: 3,
+    borderTopColor: colors.orange,
   },
   navItem: {
     flex: 1,
     alignItems: "center",
   },
   separator: {
-    width: 1,
-    backgroundColor: colors.darkBlue,
+    width: 3,
+    backgroundColor: colors.orange,
     alignSelf: "stretch",
   },
-
-  text: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: "500",
+  icon: {
+    width: 24,
+    height: 24,
+    resizeMode: "contain",
   },
 });
 
