@@ -59,8 +59,6 @@ const Footer = () => {
           style={styles.icon}
         />
       </TouchableOpacity>
-
-      <View style={styles.separator} />
     </View>
   );
 };
@@ -73,7 +71,7 @@ const styles = StyleSheet.create({
     height: 80,
     backgroundColor: colors.lightBlue,
     paddingBottom: 10,
-    borderTopWidth: 3,
+    borderTopWidth: 2,
     borderTopColor: colors.orange,
   },
   navItem: {

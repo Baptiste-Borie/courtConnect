@@ -2,7 +2,7 @@ import { StyleSheet, View } from "react-native";
 
 import Header from "./Header";
 import Footer from "./Footer";
-import colors from "../style/color";
+import colors from "../constants/color";
 
 const PageLayout = ({
   children,
@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
     backgroundColor: colors.darkBlue,
   },
 });

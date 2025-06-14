@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import OrangeButton from "../shared/OrangeButton";
 import PageLayout from "../shared/PageLayout";
+import ProfileButton from "../shared/ProfileButton";
 
 export default function HomeScreen({ navigation, onLogout }) {
   const handleLogout = async () => {
@@ -11,7 +12,8 @@ export default function HomeScreen({ navigation, onLogout }) {
   };
 
   return (
-    <PageLayout style={styles.content}>
+    <PageLayout style={styles.content} showHeader={false}>
+      <ProfileButton style={{ position: "absolute", top: 50, right: 20 }} />
       <OrangeButton
         title="Get Started"
         onPress={() => navigation.navigate("Map")}

@@ -8,6 +8,7 @@ import AuthContext from "./ressources/context/AuthContext";
 import AuthScreen from "./ressources/screens/AuthScreen";
 import HomeScreen from "./ressources/screens/HomeScreen";
 import MapScreen from "./ressources/screens/MapScreen";
+import AccountScreen from "./ressources/screens/Account/AccountScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,15 +38,26 @@ export default function App() {
 
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Map" component={MapScreen} />
+
           {isAuthenticated ? (
-            <Stack.Screen name="Home">
-              {(props) => (
-                <HomeScreen
-                  {...props}
-                  onLogout={() => setIsAuthenticated(false)}
-                />
-              )}
-            </Stack.Screen>
+            <>
+              <Stack.Screen name="Home">
+                {(props) => (
+                  <HomeScreen
+                    {...props}
+                    onLogout={() => setIsAuthenticated(false)}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="Account">
+                {(props) => (
+                  <AccountScreen
+                    {...props}
+                    onLogout={() => setIsAuthenticated(false)}
+                  />
+                )}
+              </Stack.Screen>
+            </>
           ) : (
             <Stack.Screen name="Auth">
               {(props) => (

@@ -1,19 +1,12 @@
 import { StyleSheet } from "react-native";
 
 import MapBox from "../shared/MapBox";
-import ReturnButton from "../shared/ReturnButton";
 import PageLayout from "../shared/PageLayout";
-import colors from "../style/color";
 
 const MapScreen = ({ navigation }) => {
   return (
-    <PageLayout style={styles.container}>
+    <PageLayout style={styles.container} showHeader={false}>
       <MapBox height="100%" />
-      <ReturnButton
-        onPress={() => {
-          navigation.navigate("Home");
-        }}
-      />
     </PageLayout>
   );
 };
@@ -23,7 +16,6 @@ const MapScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors,
   },
 });
 

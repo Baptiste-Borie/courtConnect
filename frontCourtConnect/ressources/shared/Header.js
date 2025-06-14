@@ -10,26 +10,23 @@ const Header = () => {
   return (
     <View style={styles.container}>
       <ReturnButton
+        style={styles.returnButton}
         onPress={() => {
-          navigation.navigate("Map");
+          navigation.goBack();
         }}
       />
-      <Text style={styles.text}>CourtConnect</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 48,
-    paddingVertical: 24,
-    paddingHorizontal: 24,
-    backgroundColor: colors.lightBlue,
-  },
-  text: {
-    color: colors.white,
-    fontSize: 18,
-    fontWeight: "bold",
+    height: 80,
+    backgroundColor: colors.orange,
+    position: "relative",
+    justifyContent: "flex-end",
+    paddingBottom: 10,
+    paddingLeft: 10,
   },
 });
 
