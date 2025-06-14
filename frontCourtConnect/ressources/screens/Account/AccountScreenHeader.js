@@ -20,7 +20,7 @@ export default function AccountScreenHeader() {
             source={
               data.profilePicture
                 ? { uri: data.profilePicture }
-                : assets.icons.account_large
+                : assets.icons.account
             }
             style={styles.avatar}
           />
