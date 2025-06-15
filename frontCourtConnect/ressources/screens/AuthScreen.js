@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -10,13 +10,15 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import OrangeButton from "../shared/OrangeButton";
-import colors from "../constants/color";
 import PageLayout from "../shared/PageLayout";
+import { ThemeContext } from "@react-navigation/native";
 
 const AuthScreen = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(false); // false = inscription par défaut
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { theme } = useContext(ThemeContext);
 
   const handleSubmit = async () => {
     const route = isLogin ? "api/login" : "register";
@@ -66,22 +68,30 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   return (
-    <PageLayout style={styles.container}>
-      <Text style={styles.title}>CourtConnect</Text>
+    <PageLayout
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
+      <Text style={[styles.title, { color: theme.primary }]}>CourtConnect</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
-          placeholderTextColor={colors.white + "99"}
-          style={styles.input}
+          placeholderTextColor={theme.text + "99"}
+          style={[
+            styles.input,
+            { borderColor: theme.primary, color: theme.text },
+          ]}
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           placeholder="Mot de passe"
-          placeholderTextColor={colors.white + "99"}
+          placeholderTextColor={theme.text + "99"}
           secureTextEntry
-          style={styles.input}
+          style={[
+            styles.input,
+            { borderColor: theme.primary, color: theme.text },
+          ]}
           value={password}
           onChangeText={setPassword}
         />
@@ -93,7 +103,7 @@ const AuthScreen = ({ onLogin }) => {
       />
 
       <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-        <Text style={styles.link}>
+        <Text style={[styles.link, { color: theme.primary }]}>
           {isLogin ? "Créer un compte" : "Déjà inscrit ? Se connecter"}
         </Text>
       </TouchableOpacity>
@@ -104,14 +114,12 @@ const AuthScreen = ({ onLogin }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.darkBlue,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
   },
   title: {
     fontSize: 24,
-    color: colors.orange,
     fontWeight: "bold",
     marginBottom: 32,
   },
@@ -122,15 +130,12 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "transparent",
-    borderColor: colors.orange,
     borderWidth: 1,
     borderRadius: 8,
-    color: colors.white,
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
   link: {
-    color: colors.orange,
     marginTop: 16,
     textDecorationLine: "underline",
   },

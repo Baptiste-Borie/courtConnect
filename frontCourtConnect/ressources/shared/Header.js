@@ -1,14 +1,16 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useContext } from "react";
 
-import colors from "../constants/color";
+import { ThemeContext } from "../context/ThemeContext";
 import ReturnButton from "./ReturnButton";
 
 const Header = () => {
   const navigation = useNavigation();
+  const { theme } = useContext(ThemeContext);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.primary }]}>
       <ReturnButton
         style={styles.returnButton}
         onPress={() => {
@@ -22,11 +24,13 @@ const Header = () => {
 const styles = StyleSheet.create({
   container: {
     height: 80,
-    backgroundColor: colors.orange,
     position: "relative",
     justifyContent: "flex-end",
     paddingBottom: 10,
     paddingLeft: 10,
+  },
+  returnButton: {
+    // style éventuellement fourni via props
   },
 });
 
