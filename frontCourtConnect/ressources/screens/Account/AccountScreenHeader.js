@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
-import colors from "../../constants/color";
+import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
 
 export default function AccountScreenHeader() {
@@ -13,9 +13,12 @@ export default function AccountScreenHeader() {
   };
 
   const [showTooltip, setShowTooltip] = useState(false);
+  const { theme } = useContext(ThemeContext);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: theme.background_light }]}
+    >
       <View style={styles.headerTop}>
         <View style={styles.avatarContainer}>
           <Image
@@ -30,24 +33,34 @@ export default function AccountScreenHeader() {
 
         <View style={styles.content}>
           <View style={styles.info}>
-            <Text style={styles.name}>{data.name}</Text>
-            <Text style={styles.ageCity}>
+            <Text style={[styles.name, { color: theme.text }]}>
+              {data.name}
+            </Text>
+            <Text style={[styles.ageCity, { color: theme.text }]}>
               {data.age} ans{"\n"}
               {data.city}
             </Text>
           </View>
 
           <View style={styles.trustContainer}>
-            <Text style={styles.trustLabel}>
+            <Text style={[styles.trustLabel, { color: theme.primary }]}>
               Réputation : {data.trustability}/100
             </Text>
 
             <View style={styles.trustRow}>
-              <View style={styles.trustBarBackground}>
+              <View
+                style={[
+                  styles.trustBarBackground,
+                  { backgroundColor: theme.text + "33" },
+                ]}
+              >
                 <View
                   style={[
                     styles.trustBarFill,
-                    { width: `${data.trustability}%` },
+                    {
+                      width: `${data.trustability}%`,
+                      backgroundColor: theme.primary,
+                    },
                   ]}
                 />
               </View>
@@ -60,8 +73,16 @@ export default function AccountScreenHeader() {
               </TouchableOpacity>
 
               {showTooltip && (
-                <View style={styles.tooltip}>
-                  <Text style={styles.tooltipText}>
+                <View
+                  style={[
+                    styles.tooltip,
+                    {
+                      backgroundColor: theme.background,
+                      shadowColor: theme.text,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.tooltipText, { color: theme.text }]}>
                     La réputation augmente en créant {"\n"}et en participant à
                     des événements.
                   </Text>
@@ -74,13 +95,13 @@ export default function AccountScreenHeader() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 10,
-    backgroundColor: colors.lightBlue,
   },
   headerTop: {
     flexDirection: "row",
@@ -106,10 +127,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.white,
   },
   ageCity: {
-    color: colors.white,
     fontSize: 14,
     marginTop: 2,
   },
@@ -117,7 +136,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   trustLabel: {
-    color: colors.orange,
     fontSize: 14,
   },
   trustRow: {
@@ -127,13 +145,11 @@ const styles = StyleSheet.create({
   },
   trustBarBackground: {
     height: 6,
-    backgroundColor: colors.white,
     borderRadius: 3,
     flex: 1,
   },
   trustBarFill: {
     height: 6,
-    backgroundColor: colors.orange,
     borderRadius: 3,
   },
   trustIcon: {
@@ -142,18 +158,15 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
 
-  /* Tooltip */
   tooltip: {
     position: "absolute",
     bottom: -50,
     right: 10,
-    backgroundColor: colors.white,
     padding: 8,
     borderRadius: 6,
     maxWidth: 250,
     zIndex: 10,
     elevation: 4,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -163,6 +176,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     flexWrap: "wrap",
     lineHeight: 16,
-    color: colors.darkBlue,
   },
 });

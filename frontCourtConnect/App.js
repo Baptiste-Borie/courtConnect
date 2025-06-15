@@ -4,13 +4,62 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { ThemeProvider, useTheme } from "./ressources/context/ThemeContext";
 import AuthContext from "./ressources/context/AuthContext";
+
 import AuthScreen from "./ressources/screens/AuthScreen";
 import HomeScreen from "./ressources/screens/HomeScreen";
 import MapScreen from "./ressources/screens/MapScreen";
 import AccountScreen from "./ressources/screens/Account/AccountScreen";
+import EditProfileScreen from "./ressources/screens/Account/EditProfileScreen";
+import AccountSettings from "./ressources/screens/Account/AccountSettings";
 
 const Stack = createNativeStackNavigator();
+
+function AppContent({ isAuthenticated, setIsAuthenticated }) {
+  const { theme, themeName } = useTheme();
+
+  return (
+    <>
+      <StatusBar
+        barStyle={themeName === "dark" ? "light-content" : "dark-content"}
+        backgroundColor={theme.background}
+      />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Map" component={MapScreen} />
+          {isAuthenticated ? (
+            <>
+              <Stack.Screen name="Home">
+                {(props) => (
+                  <HomeScreen
+                    {...props}
+                    onLogout={() => setIsAuthenticated(false)}
+                  />
+                )}
+              </Stack.Screen>
+              <Stack.Screen name="Account" component={AccountScreen} />
+              <Stack.Screen name="EditAccount" component={EditProfileScreen} />
+              <Stack.Screen
+                name="AccountSettings"
+                component={AccountSettings}
+              />
+            </>
+          ) : (
+            <Stack.Screen name="Auth">
+              {(props) => (
+                <AuthScreen
+                  {...props}
+                  onLogin={() => setIsAuthenticated(true)}
+                />
+              )}
+            </Stack.Screen>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
+  );
+}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,48 +77,13 @@ export default function App() {
   if (loading) return null;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
-      <NavigationContainer>
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor="transparent"
-          translucent
+    <ThemeProvider>
+      <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+        <AppContent
+          isAuthenticated={isAuthenticated}
+          setIsAuthenticated={setIsAuthenticated}
         />
-
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Map" component={MapScreen} />
-
-          {isAuthenticated ? (
-            <>
-              <Stack.Screen name="Home">
-                {(props) => (
-                  <HomeScreen
-                    {...props}
-                    onLogout={() => setIsAuthenticated(false)}
-                  />
-                )}
-              </Stack.Screen>
-              <Stack.Screen name="Account">
-                {(props) => (
-                  <AccountScreen
-                    {...props}
-                    onLogout={() => setIsAuthenticated(false)}
-                  />
-                )}
-              </Stack.Screen>
-            </>
-          ) : (
-            <Stack.Screen name="Auth">
-              {(props) => (
-                <AuthScreen
-                  {...props}
-                  onLogin={() => setIsAuthenticated(true)}
-                />
-              )}
-            </Stack.Screen>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AuthContext.Provider>
+      </AuthContext.Provider>
+    </ThemeProvider>
   );
 }

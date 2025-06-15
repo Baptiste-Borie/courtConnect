@@ -2,21 +2,30 @@ import { useContext } from "react";
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import colors from "../constants/color";
 import assets from "../constants/assets";
 import AuthContext from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext";
 
 const Footer = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
   const { isAuthenticated } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
 
   const isActive = (name) => route.name === name;
 
   if (!isAuthenticated) {
     return (
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: theme.background_light,
+            borderTopColor: theme.primary,
+          },
+        ]}
+      >
         <TouchableOpacity
           onPress={() => navigation.navigate("Auth")}
           style={styles.navItem}
@@ -35,7 +44,15 @@ const Footer = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.background_light,
+          borderTopColor: theme.primary,
+        },
+      ]}
+    >
       <TouchableOpacity
         onPress={() => navigation.navigate("Home")}
         style={styles.navItem}
@@ -48,7 +65,7 @@ const Footer = () => {
         />
       </TouchableOpacity>
 
-      <View style={styles.separator} />
+      <View style={[styles.separator, { backgroundColor: theme.primary }]} />
 
       <TouchableOpacity
         onPress={() => navigation.navigate("Map")}
@@ -69,10 +86,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     height: 80,
-    backgroundColor: colors.lightBlue,
     paddingBottom: 10,
     borderTopWidth: 2,
-    borderTopColor: colors.orange,
   },
   navItem: {
     flex: 1,
@@ -80,7 +95,6 @@ const styles = StyleSheet.create({
   },
   separator: {
     width: 3,
-    backgroundColor: colors.orange,
     alignSelf: "stretch",
   },
   icon: {

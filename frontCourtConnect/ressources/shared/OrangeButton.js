@@ -1,18 +1,22 @@
+import React, { useContext } from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
-
-import colors from "../constants/color";
+import { ThemeContext } from "../context/ThemeContext";
 
 const OrangeButton = ({ title, onPress }) => {
+  const { theme } = useContext(ThemeContext);
+
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
-      <Text style={styles.text}>{title}</Text>
+    <TouchableOpacity
+      style={[styles.button, { backgroundColor: theme.primary }]}
+      onPress={onPress}
+    >
+      <Text style={[styles.text, { color: theme.text }]}>{title}</Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: colors.orange,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 25,
@@ -20,7 +24,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   text: {
-    color: colors.white,
     fontSize: 16,
     fontWeight: "500",
   },

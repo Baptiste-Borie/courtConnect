@@ -1,8 +1,9 @@
+import React, { useContext } from "react";
 import { StyleSheet, View } from "react-native";
 
 import Header from "./Header";
 import Footer from "./Footer";
-import colors from "../constants/color";
+import { ThemeContext } from "../context/ThemeContext";
 
 const PageLayout = ({
   children,
@@ -10,10 +11,16 @@ const PageLayout = ({
   showFooter = true,
   style = {},
 }) => {
+  const { theme } = useContext(ThemeContext);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {showHeader && <Header />}
-      <View style={[styles.content, style]}>{children}</View>
+      <View
+        style={[styles.content, { backgroundColor: theme.background }, style]}
+      >
+        {children}
+      </View>
       {showFooter && <Footer />}
     </View>
   );
@@ -22,11 +29,9 @@ const PageLayout = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
   },
   content: {
     flex: 1,
-    backgroundColor: colors.darkBlue,
   },
 });
 

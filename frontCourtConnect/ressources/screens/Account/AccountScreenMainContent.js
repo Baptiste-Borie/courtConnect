@@ -1,39 +1,67 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import colors from "../../constants/color";
+import { useNavigation } from "@react-navigation/native";
+
+import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
 
-const options = [
-  { icon: assets.icons.edit, label: "Modifier mon profil", onPress: () => {} },
-  {
-    icon: assets.icons.Settings,
-    label: "Paramètres du compte",
-    onPress: () => {},
-  },
-  {
-    icon: assets.icons.Star,
-    label: "Gérer l’abonnement",
-    onPress: () => {},
-  },
-  {
-    icon: assets.icons.heart,
-    label: "Terrains favoris",
-    onPress: () => {},
-  },
-];
-
 export default function AccountScreenMainContent() {
+  const navigation = useNavigation();
+  const { theme } = useContext(ThemeContext);
+
+  const options = [
+    {
+      icon: assets.icons.edit,
+      label: "Modifier mon profil",
+      onPress: () => navigation.navigate("EditAccount"),
+    },
+    {
+      icon: assets.icons.Settings,
+      label: "Paramètres du compte",
+      onPress: () => {
+        navigation.navigate("AccountSettings");
+      },
+    },
+    {
+      icon: assets.icons.Star,
+      label: "Gérer l’abonnement",
+      onPress: () => {},
+    },
+    {
+      icon: assets.icons.heart,
+      label: "Terrains favoris",
+      onPress: () => {},
+    },
+  ];
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: theme.background_light }]}
+    >
       {options.map((item, index) => (
         <View key={index}>
           <TouchableOpacity style={styles.item} onPress={item.onPress}>
-            <Image source={item.icon} style={styles.icon} />
-            <Text style={styles.label}>{item.label}</Text>
-            <Image source={assets.icons.chevron_right} style={styles.chevron} />
+            <Image
+              source={item.icon}
+              style={[styles.icon, { tintColor: theme.text }]}
+            />
+            <Text style={[styles.label, { color: theme.text }]}>
+              {item.label}
+            </Text>
+            <Image
+              source={assets.icons.chevron_right}
+              style={[styles.chevron, { tintColor: theme.text }]}
+            />
           </TouchableOpacity>
 
-          {index !== options.length - 1 && <View style={styles.separator} />}
+          {index !== options.length - 1 && (
+            <View
+              style={[
+                styles.separator,
+                { backgroundColor: theme.primary + "66" },
+              ]}
+            />
+          )}
         </View>
       ))}
     </View>
@@ -43,7 +71,6 @@ export default function AccountScreenMainContent() {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 16,
-    backgroundColor: colors.lightBlue,
     borderRadius: 12,
     paddingVertical: 4,
     width: "90%",
@@ -63,19 +90,16 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   label: {
-    color: colors.white,
     fontSize: 16,
   },
   chevron: {
     width: 12,
     height: 12,
-    tintColor: colors.white,
     position: "absolute",
     right: 16,
   },
   separator: {
     height: 1,
-    backgroundColor: colors.orange,
     marginHorizontal: 16,
   },
 });
