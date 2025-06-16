@@ -113,16 +113,46 @@ class EventController extends AbstractController
     public function joinEvent(Request $request, $id, EventManager $eventManager): JsonResponse
     {
         $user = $this->getUser();
+        $event = $this->eventRepository->find($id);
+        if (!$event) {
+            return $this->json(['message' => 'L\'evevenement n\'existe pas.'], 404);
+        }
 
         $eventDto = new EventDTO();
         $eventDto->joueur = $user;
-        $result = $eventManager->joinEvent($eventDto, $id);
+        $result = $eventManager->joinEvent($eventDto, $event);
 
         if (!$result) {
-            return $this->json(['message' => 'Événement non trouvé.'], 404);
+            return $this->json(['message' => 'Evenement deja rejoint'], 404);
         }
-        return $this->json([], 200, []);
+        return $this->json(['message' => 'Evenement rejoint avec succès'], 200, []);
 
+    }
+
+    #[Route('/api/leaveEvent/{id}', name: 'app_leave_event', methods: ['POST'])]
+    public function leaveEvent(Request $request, $id, EventManager $eventManager): JsonResponse
+    {
+        $user = $this->getUser();
+        $event = $this->eventRepository->find($id);
+
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non authentifié.'], 401);
+        }
+
+        if (!$event) {
+            return $this->json(['message' => 'Événement introuvable.'], 404);
+        }
+
+        $eventDto = new EventDTO();
+        $eventDto->joueur = $user;
+
+        $result = $eventManager->leaveEvent($eventDto, $event);
+
+        if (!$result) {
+            return $this->json(['message' => 'Vous n\'êtes pas inscrit à cet événement.'], 400);
+        }
+
+        return $this->json(['message' => 'Vous avez quitté l\'événement avec succès.'], 200);
     }
 
 }

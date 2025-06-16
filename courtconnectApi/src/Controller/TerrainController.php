@@ -25,7 +25,7 @@ class TerrainController extends AbstractController
     {
 
     }
-    #[Route('/api/getAllTerrains', name: 'app_get_all_terrains')]
+    #[Route('/api/getAllTerrains', name: 'app_get_all_terrains', methods: ['GET'])]
     public function getAllTerrains(): Response
     {
         $terrains = $this->terrainRepository->findAll();

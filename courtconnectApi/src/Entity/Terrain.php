@@ -75,7 +75,7 @@ class Terrain
     #[Groups(['terrain'])]
     private ?int $etat = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['terrain'])]
     private ?string $remarque = null;
 
@@ -316,7 +316,7 @@ class Terrain
         return $this->remarque;
     }
 
-    public function setRemarque(string $remarque): static
+    public function setRemarque(?string $remarque): static
     {
         $this->remarque = $remarque;
 
@@ -340,7 +340,7 @@ class Terrain
         return $this->image_url;
     }
 
-    public function setImageUrl(string $image): static
+    public function setImageUrl(?string $image): static
     {
         $this->image_url = $image;
 
