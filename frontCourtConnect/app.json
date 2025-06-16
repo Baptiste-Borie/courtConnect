@@ -12,6 +12,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Permettez à CourtConnect d'accéder à votre localisation !"
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true
     },
