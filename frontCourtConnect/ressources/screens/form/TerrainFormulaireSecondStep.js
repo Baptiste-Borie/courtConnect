@@ -9,33 +9,13 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import PageLayout from "../../shared/PageLayout";
 import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import RadioGroup from "../../shared/RadioGroup";
-
-const TYPE_PANIERS = {
-  Bois: 2,
-  Plexiglas: 3,
-  Acrylique: 4,
-  Polycarbonate: 5,
-  Métal: 6,
-  Composite: 7,
-};
-
-const TYPE_FILETS = {
-  Nylon: 3,
-  Chaîne: 4,
-  Plastique: 5,
-  "Sans filet": 6,
-};
-
-const TYPE_SOLS = {
-  Béton: 2,
-  Bitume: 3,
-  Résine: 4,
-  "Gazon Synthétique": 5,
-};
+import useTypeList from "../../customHooks/useTypeList";
 
 export default function TerrainFormulaireSecondStep({ route, navigation }) {
   const { theme, themeName } = useContext(ThemeContext);
@@ -48,55 +28,97 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
   const [zoneSpectateurs, setZoneSpectateurs] = useState(false);
   const [remarques, setRemarques] = useState("");
 
+  const { items: typesFilet, loading: loadingFilet } = useTypeList("filet");
+  const { items: typesPanier, loading: loadingPanier } = useTypeList("panier");
+  const { items: typesSol, loading: loadingSol } = useTypeList("sol");
+
+  const extractAdresseVilleCP = (adresse) => {
+    const cpVilleRegex = /(.+),\s*(\d{5})\s(.+)/;
+    const match = adresse.match(cpVilleRegex);
+    if (match) {
+      return {
+        adresse: match[1].trim(),
+        code_ostal: match[2],
+        ville: match[3].trim(),
+      };
+    }
+    return { adresse, code_postal: "", ville: "" }; // fallback si format non reconnux
+  };
+
   const handleValidation = async () => {
-    if (
-      !TYPE_PANIERS[typePanier] ||
-      !TYPE_FILETS[typeFilet] ||
-      !TYPE_SOLS[typeSol]
-    ) {
-      Alert.alert("Champs manquants", "Veuillez compléter tous les champs.");
+    const typePanierId = typesPanier.find(
+      (item) => item.nom === typePanier
+    )?.id;
+    const typeFiletId = typesFilet.find((item) => item.nom === typeFilet)?.id;
+    const typeSolId = typesSol.find((item) => item.nom === typeSol)?.id;
+
+    if (!typePanierId || !typeFiletId || !typeSolId) {
+      Alert.alert("Erreur", "Veuillez compléter tous les champs.");
       return;
     }
 
     try {
+      const token = await AsyncStorage.getItem("token");
+
+      const {
+        adresse: adresseSansVille,
+        codePostal,
+        ville,
+      } = extractAdresseVilleCP(adresse);
+
       const body = {
         nom,
-        adresse,
+        adresse: adresseSansVille,
+        ville,
+        codePostal,
         latitude: coords.latitude,
         longitude: coords.longitude,
         usure,
-        nombrePaniers,
-        typePanier: TYPE_PANIERS[typePanier],
-        typeFilet: TYPE_FILETS[typeFilet],
-        typeSol: TYPE_SOLS[typeSol],
-        zoneSpectateurs,
-        remarques,
+        nbPanier: nombrePaniers,
+        typePanier: typePanierId,
+        typeFilet: typeFiletId,
+        typeSol: typeSolId,
+        spectateur: zoneSpectateurs,
+        remarque: remarques,
       };
 
+      console.log("Body envoyé :", JSON.stringify(body, null, 2));
+
       const response = await fetch(
-        "https://courtconnect.alwaysdata.net/app_add_terrain",
+        "https://courtconnect.alwaysdata.net/api/addTerrain",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(body),
         }
       );
 
       if (!response.ok) {
-        throw new Error(`Erreur serveur : ${response.status}`);
+        const errorText = await response.text();
+        console.error("Réponse serveur :", errorText);
+        throw new Error(`Erreur serveur ${response.status}`);
       }
 
       const data = await response.json();
       console.log("Terrain ajouté :", data);
-      Alert.alert("Succès", "Le terrain a été ajouté avec succès.");
-      // navigation.navigate("Home"); // ou autre page
+      Alert.alert("Succès", "Le terrain a été ajouté avec succès !");
+      // navigation.navigate("Home");
     } catch (err) {
       console.error("Erreur :", err);
       Alert.alert("Erreur", "Impossible d'enregistrer le terrain.");
     }
   };
+
+  if (loadingFilet || loadingPanier || loadingSol) {
+    return (
+      <Text style={{ padding: 20, color: theme.text }}>
+        Chargement des types...
+      </Text>
+    );
+  }
 
   return (
     <PageLayout headerContent="Ajouter un terrain" showFooter={false}>
@@ -123,7 +145,11 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
           Type de panier
         </Text>
         <RadioGroup
-          options={Object.keys(TYPE_PANIERS)}
+          options={
+            Array.isArray(typesPanier)
+              ? typesPanier.map((item) => item.nom)
+              : []
+          }
           selected={typePanier}
           onChange={setTypePanier}
           theme={theme}
@@ -131,7 +157,9 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
 
         <Text style={[styles.label, { color: theme.text }]}>Type de filet</Text>
         <RadioGroup
-          options={Object.keys(TYPE_FILETS)}
+          options={
+            Array.isArray(typesFilet) ? typesFilet.map((item) => item.nom) : []
+          }
           selected={typeFilet}
           onChange={setTypeFilet}
           theme={theme}
@@ -139,7 +167,9 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
 
         <Text style={[styles.label, { color: theme.text }]}>Type de sol</Text>
         <RadioGroup
-          options={Object.keys(TYPE_SOLS)}
+          options={
+            Array.isArray(typesSol) ? typesSol.map((item) => item.nom) : []
+          }
           selected={typeSol}
           onChange={setTypeSol}
           theme={theme}
