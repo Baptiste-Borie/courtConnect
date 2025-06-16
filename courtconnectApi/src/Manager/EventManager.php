@@ -60,6 +60,9 @@ class EventManager
     }
 
     public function joinEvent(EventDTO $eventDTO, Event $event) {
+        if ($event->getJoueurs()->contains($eventDTO->joueur)) {
+            return null;
+        }
         $event->addJoueur($eventDTO->joueur);
         try {
             $this->em->persist($event);
@@ -69,4 +72,22 @@ class EventManager
             return null;
         }
     }
+
+    public function leaveEvent(EventDTO $eventDTO, Event $event): ?Event
+    {
+        if (!$event->getJoueurs()->contains($eventDTO->joueur)) {
+            return null;
+        }
+
+        $event->removeJoueur($eventDTO->joueur);
+
+        try {
+            $this->em->persist($event);
+            $this->em->flush();
+            return $event;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 }
