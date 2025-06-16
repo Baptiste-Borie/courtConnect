@@ -16,6 +16,7 @@ import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import MapBox from "../../shared/MapBox";
 import assets from "../../constants/assets";
+import OrangeButton from "../../shared/OrangeButton";
 
 export default function TerrainFormulaire({ navigation }) {
   const { theme } = useContext(ThemeContext);
@@ -55,6 +56,26 @@ export default function TerrainFormulaire({ navigation }) {
     } catch (e) {
       console.warn("Erreur reverse geocoding :", e);
     }
+  };
+
+  const handleGoToNextStep = () => {
+    if (!nom || !adresse) {
+      Alert.alert("Champs manquants", "Veuillez remplir tous les champs.");
+      return;
+    }
+    if (usure < 1 || usure > 5) {
+      Alert.alert(
+        "Usure invalide",
+        "Veuillez sélectionner une usure entre 1 et 5."
+      );
+      return;
+    }
+    navigation.navigate("AddTerrainSecond", {
+      nom,
+      adresse,
+      coords: selectedCoords,
+      usure,
+    });
   };
 
   const usureLabels = [
@@ -159,6 +180,8 @@ export default function TerrainFormulaire({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        <OrangeButton title="Suivant" onPress={handleGoToNextStep} />
       </View>
     </PageLayout>
   );

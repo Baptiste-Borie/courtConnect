@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
 
