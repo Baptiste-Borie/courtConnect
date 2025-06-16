@@ -27,9 +27,6 @@ class EventManager
         $newEvent->setEtat($eventDTO->etat);
         $newEvent->setTypeEvent($eventDTO->type_event);
 
-        $this->em->persist($newEvent);
-        $this->em->flush();
-
         try {
             $this->em->persist($newEvent);
             $this->em->flush();
@@ -52,9 +49,6 @@ class EventManager
         $event->setEtat($eventDTO->etat);
         $event->setTypeEvent($eventDTO->type_event);
 
-        $this->em->persist($event);
-        $this->em->flush();
-
         try {
             $this->em->persist($event);
             $this->em->flush();
@@ -63,5 +57,16 @@ class EventManager
             return null;
         }
 
+    }
+
+    public function joinEvent(EventDTO $eventDTO, Event $event) {
+        $event->addJoueur($eventDTO->joueur);
+        try {
+            $this->em->persist($event);
+            $this->em->flush();
+            return $event;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

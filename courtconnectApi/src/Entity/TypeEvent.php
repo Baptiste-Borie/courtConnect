@@ -14,11 +14,11 @@ class TypeEvent
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'type_event'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'type_event'])]
     private ?string $nom = null;
 
     /**

@@ -32,6 +32,18 @@ class EventController extends AbstractController
         return $this->json($terrain, 200, [], ['groups' => ['all_events']]);
     }
 
+    #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
+    public function getEventById(int $id): JsonResponse
+    {
+        $event = $this->eventRepository->find($id);
+
+        if (!$event) {
+            return $this->json(['message' => 'Evenement non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($event, Response::HTTP_OK, [], ['groups' => ['all_events']]);
+    }
+
 
     #[Route('/api/addEvent', name: 'app_add_event', methods: ['POST'])]
     public function addEvent(Request $request, EventManager $eventManager): JsonResponse
@@ -95,6 +107,22 @@ class EventController extends AbstractController
         }
 
         return $this->json($result, 200, [], ['groups' => ['all_events']]);
+    }
+
+    #[Route('/api/joinEvent/{id}', name: 'app_join_event', methods: ['POST'])]
+    public function joinEvent(Request $request, $id, EventManager $eventManager): JsonResponse
+    {
+        $user = $this->getUser();
+
+        $eventDto = new EventDTO();
+        $eventDto->joueur = $user;
+        $result = $eventManager->joinEvent($eventDto, $id);
+
+        if (!$result) {
+            return $this->json(['message' => 'Événement non trouvé.'], 404);
+        }
+        return $this->json([], 200, []);
+
     }
 
 }

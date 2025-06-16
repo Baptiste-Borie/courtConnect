@@ -25,7 +25,7 @@ class RefreshTokenController extends AbstractController
      *
      * @return JsonResponse Réponse JSON contenant un nouveau token JWT ou un message d’erreur en cas d’échec.
      */
-    #[Route('/api/token/refresh', name: 'refresh_token', methods: ['POST'])]
+    #[Route('/token/refresh', name: 'refresh_token', methods: ['POST'])]
     public function refreshToken(
         Request $request,
         RefreshTokenRepository $refreshTokenRepository,

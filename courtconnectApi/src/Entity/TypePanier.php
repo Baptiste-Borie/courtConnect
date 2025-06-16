@@ -14,11 +14,11 @@ class TypePanier
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'type_panier'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'type_panier'])]
     private ?string $nom = null;
 
     /**

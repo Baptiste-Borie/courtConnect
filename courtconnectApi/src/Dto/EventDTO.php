@@ -14,6 +14,7 @@ class EventDTO
     public $niveau;
     public $etat;
     public $type_event;
+    public $joueur;
 
 
 }
