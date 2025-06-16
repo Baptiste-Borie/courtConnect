@@ -15,7 +15,12 @@ const assets = {
     Settings: require("../../assets/Settings.png"),
     chevron_right: require("../../assets/Chevron_right.png"),
     chevron_left: require("../../assets/Chevron_left.png"),
+    marker: require("../../assets/marker.png"),
+    star: require("../../assets/star.png"),
+    star_filled: require("../../assets/star_filled.png"),
   },
+  terrain: require("../../assets/terrain.png"),
+  ballon: require("../../assets/ballon.png"),
 };
 
 export default assets;

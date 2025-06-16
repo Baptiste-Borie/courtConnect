@@ -1,7 +1,9 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, Switch } from "react-native";
+
 import { ThemeContext } from "../../context/ThemeContext";
 import PageLayout from "../../shared/PageLayout";
+
 const AccountSettings = () => {
   const { theme, toggleTheme, themeName } = useContext(ThemeContext);
 
