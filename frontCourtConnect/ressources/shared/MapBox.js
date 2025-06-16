@@ -2,18 +2,20 @@ import React, { useContext } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { ThemeContext } from "../context/ThemeContext";
+import assets from "../constants/assets";
 
 const MapBox = ({
-  width: mapWidth = "100%",
+  style = {},
   height = 200,
   region,
   centerMaker = false,
+  markers = [],
   onRegionChange = () => {},
 }) => {
   const { themeName } = useContext(ThemeContext);
 
   return (
-    <View style={{ width: mapWidth, height }}>
+    <View style={[{ flex: 1 }, { height }, style]}>
       <MapView
         style={StyleSheet.absoluteFill}
         userInterfaceStyle={themeName}
@@ -26,10 +28,21 @@ const MapBox = ({
           }
         }
         onRegionChangeComplete={onRegionChange}
-      />
+      >
+        {markers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={marker.coordinate}
+            title={marker.title}
+            description={marker.description}
+          />
+        ))}
+      </MapView>
 
       {centerMaker && (
-        <Marker coordinate={{ latitude, longitude }} title="Vous êtes ici" />
+        <View style={styles.markerFixed}>
+          <Image source={assets.icons.marker} style={styles.marker} />
+        </View>
       )}
     </View>
   );

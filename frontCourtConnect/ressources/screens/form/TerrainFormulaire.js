@@ -115,6 +115,7 @@ export default function TerrainFormulaire({ navigation }) {
         </Text>
 
         <MapBox
+          style={{ width: "100%", height: 250 }}
           centerMaker={true}
           region={{
             ...selectedCoords,
@@ -133,7 +134,7 @@ export default function TerrainFormulaire({ navigation }) {
 
             debounceTimer.current = setTimeout(() => {
               fetchAddress(region);
-            }, 600); // délai de 0.6 seconde de debounce
+            }, 600);
           }}
         />
 
