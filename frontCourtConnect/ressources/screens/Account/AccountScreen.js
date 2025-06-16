@@ -1,6 +1,5 @@
 import { StyleSheet, View } from "react-native";
 
-import OrangeButton from "../../shared/OrangeButton";
 import PageLayout from "../../shared/PageLayout";
 import AccountScreenHeader from "./AccountScreenHeader";
 import AccountScreenMainContent from "./AccountScreenMainContent";

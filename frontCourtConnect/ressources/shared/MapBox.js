@@ -1,20 +1,34 @@
-import { View, StyleSheet } from "react-native";
+import React, { useContext } from "react";
+import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
-const MapBox = ({ width = "100%", height = 200, region, markers = [] }) => {
+import { ThemeContext } from "../context/ThemeContext";
+import assets from "../constants/assets";
+
+const MapBox = ({
+  style = {},
+  height = 200,
+  region,
+  centerMaker = false,
+  markers = [],
+  onRegionChange = () => {},
+}) => {
+  const { themeName } = useContext(ThemeContext);
+
   return (
-    <View style={{ width, height }}>
+    <View style={[{ flex: 1 }, { height }, style]}>
       <MapView
         style={StyleSheet.absoluteFill}
-        userInterfaceStyle="dark"
+        userInterfaceStyle={themeName}
         initialRegion={
           region || {
-            latitude: 48.8566, // C'est centré sur Paris par défaut mais je te laisse le changer
+            latitude: 48.8566,
             longitude: 2.3522,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
           }
         }
+        onRegionChangeComplete={onRegionChange}
       >
         {markers.map((marker, index) => (
           <Marker
@@ -25,8 +39,28 @@ const MapBox = ({ width = "100%", height = 200, region, markers = [] }) => {
           />
         ))}
       </MapView>
+
+      {centerMaker && (
+        <View style={styles.markerFixed}>
+          <Image source={assets.icons.marker} style={styles.marker} />
+        </View>
+      )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  markerFixed: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginLeft: -12,
+    marginTop: -24,
+  },
+  marker: {
+    width: 48,
+    height: 48,
+  },
+});
 
 export default MapBox;

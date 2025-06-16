@@ -1,28 +1,33 @@
 import { useEffect, useRef } from "react";
-import MapView, { Marker } from 'react-native-maps';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-
+import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
 import PageLayout from "../shared/PageLayout";
 import useLocation from "../customHooks/useLocation";
-
+import MapBox from "../shared/MapBox";
 
 const MapScreen = ({ navigation }) => {
-
   const { latitude, longitude, errorMsg } = useLocation();
   const mapRef = useRef(null);
+
   useEffect(() => {
     if (latitude && longitude && mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }, 1000);
+      mapRef.current.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        1000
+      );
     }
   }, [latitude, longitude]);
 
   if (errorMsg) {
-    return <View><Text>{errorMsg}</Text></View>;
+    return (
+      <View>
+        <Text>{errorMsg}</Text>
+      </View>
+    );
   }
 
   if (!latitude || !longitude) {
@@ -31,27 +36,30 @@ const MapScreen = ({ navigation }) => {
 
   return (
     <PageLayout style={styles.container} showHeader={false}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        initialRegion={{
+      <MapBox
+        style={{ flex: 1 }}
+        region={{
           latitude,
           longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        showsUserLocation={true}
-      >
-        <Marker coordinate={{ latitude, longitude }} title="Vous êtes ici" />
-      </MapView>
+        markers={[
+          {
+            coordinate: { latitude, longitude },
+            title: "Vous êtes ici",
+          },
+        ]}
+      />
     </PageLayout>
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
 });
 
 export default MapScreen;

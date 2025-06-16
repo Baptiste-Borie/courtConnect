@@ -1,10 +1,12 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { View, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import assets from "../constants/assets";
-import AuthContext from "../context/AuthContext";
-import { ThemeContext } from "../context/ThemeContext";
+import assets from "../../constants/assets";
+import AuthContext from "../../context/AuthContext";
+import { ThemeContext } from "../../context/ThemeContext";
+import AddButton from "./AddButton";
+import AddModal from "../../screens/AddModal";
 
 const Footer = () => {
   const navigation = useNavigation();
@@ -12,6 +14,8 @@ const Footer = () => {
 
   const { isAuthenticated } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const isActive = (name) => route.name === name;
 
@@ -65,8 +69,20 @@ const Footer = () => {
         />
       </TouchableOpacity>
 
-      <View style={[styles.separator, { backgroundColor: theme.primary }]} />
+      <AddButton onPress={() => setModalVisible(true)} />
 
+      <AddModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onAddTerrain={() => {
+          setModalVisible(false);
+          navigation.navigate("AddTerrain");
+        }}
+        onAddEvent={() => {
+          setModalVisible(false);
+          navigation.navigate("CreateEvent");
+        }}
+      />
       <TouchableOpacity
         onPress={() => navigation.navigate("Map")}
         style={styles.navItem}
