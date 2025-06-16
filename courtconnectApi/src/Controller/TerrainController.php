@@ -25,13 +25,26 @@ class TerrainController extends AbstractController
     {
 
     }
-    #[Route('/api/getAllTerrains', name: 'app_terrain')]
-    public function getAll(): Response
+    #[Route('/api/getAllTerrains', name: 'app_get_all_terrains')]
+    public function getAllTerrains(): Response
     {
-        $terrain = $this->terrainRepository->findAll();
+        $terrains = $this->terrainRepository->findAll();
 
-        return $this->json($terrain, 200, [], ['groups' => ['terrain']]);
+        return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
+
+    #[Route('/api/getTerrain/{id}', name: 'app_get_terrain_by_id', methods: ['GET'])]
+    public function getTerrainById(int $id): JsonResponse
+    {
+        $terrain = $this->terrainRepository->find($id);
+
+        if (!$terrain) {
+            return $this->json(['message' => 'Terrain non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($terrain, Response::HTTP_OK, [], ['groups' => ['terrain']]);
+    }
+
 
 
     #[Route('/api/addTerrain', name: 'app_add_terrain', methods: ['POST'])]

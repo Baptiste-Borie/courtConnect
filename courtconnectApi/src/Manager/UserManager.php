@@ -34,7 +34,7 @@ class UserManager
 
     }
 
-    public function updateUser(UserDTO $userDTO, User $user) {
+    public function updateUser(UserDTO $userDTO, $user) {
 
         $user->setUsername($userDTO->username);
 //        $user->setPassword($userDTO->password);
