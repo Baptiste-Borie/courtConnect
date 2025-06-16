@@ -50,6 +50,15 @@ class EventController extends AbstractController
         return $this->handleEvent($request, $eventManager, $event);
     }
 
+    /**
+     * Gère la création ou la mise à jour d'un événement.
+     *
+     * @param Request $request         La requête HTTP contenant les données JSON de l'événement.
+     * @param EventManager $eventManager Le gestionnaire d'événements utilisé pour persister les données.
+     * @param Event|null $event        L'événement à mettre à jour, ou null pour en créer un nouveau.
+     *
+     * @return JsonResponse           Réponse JSON contenant l'événement créé/mis à jour ou un message d'erreur.
+     */
     private function handleEvent(Request $request, EventManager $eventManager, ?Event $event = null): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
