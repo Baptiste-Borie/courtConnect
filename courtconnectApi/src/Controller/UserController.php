@@ -20,8 +20,12 @@ class UserController extends AbstractController
 
     }
 
+    /**
+     * Récupère les informations de l'utilisateur connecté
+     * @return JsonResponse
+     */
     #[Route('/api/userConnected', name: 'app_user_connected', methods: ['GET'])]
-    public function userConnected(Request $request): JsonResponse
+    public function userConnected(): JsonResponse
     {
         return $this->json($this->getUser(), 200, [], ['groups' => ['user']]);
 

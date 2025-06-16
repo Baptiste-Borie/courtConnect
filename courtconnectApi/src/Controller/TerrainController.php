@@ -64,6 +64,18 @@ class TerrainController extends AbstractController
         return $this->handleTerrain($request, $terrainManager, $terrain);
     }
 
+    /**
+     * Crée ou met à jour un terrain selon que l'entité $terrain est fournie ou non.
+     *
+     * Cette méthode récupère les données JSON envoyées dans la requête, les mappe dans un DTO,
+     * puis délègue la création ou la mise à jour du terrain au TerrainManager.
+     *
+     * @param Request $request La requête HTTP contenant les données du terrain au format JSON.
+     * @param TerrainManager $terrainManager Le service responsable de la logique métier liée aux terrains.
+     * @param Terrain|null $terrain L'entité Terrain à mettre à jour, ou null pour une création.
+     *
+     * @return JsonResponse Réponse JSON contenant le terrain créé ou mis à jour, ou un message d’erreur.
+     */
     private function handleTerrain(Request $request, TerrainManager $terrainManager, ?Terrain $terrain = null): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -91,7 +103,7 @@ class TerrainController extends AbstractController
         $dto->createdBy = $user;
         $dto->remarque = $data['remarque'];
         $dto->usure = $data['usure'];
-        $dto->image_url = $data['imageUrl'] ?? null; // correction ici
+        $dto->image_url = $data['imageUrl'] ?? null;
 
         $result = $terrain
             ? $terrainManager->updateTerrain($dto, $terrain)
