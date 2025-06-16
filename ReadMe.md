@@ -2,7 +2,7 @@
 
 compte :
 
-courtconnect2025@gmail.fr
+courtconnect2025@gmail.com
 lpweb2025
 
 
