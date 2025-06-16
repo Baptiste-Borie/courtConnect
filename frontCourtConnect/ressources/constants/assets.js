@@ -11,7 +11,7 @@ const assets = {
     info_active: require("../../assets/Info_orange.png"),
     edit: require("../../assets/Edit.png"),
     heart: require("../../assets/Heart.png"),
-    Star: require("../../assets/Star.png"),
+    Star: require("../../assets/Star_white.png"),
     Settings: require("../../assets/Settings.png"),
     chevron_right: require("../../assets/Chevron_right.png"),
     chevron_left: require("../../assets/Chevron_left.png"),
