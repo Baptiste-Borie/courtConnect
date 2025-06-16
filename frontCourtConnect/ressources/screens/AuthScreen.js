@@ -11,7 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import OrangeButton from "../shared/OrangeButton";
 import PageLayout from "../shared/PageLayout";
-import { ThemeContext } from "@react-navigation/native";
+import { ThemeContext } from "../context/ThemeContext";
 
 const AuthScreen = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(false); // false = inscription par défaut

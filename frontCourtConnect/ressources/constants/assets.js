@@ -1,5 +1,3 @@
-import { Settings } from "react-native";
-
 const assets = {
   icons: {
     home: require("../../assets/Home.png"),
