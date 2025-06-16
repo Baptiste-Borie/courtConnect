@@ -38,7 +38,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
     if (match) {
       return {
         adresse: match[1].trim(),
-        code_ostal: match[2],
+        codePostal: match[2],
         ville: match[3].trim(),
       };
     }
@@ -105,7 +105,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
       const data = await response.json();
       console.log("Terrain ajouté :", data);
       Alert.alert("Succès", "Le terrain a été ajouté avec succès !");
-      // navigation.navigate("Home");
+      navigation.navigate("Home");
     } catch (err) {
       console.error("Erreur :", err);
       Alert.alert("Erreur", "Impossible d'enregistrer le terrain.");
