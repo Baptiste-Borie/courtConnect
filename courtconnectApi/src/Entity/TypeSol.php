@@ -14,11 +14,11 @@ class TypeSol
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'type_sol'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'type_sol'])]
     private ?string $nom = null;
 
     /**

@@ -14,23 +14,23 @@ class Terrain
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?string $ville = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?string $code_postal = null;
 
     #[ORM\Column]

@@ -14,11 +14,11 @@ class TypeFilet
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'type_filet'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'type_filet'])]
     private ?string $nom = null;
 
     /**

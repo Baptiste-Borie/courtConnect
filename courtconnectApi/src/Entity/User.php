@@ -17,18 +17,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain', 'user'])]
+    #[Groups(['terrain', 'user', 'all_events'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['terrain', 'user'])]
+    #[Groups(['terrain', 'user', 'all_events'])]
     private ?string $username = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['terrain', 'user'])]
+    #[Groups(['terrain', 'user', 'all_events'])]
     private array $roles = [];
 
     /**
@@ -38,15 +38,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user'])]
+    #[Groups(['terrain', 'user', 'all_events'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user'])]
+    #[Groups(['terrain', 'user', 'all_events'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user'])]
+    #[Groups(['terrain', 'user', 'all_events'])]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
