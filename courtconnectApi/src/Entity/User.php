@@ -72,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $favori;
 
     #[ORM\Column]
+    #[Groups(['terrain', 'user'])]
     private ?int $trustability = null;
 
     public function __construct()
