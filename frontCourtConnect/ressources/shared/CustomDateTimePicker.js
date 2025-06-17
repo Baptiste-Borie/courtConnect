@@ -130,7 +130,6 @@ export default function CustomDateTimePicker({
                     newDate.setDate(tempDay);
                     setTempDateTime(newDate);
                     onChange?.(newDate);
-                    console.log("Date validée :", newDate);
                     setShowDateModal(false);
                   }}
                   style={[
@@ -194,7 +193,6 @@ export default function CustomDateTimePicker({
                     newDate.setMinutes(tempMinute);
                     setTempDateTime(newDate);
                     onChange?.(newDate);
-                    console.log("Heure validée :", newDate);
                     setShowTimeModal(false);
                   }}
                   style={[
