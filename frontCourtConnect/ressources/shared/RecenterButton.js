@@ -14,8 +14,6 @@ const RecenterButton = ({ mapRef, latitude, longitude }) => {
                 },
                 1000
             );
-        } else {
-            console.log("Référence de la carte ou coordonnées non disponibles !");
         }
     };
 
