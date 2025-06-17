@@ -5,6 +5,7 @@ const routeMap = {
   filet: "getAllTypeFilet",
   panier: "getAllTypePanier",
   sol: "getAllTypeSol",
+  event: "getAllTypeEvent",
 };
 
 const useTypeList = (type) => {

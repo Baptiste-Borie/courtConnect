@@ -80,7 +80,7 @@ const Footer = () => {
         }}
         onAddEvent={() => {
           setModalVisible(false);
-          navigation.navigate("CreateEvent");
+          navigation.navigate("AddEvent");
         }}
       />
       <TouchableOpacity
