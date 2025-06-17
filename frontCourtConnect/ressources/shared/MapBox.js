@@ -4,13 +4,15 @@ import MapView, { Marker } from "react-native-maps";
 
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
+import MarkerCourt from "./MarkerCourt";
 
 const MapBox = ({
   style = {},
   height = 200,
   region,
   centerMaker = false,
-  markers = [],
+  userLocation ,
+  terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
   const { themeName } = useContext(ThemeContext);
@@ -25,7 +27,7 @@ const MapBox = ({
           "-" +
           region?.longitude +
           "-" +
-          markers
+          terrainMarkers
             .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
             .join("|")
         }
@@ -39,14 +41,20 @@ const MapBox = ({
         }
         onRegionChangeComplete={onRegionChange}
       >
-        {markers.map((marker, index) => (
+        {userLocation && (
+          <Marker
+            coordinate={userLocation.coordinate}
+            title={userLocation.title}
+            pinColor="blue"
+          />
+        )}
+        {terrainMarkers.map((marker, index) => (
           <Marker
             key={index}
             coordinate={marker.coordinate}
             title={marker.title}
-            description={marker.description}
-          />
-        ))}
+            pinColor="orange"
+          />))}
       </MapView>
 
       {centerMaker && (
