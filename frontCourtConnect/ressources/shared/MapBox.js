@@ -11,10 +11,13 @@ const MapBox = ({
   height = 200,
   region,
   centerMaker = false,
+  userLocation = [],
+  terrainMarkers = [], 
   userLocation ,
   terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
+  
   console.log("Marker de la position:"+ JSON.stringify(userLocation, null, 2))
   console.log("Markers des terrains:"+ JSON.stringify(terrainMarkers, null, 2))
 
