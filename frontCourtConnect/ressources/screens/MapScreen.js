@@ -32,7 +32,7 @@ const MapScreen = ({ navigation }) => {
     const fetchTerrains = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        const response = await fetch("https://courtconnect.alwaysdata.net/api/getAllPendingTerrains", {
+        const response = await fetch("https://courtconnect.alwaysdata.net/api/getAllValidatedTerrains", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -94,7 +94,6 @@ const MapScreen = ({ navigation }) => {
           coordinate: { latitude, longitude },
           title: "Vous êtes ici",
         }}
-
         terrainMarkers={terrainMarkers}
       />
     </PageLayout>

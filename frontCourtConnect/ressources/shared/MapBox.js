@@ -51,11 +51,11 @@ const MapBox = ({
           />
         )}
         {terrainMarkers.map((marker, index) => (
-          <MarkerCourt
+          <Marker
             key={index}
             coordinate={marker.coordinate}
             title={marker.title}
-            description={marker.description}
+            pinColor="orange"
           />))}
       </MapView>
 
