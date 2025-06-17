@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrangeButton from "../../shared/OrangeButton";
 import PageLayout from "../../shared/PageLayout";
 import { ThemeContext } from "../../context/ThemeContext";
+import { authFetch } from "../../utils/AuthFetch";
 
 export default function EditProfileScreen({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
@@ -26,45 +27,37 @@ export default function EditProfileScreen({ navigation, route }) {
 
   const handleSubmit = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert("Non autorisé", "Vous devez être connecté.");
-        return;
-      }
+      const payload = {
+        username,
+        pseudo,
+        nom,
+        prenom,
+        imageUrl,
+        trustability: 0,
+      };
 
-      const response = await fetch(
-        "https://courtconnect.alwaysdata.net/api/updateUser",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            username,
-            pseudo,
-            nom,
-            prenom,
-            imageUrl,
-            trustability: 0,
-          }),
-        }
-      );
+      const data = await authFetch("api/updateUser", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert(
-          "Profil mis à jour",
-          "Vos informations ont été enregistrées."
+      if (!data) {
+        throw new Error(
+          data.message || "Erreur lors de la mise à jour du profil."
         );
-        navigation.navigate("Account", { refresh: true });
-      } else {
-        Alert.alert("Erreur", data.message || "Une erreur est survenue.");
       }
+
+      Alert.alert(
+        "Profil mis à jour",
+        "Vos informations ont été enregistrées."
+      );
+      navigation.navigate("Account", { refresh: true });
     } catch (error) {
       console.error("Erreur :", error);
-      Alert.alert("Erreur réseau", "Impossible de mettre à jour votre profil.");
+      Alert.alert(
+        "Erreur",
+        error.message || "Impossible de mettre à jour votre profil."
+      );
     }
   };
 
