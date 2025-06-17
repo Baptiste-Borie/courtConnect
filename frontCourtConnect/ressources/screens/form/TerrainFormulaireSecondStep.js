@@ -16,6 +16,7 @@ import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import RadioGroup from "../../shared/RadioGroup";
 import useTypeList from "../../customHooks/useTypeList";
+import { authFetch } from "../../utils/AuthFetch";
 
 export default function TerrainFormulaireSecondStep({ route, navigation }) {
   const { theme, themeName } = useContext(ThemeContext);
@@ -82,17 +83,10 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         remarque: remarques,
       };
 
-      const response = await fetch(
-        "https://courtconnect.alwaysdata.net/api/addTerrain",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await authFetch("api/addTerrain", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -119,7 +113,13 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
 
   return (
     <PageLayout headerContent="Ajouter un terrain" showFooter={false}>
-      <StepTracker currentStep={2} />
+      <StepTracker
+        currentStep={2}
+        onStepChange={(step) => {
+          if (step === 1) navigation.goBack();
+        }}
+      />
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.label, { color: theme.text }]}>
           Nombres de paniers

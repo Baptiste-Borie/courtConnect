@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { authFetch } from "../utils/AuthFetch";
 
 const routeMap = {
   filet: "getAllTypeFilet",
@@ -21,17 +22,7 @@ const useTypeList = (type) => {
 
     const fetchTypes = async () => {
       try {
-        const token = await AsyncStorage.getItem("token");
-
-        const res = await fetch(
-          `https://courtconnect.alwaysdata.net/api/${route}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-          }
-        );
+        const res = await authFetch(`api/${route}`);
 
         const data = await res.json();
         setItems(data);
