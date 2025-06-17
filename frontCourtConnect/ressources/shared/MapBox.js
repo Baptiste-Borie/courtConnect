@@ -10,9 +10,11 @@ const MapBox = ({
   height = 200,
   region,
   centerMaker = false,
-  markers = [],
+  userLocation = [],
+  terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
+  
   const { themeName } = useContext(ThemeContext);
 
   return (
@@ -20,6 +22,15 @@ const MapBox = ({
       <MapView
         style={StyleSheet.absoluteFill}
         userInterfaceStyle={themeName}
+        // key={
+        //   region?.latitude +
+        //   "-" +
+        //   region?.longitude +
+        //   "-" +
+        //   markers
+        //     .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
+        //     .join("|")
+        // }
         initialRegion={
           region || {
             latitude: 48.8566,
@@ -30,14 +41,20 @@ const MapBox = ({
         }
         onRegionChangeComplete={onRegionChange}
       >
-        {markers.map((marker, index) => (
+        {userLocation.map((marker, index) => (
           <Marker
             key={index}
             coordinate={marker.coordinate}
             title={marker.title}
             description={marker.description}
-          />
-        ))}
+          />))}
+        {terrainMarkers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={marker.coordinate}
+            title={marker.title}
+            description={marker.description}
+          />))}
       </MapView>
 
       {centerMaker && (
