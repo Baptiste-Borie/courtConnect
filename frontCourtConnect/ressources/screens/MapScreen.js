@@ -47,7 +47,6 @@ const MapScreen = ({ navigation }) => {
           },
           title: terrain.nom,
         }));
-        console.log("Coordonnées actuelles :", latitude, longitude);
         setTerrainMarkers(markers);
       } catch (error) {
         console.error("Erreur de récupération des terrains :", error);
