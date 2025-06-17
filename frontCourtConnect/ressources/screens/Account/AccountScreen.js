@@ -32,7 +32,6 @@ export default function AccountScreen({ navigation }) {
           }
 
           const user = await res.json();
-          console.log("b:", user);
           setData(user);
         } catch (err) {
           console.error("Erreur fetch userConnected :", err);
