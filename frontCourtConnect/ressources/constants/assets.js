@@ -19,6 +19,7 @@ const assets = {
     star: require("../../assets/star.png"),
     star_filled: require("../../assets/star_filled.png"),
     time: require("../../assets/Hourglass.png"),
+    logout: require("../../assets/logout.png"),
   },
   terrain: require("../../assets/terrain.png"),
   ballon: require("../../assets/ballon.png"),

@@ -10,13 +10,14 @@ const PageLayout = ({
   showHeader = true,
   showFooter = true,
   headerContent = null,
+  onLogout = null,
   style = {},
 }) => {
   const { theme } = useContext(ThemeContext);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {showHeader && <Header content={headerContent} />}
+      {showHeader && <Header content={headerContent} onLogout={onLogout} />}
       <View
         style={[styles.content, { backgroundColor: theme.background }, style]}
       >
