@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Dto\TerrainDTO;
 use App\Dto\VoteDTO;
 use App\Entity\Terrain;
+use App\Entity\User;
 use App\Manager\TerrainManager;
 use App\Manager\VoteManager;
 use App\Repository\TerrainRepository;
@@ -12,6 +13,7 @@ use App\Repository\TypeFiletRepository;
 use App\Repository\TypePanierRepository;
 use App\Repository\TypeSolRepository;
 use App\Repository\VoteRepository;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +33,13 @@ class TerrainController extends AbstractController
     {
 
     }
+
+    /**
+     * Récupère tous les terrains validés (état = 1) triés par date de création décroissante
+     *
+     * @return JsonResponse 200: Liste des terrains validés formatés selon le groupe de sérialisation 'terrain'
+     *
+     */
     #[Route('/getAllValidatedTerrains', name: 'app_get_all_validated_terrains', methods: ['GET'])]
     public function getAllValidatedTerrains(): Response
     {
@@ -39,6 +48,15 @@ class TerrainController extends AbstractController
         return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
 
+
+    /**
+     * Récupère tous les terrains en attente de validation (état = 0)
+     *
+     * Les résultats sont triés par date de création ascendante
+     *
+     * @return JsonResponse
+     *   - 200: Liste des terrains en attente
+     */
     #[Route('/api/getAllPendingTerrains', name: 'app_get_all_pending_terrains', methods: ['GET'])]
     public function getAllPendingTerrains(): Response
     {
@@ -47,6 +65,15 @@ class TerrainController extends AbstractController
         return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
 
+    /**
+     * Récupère tous les terrains pour lesquels l'utilisateur connecté n'a pas encore voté
+     *
+     * @return JsonResponse
+     *   - 200: Liste des terrains non votés
+     *   - 401: Utilisateur non authentifié
+     *
+     * @throws Exception Si une erreur survient lors de la récupération des terrains
+     */
     #[Route('/api/getAllNoVotedTerrains', name: 'app_get_all_no_voted_terrains', methods: ['GET'])]
     public function getAllNoVotedTerrains(): Response
     {
@@ -151,15 +178,27 @@ class TerrainController extends AbstractController
     #[Route('/api/terrain/{id}/validate', name: 'app_validate_terrain', methods: ['POST'])]
     public function validateTerrain($id): Response
     {
-        return $this->handleTerrainEtatChange($id, 1, $this->terrainManager);
+        return $this->handleTerrainEtatChange($id, 1);
     }
 
     #[Route('/api/terrain/{id}/refuse', name: 'app_refuse_terrain', methods: ['POST'])]
     public function refuseTerrain($id): Response
     {
-        return $this->handleTerrainEtatChange($id, 2, $this->terrainManager);
+        return $this->handleTerrainEtatChange($id, 2);
     }
 
+
+    /**
+     * Gère le changement d'état d'un terrain via un vote utilisateur
+     *
+     * @param mixed $id ID du terrain
+     * @param int $etat État du vote (1 = validé, autre = refusé)
+     * @return Response
+     *   - 200: Vote enregistré avec succès
+     *   - 500: Erreur lors du traitement
+     *
+     * @throws Exception Si l'utilisateur a déjà voté ou si le terrain n'existe pas
+     */
     private function handleTerrainEtatChange($id, int $etat): Response
     {
         $terrain = $this->terrainRepository->find($id);
@@ -194,6 +233,19 @@ class TerrainController extends AbstractController
         return $this->json(['message' => $message], 200);
     }
 
+
+    /**
+     * Change l'état d'un terrain en fonction des votes reçus
+     *
+     * - Valide le terrain (état = 1) si 3 votes valides ou plus
+     * - Supprime le terrain si 3 votes refusés ou plus
+     *
+     * @param int $id ID du terrain à modifier
+     * @param TerrainManager $terrainManager Service de gestion des terrains
+     * @return JsonResponse
+     *   - 200: Succès ou seuil non atteint
+     *   - 500: Erreur ou terrain non trouvé
+     */
     public function changeEtatTerrain(int $id, TerrainManager $terrainManager): JsonResponse
     {
         $terrain = $this->terrainRepository->find($id);
@@ -221,7 +273,15 @@ class TerrainController extends AbstractController
         return $this->json(['message' => "L'état du terrain a été mis à jour avec succès."], 200);
     }
 
-    public function hasUserVoted($user, Terrain $terrain): bool
+
+    /**
+     * Vérifie si un utilisateur a déjà voté pour un terrain donné
+     *
+     * @param User $user L'utilisateur à vérifier
+     * @param Terrain $terrain Le terrain concerné
+     * @return bool True si l'utilisateur a déjà voté, false sinon
+     */
+    public function hasUserVoted(User $user, Terrain $terrain): bool
     {
         return $this->voteRepository->findOneBy([
                 'user' => $user,
