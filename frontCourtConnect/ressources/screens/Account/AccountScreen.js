@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { authFetch } from "../../utils/AuthFetch";
 import PageLayout from "../../shared/PageLayout";
 import AccountScreenHeader from "./AccountScreenHeader";
 import AccountScreenMainContent from "./AccountScreenMainContent";
@@ -13,17 +13,9 @@ export default function AccountScreen({ navigation }) {
     React.useCallback(() => {
       const fetchUser = async () => {
         try {
-          const token = await AsyncStorage.getItem("token");
-          const res = await fetch(
-            "https://courtconnect.alwaysdata.net/api/userConnected",
-            {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          const res = await authFetch("api/userConnected", {
+            method: "GET",
+          });
 
           if (!res.ok) {
             const errText = await res.text();

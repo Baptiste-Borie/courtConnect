@@ -35,6 +35,11 @@ export default function AccountScreenMainContent({ data }) {
       label: "Terrains favoris",
       onPress: () => {},
     },
+    {
+      icon: assets.icons.time,
+      label: "Terrains en attente",
+      onPress: () => {},
+    },
   ];
 
   return (
