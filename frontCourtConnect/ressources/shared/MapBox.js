@@ -25,15 +25,15 @@ const MapBox = ({
       <MapView
         style={StyleSheet.absoluteFill}
         userInterfaceStyle={themeName}
-        // key={
-        //   region?.latitude +
-        //   "-" +
-        //   region?.longitude +
-        //   "-" +
-        //   markers
-        //     .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
-        //     .join("|")
-        // }
+        key={
+          region?.latitude +
+          "-" +
+          region?.longitude +
+          "-" +
+          terrainMarkers
+            .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
+            .join("|")
+        }
         initialRegion={
           region || {
             latitude: 48.8566,
@@ -52,11 +52,11 @@ const MapBox = ({
           />
         )}
         {terrainMarkers.map((marker, index) => (
-          <MarkerCourt
+          <Marker
             key={index}
             coordinate={marker.coordinate}
             title={marker.title}
-            description={marker.description}
+            pinColor="orange"
           />))}
       </MapView>
 
