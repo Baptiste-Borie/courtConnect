@@ -16,7 +16,6 @@ const MapBox = ({
   terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
-  
   const { themeName } = useContext(ThemeContext);
 
   return (
