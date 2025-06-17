@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Dto\TerrainDTO;
+use App\Dto\VoteDTO;
 use App\Entity\Terrain;
+use App\Entity\User;
 use App\Manager\TerrainManager;
+use App\Manager\VoteManager;
 use App\Repository\TerrainRepository;
 use App\Repository\TypeFiletRepository;
 use App\Repository\TypePanierRepository;
 use App\Repository\TypeSolRepository;
+use App\Repository\VoteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,17 +25,42 @@ class TerrainController extends AbstractController
                                 private TypeSolRepository $typeSolRepository,
                                 private TypePanierRepository $typePanierRepository,
                                 private TypeFiletRepository $typeFiletRepository,
+                                private VoteManager $voteManager,
+                                private TerrainManager $terrainManager,
+                                private VoteRepository $voteRepository,
     )
     {
 
     }
-    #[Route('/api/getAllTerrains', name: 'app_get_all_terrains', methods: ['GET'])]
-    public function getAllTerrains(): Response
+    #[Route('/api/getAllValidatedTerrains', name: 'app_get_all_validated_terrains', methods: ['GET'])]
+    public function getAllValidatedTerrains(): Response
     {
-        $terrains = $this->terrainRepository->findAll();
+        $terrains = $this->terrainRepository->findBy(['etat' => 1], ['created_at' => 'DESC']);
 
         return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
+
+    #[Route('/api/getAllPendingTerrains', name: 'app_get_all_pending_terrains', methods: ['GET'])]
+    public function getAllPendingTerrains(): Response
+    {
+        $terrains = $this->terrainRepository->findBy(['etat' => 0], ['created_at' => 'ASC']);
+
+        return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
+    }
+
+    #[Route('/api/getAllNoVotedTerrains', name: 'app_get_all_no_voted_terrains', methods: ['GET'])]
+    public function getAllNoVotedTerrains(): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $terrains = $this->terrainRepository->findTerrainsNotVotedByUser($user);
+
+        return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
+    }
+
 
     #[Route('/api/getTerrain/{id}', name: 'app_get_terrain_by_id', methods: ['GET'])]
     public function getTerrainById(int $id): JsonResponse
@@ -48,20 +77,20 @@ class TerrainController extends AbstractController
 
 
     #[Route('/api/addTerrain', name: 'app_add_terrain', methods: ['POST'])]
-    public function addTerrain(Request $request, TerrainManager $terrainManager): JsonResponse
+    public function addTerrain(Request $request): JsonResponse
     {
-        return $this->handleTerrain($request, $terrainManager);
+        return $this->handleTerrain($request);
     }
 
     #[Route('/api/updateTerrain/{id}', name: 'app_update_terrain', methods: ['POST'])]
-    public function updateTerrain(Request $request, TerrainManager $terrainManager, $id): JsonResponse
+    public function updateTerrain(Request $request, $id): JsonResponse
     {
         $terrain = $this->terrainRepository->find($id);
         if (!$terrain) {
             return $this->json(['message' => 'Terrain non trouvé.'], 404);
         }
 
-        return $this->handleTerrain($request, $terrainManager, $terrain);
+        return $this->handleTerrain($request, $terrain);
     }
 
     /**
@@ -71,12 +100,11 @@ class TerrainController extends AbstractController
      * puis délègue la création ou la mise à jour du terrain au TerrainManager.
      *
      * @param Request $request La requête HTTP contenant les données du terrain au format JSON.
-     * @param TerrainManager $terrainManager Le service responsable de la logique métier liée aux terrains.
      * @param Terrain|null $terrain L'entité Terrain à mettre à jour, ou null pour une création.
      *
      * @return JsonResponse Réponse JSON contenant le terrain créé ou mis à jour, ou un message d’erreur.
      */
-    private function handleTerrain(Request $request, TerrainManager $terrainManager, ?Terrain $terrain = null): JsonResponse
+    private function handleTerrain(Request $request, ?Terrain $terrain = null): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $user = $this->getUser();
@@ -106,8 +134,8 @@ class TerrainController extends AbstractController
         $dto->image_url = $data['imageUrl'] ?? null;
 
         $result = $terrain
-            ? $terrainManager->updateTerrain($dto, $terrain)
-            : $terrainManager->addTerrain($dto);
+            ? $this->terrainManager->updateTerrain($dto, $terrain)
+            : $this->terrainManager->addTerrain($dto);
 
         if (!$result) {
             return $this->json([
@@ -120,6 +148,87 @@ class TerrainController extends AbstractController
         return $this->json($result, 200, [], ['groups' => ['terrain']]);
     }
 
+
+    #[Route('/api/terrain/{id}/validate', name: 'app_validate_terrain', methods: ['POST'])]
+    public function validateTerrain($id): Response
+    {
+        return $this->handleTerrainEtatChange($id, 1, $this->terrainManager);
+    }
+
+    #[Route('/api/terrain/{id}/refuse', name: 'app_refuse_terrain', methods: ['POST'])]
+    public function refuseTerrain($id): Response
+    {
+        return $this->handleTerrainEtatChange($id, 2, $this->terrainManager);
+    }
+
+    private function handleTerrainEtatChange($id, int $etat): Response
+    {
+        $terrain = $this->terrainRepository->find($id);
+        if (!$terrain) {
+            return $this->json(['message' => 'Terrain non trouvé.'], 500);
+        }
+        $hasVoted = $this->hasUserVoted($this->getUser(), $terrain);
+        if ($hasVoted) {
+            return $this->json(['message' => 'Vous avez deja voter pour ce terrain.'], 500);
+        }
+
+        $dto = new TerrainDTO();
+        if ($etat === 1) {
+            $dto->voteValide = 1;
+        } else {
+            $dto->voteRefuse = 1;
+        }
+
+        $voteDto = new VoteDTO();
+        $voteDto->resultat = $etat;
+        $result = $this->terrainManager->incrementVote($dto, $terrain);
+        $vote = $this->voteManager->addVote($voteDto, $this->getUser(), $terrain);
+
+        if (!$result) {
+            return $this->json(['message' => "Erreur lors du changement d'état du terrain."], 500);
+        }
+        if (!$vote) {
+            return $this->json(['message' => "Erreur lors de l'enregistrement du vote."], 500);
+        }
+        $this->changeEtatTerrain($id, $this->terrainManager);
+        $message = $etat === 1 ? 'Vote de validation enregistré.' : 'Vote de refus enregistré.';
+        return $this->json(['message' => $message], 200);
+    }
+
+    public function changeEtatTerrain(int $id, TerrainManager $terrainManager): JsonResponse
+    {
+        $terrain = $this->terrainRepository->find($id);
+        if (!$terrain) {
+            return $this->json(['message' => "Terrain non trouvé."], 500);
+        }
+
+        $terrainDto = new TerrainDTO();
+        $result = null;
+
+        if ($terrain->getVoteValide() >= 3) {
+            $terrainDto->etat = 1;
+            $result = $terrainManager->changeEtatTerrain($terrain, $terrainDto);
+        } elseif ($terrain->getVoteRefuse() >= 3) {
+            $terrainManager->deleteTerrain($terrain);
+            $result = true;
+        } else {
+            return $this->json(['message' => "Le terrain n’a pas encore atteint le seuil de vote requis."], 200);
+        }
+
+        if (!$result) {
+            return $this->json(['message' => "Erreur lors du changement d'état du terrain."], 500);
+        }
+
+        return $this->json(['message' => "L'état du terrain a été mis à jour avec succès."], 200);
+    }
+
+    public function hasUserVoted($user, Terrain $terrain): bool
+    {
+        return $this->voteRepository->findOneBy([
+                'user' => $user,
+                'terrain' => $terrain
+            ]) !== null;
+    }
 
 
 }

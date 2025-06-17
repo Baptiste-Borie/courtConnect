@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Terrain;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,17 @@ class TerrainRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findTerrainsNotVotedByUser(User $user)
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.votes', 'v', 'WITH', 'v.user = :user')
+            ->where('t.etat = 0')
+            ->andWhere('v.id IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('t.created_at', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

@@ -102,10 +102,23 @@ class Terrain
     #[ORM\JoinColumn(name: 'type_sol', referencedColumnName: 'id')]
     private ?TypeSol $type_sol = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $Vote_valide = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $Vote_refuse = null;
+
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'terrain', cascade: ['persist', 'remove'])]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->favori = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -367,6 +380,60 @@ class Terrain
     public function setTypeSol(?TypeSol $type_sol): static
     {
         $this->type_sol = $type_sol;
+
+        return $this;
+    }
+
+    public function getVoteValide(): ?int
+    {
+        return $this->Vote_valide;
+    }
+
+    public function setVoteValide(?int $Vote_valide): static
+    {
+        $this->Vote_valide = $Vote_valide;
+
+        return $this;
+    }
+
+    public function getVoteRefuse(): ?int
+    {
+        return $this->Vote_refuse;
+    }
+
+    public function setVoteRefuse(?int $Vote_refuse): static
+    {
+        $this->Vote_refuse = $Vote_refuse;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(Vote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setTerrain($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): static
+    {
+        if ($this->votes->removeElement($vote)) {
+            // set the owning side to null (unless already changed)
+            if ($vote->getTerrain() === $this) {
+                $vote->setTerrain(null);
+            }
+        }
 
         return $this;
     }

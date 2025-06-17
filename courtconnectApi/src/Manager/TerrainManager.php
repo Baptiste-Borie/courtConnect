@@ -34,9 +34,6 @@ class TerrainManager
         $newTerrain->setRemarque($terrainDTO->remarque);
         $newTerrain->setImageUrl($terrainDTO->image_url);
 
-        $this->em->persist($newTerrain);
-        $this->em->flush();
-
         try {
             $this->em->persist($newTerrain);
             $this->em->flush();
@@ -65,8 +62,24 @@ class TerrainManager
         $terrain->setRemarque($terrainDTO->remarque);
         $terrain->setImageUrl($terrainDTO->image_url);
 
-        $this->em->persist($terrain);
-        $this->em->flush();
+        try {
+            $this->em->persist($terrain);
+            $this->em->flush();
+            return $terrain;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function incrementVote(TerrainDTO $terrainDto, Terrain $terrain)
+    {
+        if ($terrainDto->voteValide) {
+            $terrain->setVoteValide($terrain->getVoteValide() + 1);
+        }
+
+        if ($terrainDto->voteRefuse) {
+            $terrain->setVoteRefuse($terrain->getVoteRefuse() + 1);
+        }
 
         try {
             $this->em->persist($terrain);
@@ -75,6 +88,24 @@ class TerrainManager
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function changeEtatTerrain(Terrain $terrain, TerrainDTO $terrainDTO)
+    {
+        $terrain->setEtat($terrainDTO->etat);
+        try {
+            $this->em->persist($terrain);
+            $this->em->flush();
+            return $terrain;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function deleteTerrain(Terrain $terrain)
+    {
+        $this->em->remove($terrain);
+        $this->em->flush();
 
     }
 }
