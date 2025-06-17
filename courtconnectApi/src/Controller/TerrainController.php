@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Dto\TerrainDTO;
 use App\Dto\VoteDTO;
 use App\Entity\Terrain;
-use App\Entity\User;
 use App\Manager\TerrainManager;
 use App\Manager\VoteManager;
 use App\Repository\TerrainRepository;
