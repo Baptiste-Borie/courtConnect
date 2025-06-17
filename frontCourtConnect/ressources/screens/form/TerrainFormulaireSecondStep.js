@@ -82,8 +82,6 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         remarque: remarques,
       };
 
-      console.log("Body envoyé :", JSON.stringify(body, null, 2));
-
       const response = await fetch(
         "https://courtconnect.alwaysdata.net/api/addTerrain",
         {
@@ -103,7 +101,6 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
       }
 
       const data = await response.json();
-      console.log("Terrain ajouté :", data);
       Alert.alert("Succès", "Le terrain a été ajouté avec succès !");
       navigation.navigate("Home");
     } catch (err) {
