@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Dto\EventDTO;
 use App\Entity\Event;
+use App\Entity\Terrain;
 use App\Manager\EventManager;
 use App\Repository\EventRepository;
 use App\Repository\TerrainRepository;
 use App\Repository\TypeEventRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +21,8 @@ class EventController extends AbstractController
     public function __construct(private EventRepository $eventRepository,
                                 private TypeEventRepository $typeEventRepository,
                                 private TerrainRepository $terrainRepository,
+                                private EventManager $eventManager,
+                                private EntityManagerInterface $em,
 
     )
     {
@@ -27,10 +31,33 @@ class EventController extends AbstractController
     #[Route('/api/getAllEvents', name: 'app_terrain')]
     public function getAll(): Response
     {
-        $terrain = $this->eventRepository->findAll();
+        $events = $this->eventRepository->findAll();
+        $this->checkEventState($events);
 
-        return $this->json($terrain, 200, [], ['groups' => ['all_events']]);
+        return $this->json($events, 200, [], ['groups' => ['all_events']]);
     }
+
+    public function checkEventState(): void
+    {
+        $events = $this->eventRepository->findAll();
+        $now = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+        $today = $now->format('Y-m-d');
+        foreach ($events as $event) {
+            $eventDate = $event->getDateHeure()->setTimezone(new \DateTimeZone('Europe/Paris'));
+            $eventDay = $eventDate->format('Y-m-d');
+            dd($eventDate, $now);
+            if ($eventDate < $now) {
+                $etat = $eventDay === $today ? 1 : 2;
+                $event->setEtat($etat);
+                $this->em->persist($event);
+            }
+        }
+
+        $this->em->flush();
+    }
+
+
+
 
     #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
     public function getEventById(int $id): JsonResponse
