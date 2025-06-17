@@ -22,6 +22,7 @@ const assets = {
   },
   terrain: require("../../assets/terrain.png"),
   ballon: require("../../assets/ballon.png"),
+  courtMarker: require("../../assets/courtMarker.png")
 };
 
 export default assets;
