@@ -4,13 +4,14 @@ import MapView, { Marker } from "react-native-maps";
 
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
+import MarkerCourt from "./MarkerCourt";
 
 const MapBox = ({
   style = {},
   height = 200,
   region,
   centerMaker = false,
-  userLocation = [],
+  userLocation ,
   terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
