@@ -31,7 +31,7 @@ class TerrainController extends AbstractController
     {
 
     }
-    #[Route('/api/getAllValidatedTerrains', name: 'app_get_all_validated_terrains', methods: ['GET'])]
+    #[Route('/getAllValidatedTerrains', name: 'app_get_all_validated_terrains', methods: ['GET'])]
     public function getAllValidatedTerrains(): Response
     {
         $terrains = $this->terrainRepository->findBy(['etat' => 1], ['created_at' => 'DESC']);
