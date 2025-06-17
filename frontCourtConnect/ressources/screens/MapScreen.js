@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
 
+
 import PageLayout from "../shared/PageLayout";
 import useLocation from "../customHooks/useLocation";
 import MapBox from "../shared/MapBox";
+import RecenterButton from "../shared/RecenterButton";
 
 const MapScreen = ({ navigation }) => {
   const { latitude, longitude, errorMsg } = useLocation();
@@ -55,6 +57,7 @@ const MapScreen = ({ navigation }) => {
           },
           title: terrain.nom,
         }));
+        console.log("Coordonnées actuelles :", latitude, longitude);
         setTerrainMarkers(markers);
       } catch (error) {
         console.error("Erreur de récupération des terrains :", error);
@@ -82,6 +85,7 @@ const MapScreen = ({ navigation }) => {
     <PageLayout style={styles.container} showHeader={false}>
       <MapBox
         style={{ flex: 1 }}
+        ref={mapRef}
         region={{
           latitude,
           longitude,
@@ -93,6 +97,11 @@ const MapScreen = ({ navigation }) => {
           title: "Vous êtes ici",
         }}
         terrainMarkers={terrainMarkers}
+      />
+      <RecenterButton
+        mapRef={mapRef}
+        latitude={latitude}
+        longitude={longitude}
       />
     </PageLayout>
   );
