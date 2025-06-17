@@ -32,24 +32,26 @@ const MapScreen = ({ navigation }) => {
     const fetchTerrains = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        const response = await fetch("https://courtconnect.alwaysdata.net/api/getAllTerrainsValidated", {
+        const response = await fetch("https://courtconnect.alwaysdata.net/api/getAllPendingTerrains", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Réponse serveur :", errorText);
-        throw new Error(`Erreur serveur ${response.status}`);
-      }
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Réponse serveur :", errorText);
+          throw new Error(`Erreur serveur ${response.status}`);
+        }
 
         const data = await response.json();
+        console.log("Terrains récupérés : " + JSON.stringify(data, null, 2));
         const markers = data.map((terrain) => ({
           coordinate: {
             latitude: terrain.latitude,
-            longitude: terrain.longitude, 
+            longitude: terrain.longitude,
           },
           title: terrain.nom,
         }));
@@ -88,12 +90,11 @@ const MapScreen = ({ navigation }) => {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        userLocation={[
-          {
-            coordinate: { latitude, longitude },
-            title: "Vous êtes ici",
-          },
-        ]}
+        userLocation={{
+          coordinate: { latitude, longitude },
+          title: "Vous êtes ici",
+        }}
+
         terrainMarkers={terrainMarkers}
       />
     </PageLayout>

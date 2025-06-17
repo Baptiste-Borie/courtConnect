@@ -7,6 +7,7 @@ const MarkerCourt = ({ coordinate, title, description }) => {
   return (
     <Marker coordinate={coordinate} title={title} description={description}>
       <View style={styles.markerContainer}>
+          <Image source={assets.icons.ballon} style={styles.markerIcon} />
         <Text style={styles.label}>{title}</Text>
       </View>
     </Marker>
