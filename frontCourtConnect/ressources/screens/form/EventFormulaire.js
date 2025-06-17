@@ -1,5 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
-import { StyleSheet, View, TextInput, Text, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  Text,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -8,9 +15,12 @@ import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import MapBox from "../../shared/MapBox";
 import OrangeButton from "../../shared/OrangeButton";
+import { authFetch } from "../../utils/AuthFetch";
 
 export default function EventFormulaire({ navigation }) {
   const { theme } = useContext(ThemeContext);
+
+  const [isLoadingTerrains, setIsLoadingTerrains] = useState(true);
 
   const [nom, setNom] = useState("");
   const [terrains, setTerrains] = useState([]);
@@ -42,22 +52,16 @@ export default function EventFormulaire({ navigation }) {
   useEffect(() => {
     const fetchTerrains = async () => {
       try {
+        setIsLoadingTerrains(true);
         const token = await AsyncStorage.getItem("token");
         if (!token) {
           console.warn("Aucun token disponible");
           return;
         }
 
-        const res = await fetch(
-          "https://courtconnect.alwaysdata.net/api/getAllTerrains",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await authFetch("api/getAllValidatedTerrains", {
+          method: "GET",
+        });
 
         if (!res.ok) {
           const errorText = await res.text();
@@ -69,6 +73,8 @@ export default function EventFormulaire({ navigation }) {
         setTerrains(data);
       } catch (error) {
         console.error("Erreur récupération terrains :", error);
+      } finally {
+        setIsLoadingTerrains(false);
       }
     };
 
@@ -123,34 +129,42 @@ export default function EventFormulaire({ navigation }) {
         />
 
         <Text style={[styles.label, { color: theme.text }]}>Terrain</Text>
-        <View
-          style={[
-            styles.pickerContainer,
-            {
-              backgroundColor: theme.background_light,
-              borderColor: theme.primary,
-            },
-          ]}
-        >
-          <Picker
-            selectedValue={selectedTerrain}
-            onValueChange={(itemValue) => setSelectedTerrain(itemValue)}
-            dropdownIconColor={theme.text}
-            style={{
-              width: "100%",
-            }}
-            itemStyle={{ color: theme.text, height: 120 }}
+        {isLoadingTerrains ? (
+          <ActivityIndicator
+            size="large"
+            color={theme.primary}
+            style={{ marginVertical: 20 }}
+          />
+        ) : (
+          <View
+            style={[
+              styles.pickerContainer,
+              {
+                backgroundColor: theme.background_light,
+                borderColor: theme.primary,
+              },
+            ]}
           >
-            <Picker.Item label="Choisir un terrain..." value={null} />
-            {terrains.map((terrain) => (
-              <Picker.Item
-                key={terrain.id}
-                label={terrain.nom}
-                value={terrain.id}
-              />
-            ))}
-          </Picker>
-        </View>
+            <Picker
+              selectedValue={selectedTerrain}
+              onValueChange={(itemValue) => setSelectedTerrain(itemValue)}
+              dropdownIconColor={theme.text}
+              style={{
+                width: "100%",
+              }}
+              itemStyle={{ color: theme.text, height: 120 }}
+            >
+              <Picker.Item label="Choisir un terrain..." value={null} />
+              {terrains.map((terrain) => (
+                <Picker.Item
+                  key={terrain.id}
+                  label={terrain.nom}
+                  value={terrain.id}
+                />
+              ))}
+            </Picker>
+          </View>
+        )}
 
         {mapRegion && (
           <>

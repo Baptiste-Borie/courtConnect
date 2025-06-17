@@ -4,13 +4,15 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 const RadioGroup = ({ options, selected, onChange, theme }) => {
   return (
     <View style={styles.group}>
-      {options.map((option) => {
-        const isSelected = selected === option;
+      {options.map((option, index) => {
+        const value = typeof option === "object" ? option.value : option;
+        const label = typeof option === "object" ? option.label : option;
+        const isSelected = selected === value;
 
         return (
           <TouchableOpacity
-            key={option}
-            onPress={() => onChange(option)}
+            key={value}
+            onPress={() => onChange(value)}
             style={[
               styles.option,
               {
@@ -20,7 +22,7 @@ const RadioGroup = ({ options, selected, onChange, theme }) => {
             ]}
           >
             <Text style={{ color: isSelected ? "#fff" : theme.text }}>
-              {option}
+              {label}
             </Text>
           </TouchableOpacity>
         );

@@ -9,8 +9,8 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DatePicker from "react-native-date-picker";
 
+import CustomDateTimePicker from "../../shared/CustomDateTimePicker";
 import PageLayout from "../../shared/PageLayout";
 import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
@@ -26,7 +26,6 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
   const [maxJoueurs, setMaxJoueurs] = useState(10);
   const [niveau, setNiveau] = useState("1");
   const [typeEvent, setTypeEvent] = useState("");
-  const [showPicker, setShowPicker] = useState(false);
 
   const { items: typeEvents, loading: loadingTypes } = useTypeList("event");
 
@@ -46,7 +45,6 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         dateHeure: date.toISOString(),
         maxJoueurs: maxJoueurs,
         niveau: parseInt(niveau),
-        etat: 1,
         terrain: terrainId,
         typeEvent: typeEventId,
       };
@@ -105,14 +103,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
           ]}
         />
         <Text style={[styles.label, { color: theme.text }]}>Date & heure</Text>
-        <DatePicker
-          date={date}
-          onDateChange={setDate}
-          mode="date"
-          textColor="white"
-          fadeToColor="black"
-          androidVariant="nativeAndroid"
-        />
+        <CustomDateTimePicker value={date} onChange={setDate} theme={theme} />
 
         <Text style={[styles.label, { color: theme.text }]}>
           Nombre de joueurs max
@@ -132,11 +123,16 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         />
         <Text style={[styles.label, { color: theme.text }]}>Niveau requis</Text>
         <RadioGroup
-          options={["1", "2", "3", "4", "5"]}
+          options={[
+            { label: "Débutant", value: "0" },
+            { label: "Intermédiaire", value: "1" },
+            { label: "Expert", value: "2" },
+          ]}
           selected={niveau}
           onChange={setNiveau}
           theme={theme}
         />
+
         <Text style={[styles.label, { color: theme.text }]}>
           Type d'événement
         </Text>
