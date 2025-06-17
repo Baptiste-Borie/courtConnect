@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { forwardRef, useContext } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
@@ -6,7 +6,7 @@ import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
 import MarkerCourt from "./MarkerCourt";
 
-const MapBox = ({
+const MapBox = forwardRef(({
   style = {},
   height = 200,
   region,
@@ -14,12 +14,13 @@ const MapBox = ({
   userLocation ,
   terrainMarkers = [], 
   onRegionChange = () => {},
-}) => {
+}, ref) => {
   const { themeName } = useContext(ThemeContext);
 
   return (
     <View style={[{ flex: 1 }, { height }, style]}>
       <MapView
+        ref={ref}
         style={StyleSheet.absoluteFill}
         userInterfaceStyle={themeName}
         key={
@@ -64,7 +65,7 @@ const MapBox = ({
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   markerFixed: {

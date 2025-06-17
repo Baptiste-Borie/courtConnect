@@ -4,6 +4,7 @@ import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
 import PageLayout from "../shared/PageLayout";
 import useLocation from "../customHooks/useLocation";
 import MapBox from "../shared/MapBox";
+import RecenterButton from "../shared/RecenterButton";
 import { authFetch } from "../utils/AuthFetch";
 
 const MapScreen = ({ navigation }) => {
@@ -73,6 +74,7 @@ const MapScreen = ({ navigation }) => {
     <PageLayout style={styles.container} showHeader={false}>
       <MapBox
         style={{ flex: 1 }}
+        ref={mapRef}
         region={{
           latitude,
           longitude,
@@ -84,6 +86,11 @@ const MapScreen = ({ navigation }) => {
           title: "Vous êtes ici",
         }}
         terrainMarkers={terrainMarkers}
+      />
+      <RecenterButton
+        mapRef={mapRef}
+        latitude={latitude}
+        longitude={longitude}
       />
     </PageLayout>
   );
