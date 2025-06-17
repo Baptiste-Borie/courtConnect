@@ -15,9 +15,6 @@ const MapBox = ({
   terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
-  console.log("Marker de la position:"+ JSON.stringify(userLocation, null, 2))
-  console.log("Markers des terrains:"+ JSON.stringify(terrainMarkers, null, 2))
-
   const { themeName } = useContext(ThemeContext);
 
   return (

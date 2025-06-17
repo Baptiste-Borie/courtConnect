@@ -47,7 +47,7 @@ const MapScreen = ({ navigation }) => {
         }
 
         const data = await response.json();
-        console.log("Terrains récupérés : " + JSON.stringify(data, null, 2));
+
         const markers = data.map((terrain) => ({
           coordinate: {
             latitude: terrain.latitude,
