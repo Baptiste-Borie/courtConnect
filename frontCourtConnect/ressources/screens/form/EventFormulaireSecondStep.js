@@ -16,6 +16,7 @@ import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import RadioGroup from "../../shared/RadioGroup";
 import useTypeList from "../../customHooks/useTypeList";
+import { authFetch } from "../../utils/AuthFetch";
 
 export default function EventFormulaireSecondStep({ route, navigation }) {
   const { theme } = useContext(ThemeContext);
@@ -38,7 +39,6 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
     }
 
     try {
-      const token = await AsyncStorage.getItem("token");
       const body = {
         nom,
         description,
@@ -49,17 +49,10 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         typeEvent: typeEventId,
       };
 
-      const response = await fetch(
-        "https://courtconnect.alwaysdata.net/api/addEvent",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await authFetch("api/addEvent", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -86,7 +79,13 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
 
   return (
     <PageLayout headerContent="Créer un événement" showFooter={false}>
-      <StepTracker currentStep={2} />
+      <StepTracker
+        currentStep={2}
+        onStepChange={(step) => {
+          if (step === 1) navigation.goBack();
+        }}
+      />
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.label, { color: theme.text }]}>Description</Text>
         <TextInput

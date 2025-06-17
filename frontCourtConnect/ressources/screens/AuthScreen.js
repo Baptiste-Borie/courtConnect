@@ -50,6 +50,7 @@ const AuthScreen = ({ onLogin }) => {
 
         if (isLogin) {
           await AsyncStorage.setItem("token", data.token);
+          await AsyncStorage.setItem("refresh_token", data.refresh_token);
           onLogin();
         } else {
           Alert.alert(

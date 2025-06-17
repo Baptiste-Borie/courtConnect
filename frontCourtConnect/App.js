@@ -75,17 +75,6 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
   );
 }
 
-// Fonction simple pour vérifier si un token est expiré
-const isTokenExpired = (token) => {
-  try {
-    const [, payload] = token.split(".");
-    const decoded = JSON.parse(atob(payload));
-    return decoded.exp * 1000 < Date.now();
-  } catch {
-    return true;
-  }
-};
-
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -93,33 +82,7 @@ export default function App() {
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("token");
-      const refreshToken = await AsyncStorage.getItem("refresh_token");
-
-      if (token && !isTokenExpired(token)) {
-        setIsAuthenticated(true);
-      } else if (refreshToken) {
-        try {
-          const response = await fetch("https://ton-api.com/refresh", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refresh_token: refreshToken }),
-          });
-
-          if (!response.ok) throw new Error("Refresh token invalide");
-
-          const data = await response.json();
-          await AsyncStorage.setItem("token", data.token);
-          await AsyncStorage.setItem("refresh_token", data.refresh_token);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error("Erreur lors du refresh :", error);
-          await AsyncStorage.multiRemove(["token", "refresh_token"]);
-          setIsAuthenticated(false);
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-
+      setIsAuthenticated(!!token);
       setLoading(false);
     };
 
