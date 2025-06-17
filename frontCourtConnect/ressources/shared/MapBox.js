@@ -12,8 +12,6 @@ const MapBox = ({
   centerMaker = false,
   userLocation = [],
   terrainMarkers = [], 
-  userLocation ,
-  terrainMarkers = [], 
   onRegionChange = () => {},
 }) => {
   const { themeName } = useContext(ThemeContext);
@@ -28,7 +26,7 @@ const MapBox = ({
           "-" +
           region?.longitude +
           "-" +
-          markers
+          terrainMarkers
             .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
             .join("|")
         }
