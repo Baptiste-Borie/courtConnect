@@ -50,7 +50,7 @@ const MapBox = forwardRef(({
           />
         )}
         {terrainMarkers.map((marker, index) => (
-          <Marker
+          <MarkerCourt
             key={index}
             coordinate={marker.coordinate}
             title={marker.title}
