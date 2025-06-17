@@ -1,10 +1,22 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-//custom marker à faire
-export default function MarkerCourt() {
+import React from 'react';
+import { Marker } from 'react-native-maps';
+import { Image } from 'react-native';
+
+import { ThemeContext } from "../context/ThemeContext";
+import assets from "../constants/assets";
+
+export default function MarkerCourt({ coordinate, title, onPress }) {
   return (
-    <View>
-      <Text>MarkerCourt</Text>
-    </View>
-  )
+    <Marker
+      coordinate={coordinate}
+      title={title}
+      onPress={onPress}
+    >
+      <Image
+        source={assets.courtMarker}
+        style={{ width: 40, height: 40 }} 
+        resizeMode="contain"
+      />
+    </Marker>
+  );
 }
