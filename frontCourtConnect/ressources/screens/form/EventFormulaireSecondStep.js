@@ -1,0 +1,182 @@
+import React, { useContext, useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DatePicker from "react-native-date-picker";
+
+import PageLayout from "../../shared/PageLayout";
+import StepTracker from "./StepTracker";
+import { ThemeContext } from "../../context/ThemeContext";
+import RadioGroup from "../../shared/RadioGroup";
+import useTypeList from "../../customHooks/useTypeList";
+
+export default function EventFormulaireSecondStep({ route, navigation }) {
+  const { theme } = useContext(ThemeContext);
+  const { nom, terrainId } = route.params;
+
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [maxJoueurs, setMaxJoueurs] = useState(10);
+  const [niveau, setNiveau] = useState("1");
+  const [typeEvent, setTypeEvent] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
+
+  const { items: typeEvents, loading: loadingTypes } = useTypeList("event");
+
+  const handleValidation = async () => {
+    const typeEventId = typeEvents.find((item) => item.nom === typeEvent)?.id;
+
+    if (!description || !typeEventId) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const body = {
+        nom,
+        description,
+        dateHeure: date.toISOString(),
+        maxJoueurs: maxJoueurs,
+        niveau: parseInt(niveau),
+        etat: 1,
+        terrain: terrainId,
+        typeEvent: typeEventId,
+      };
+
+      const response = await fetch(
+        "https://courtconnect.alwaysdata.net/api/addEvent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Réponse serveur :", errorText);
+        throw new Error(`Erreur serveur ${response.status}`);
+      }
+
+      const data = await response.json();
+      Alert.alert("Succès", "L'événement a été créé avec succès !");
+      navigation.navigate("Home");
+    } catch (err) {
+      console.error("Erreur :", err);
+      Alert.alert("Erreur", "Impossible de créer l'événement.");
+    }
+  };
+
+  if (loadingTypes) {
+    return (
+      <Text style={{ padding: 20, color: theme.text }}>
+        Chargement des types...
+      </Text>
+    );
+  }
+
+  return (
+    <PageLayout headerContent="Créer un événement" showFooter={false}>
+      <StepTracker currentStep={2} />
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={[styles.label, { color: theme.text }]}>Description</Text>
+        <TextInput
+          placeholder="Ex: match entre amis"
+          value={description}
+          onChangeText={setDescription}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.background_light,
+              color: theme.text,
+              borderColor: theme.primary,
+            },
+          ]}
+        />
+        <Text style={[styles.label, { color: theme.text }]}>Date & heure</Text>
+        <DatePicker
+          date={date}
+          onDateChange={setDate}
+          mode="date"
+          textColor="white"
+          fadeToColor="black"
+          androidVariant="nativeAndroid"
+        />
+
+        <Text style={[styles.label, { color: theme.text }]}>
+          Nombre de joueurs max
+        </Text>
+        <TextInput
+          keyboardType="numeric"
+          value={String(maxJoueurs)}
+          onChangeText={(value) => setMaxJoueurs(parseInt(value) || 0)}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.background_light,
+              color: theme.text,
+              borderColor: theme.primary,
+            },
+          ]}
+        />
+        <Text style={[styles.label, { color: theme.text }]}>Niveau requis</Text>
+        <RadioGroup
+          options={["1", "2", "3", "4", "5"]}
+          selected={niveau}
+          onChange={setNiveau}
+          theme={theme}
+        />
+        <Text style={[styles.label, { color: theme.text }]}>
+          Type d'événement
+        </Text>
+        <RadioGroup
+          options={typeEvents.map((e) => e.nom)}
+          selected={typeEvent}
+          onChange={setTypeEvent}
+          theme={theme}
+        />
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: theme.primary }]}
+          onPress={handleValidation}
+        >
+          <Text style={{ color: "#fff", fontWeight: "bold" }}>
+            Créer l'événement
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </PageLayout>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 30,
+  },
+  label: {
+    marginBottom: 8,
+    fontSize: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 16,
+  },
+  button: {
+    alignItems: "center",
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+});

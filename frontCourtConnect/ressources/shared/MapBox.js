@@ -20,7 +20,16 @@ const MapBox = ({
       <MapView
         style={StyleSheet.absoluteFill}
         userInterfaceStyle={themeName}
-        initialRegion={
+        key={
+          region?.latitude +
+          "-" +
+          region?.longitude +
+          "-" +
+          markers
+            .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
+            .join("|")
+        }
+        region={
           region || {
             latitude: 48.8566,
             longitude: 2.3522,

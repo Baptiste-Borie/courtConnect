@@ -15,6 +15,8 @@ import EditProfileScreen from "./ressources/screens/Account/EditProfileScreen";
 import AccountSettings from "./ressources/screens/Account/AccountSettings";
 import TerrainFormulaire from "./ressources/screens/form/TerrainFormulaire";
 import TerrainFormulaireSecondStep from "./ressources/screens/form/TerrainFormulaireSecondStep";
+import EventFormulaire from "./ressources/screens/form/EventFormulaire";
+import EventFormulaireSecondStep from "./ressources/screens/form/EventFormulaireSecondStep";
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +52,11 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
               <Stack.Screen
                 name="AddTerrainSecond"
                 component={TerrainFormulaireSecondStep}
+              />
+              <Stack.Screen name="AddEvent" component={EventFormulaire} />
+              <Stack.Screen
+                name="AddEventSecond"
+                component={EventFormulaireSecondStep}
               />
             </>
           ) : (
