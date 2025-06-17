@@ -4,7 +4,6 @@ import MapView, { Marker } from "react-native-maps";
 
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
-import MarkerCourt from "./MarkerCourt";
 
 const MapBox = ({
   style = {},
@@ -18,9 +17,6 @@ const MapBox = ({
   onRegionChange = () => {},
 }) => {
   
-  console.log("Marker de la position:"+ JSON.stringify(userLocation, null, 2))
-  console.log("Markers des terrains:"+ JSON.stringify(terrainMarkers, null, 2))
-
   const { themeName } = useContext(ThemeContext);
 
   return (

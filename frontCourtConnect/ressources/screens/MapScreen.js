@@ -90,13 +90,6 @@ const MapScreen = ({ navigation }) => {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        userLocation={[
-          {
-            coordinate: { latitude, longitude },
-            title: "Vous êtes ici",
-          },
-        ]}
-        terrainMarkers={terrainMarkers}
         userLocation={{
           coordinate: { latitude, longitude },
           title: "Vous êtes ici",
