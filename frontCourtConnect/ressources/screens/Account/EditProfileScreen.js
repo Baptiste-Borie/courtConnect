@@ -13,14 +13,16 @@ import OrangeButton from "../../shared/OrangeButton";
 import PageLayout from "../../shared/PageLayout";
 import { ThemeContext } from "../../context/ThemeContext";
 
-export default function EditProfileScreen({ navigation }) {
+export default function EditProfileScreen({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
 
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [age, setAge] = useState("");
-  const [ville, setVille] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const user = route.params?.data || {};
+
+  const [nom, setNom] = useState(user.nom || "");
+  const [prenom, setPrenom] = useState(user.prenom || "");
+  const [username, setUsername] = useState(user.username || "");
+  const [pseudo, setPseudo] = useState(user.pseudo || "");
+  const [imageUrl, setImageUrl] = useState(user.image_url || "");
 
   const handleSubmit = async () => {
     try {
@@ -39,7 +41,8 @@ export default function EditProfileScreen({ navigation }) {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            username: "",
+            username,
+            pseudo,
             nom,
             prenom,
             imageUrl,
@@ -55,7 +58,7 @@ export default function EditProfileScreen({ navigation }) {
           "Profil mis à jour",
           "Vos informations ont été enregistrées."
         );
-        navigation.goBack();
+        navigation.navigate("Account", { refresh: true });
       } else {
         Alert.alert("Erreur", data.message || "Une erreur est survenue.");
       }
@@ -100,10 +103,10 @@ export default function EditProfileScreen({ navigation }) {
         />
 
         <TextInput
-          placeholder="Âge"
+          placeholder="Email"
           placeholderTextColor={theme.text + "99"}
-          value={age}
-          onChangeText={setAge}
+          value={username}
+          onChangeText={setUsername}
           style={[
             styles.input,
             { borderColor: theme.primary, color: theme.text },
@@ -111,10 +114,10 @@ export default function EditProfileScreen({ navigation }) {
         />
 
         <TextInput
-          placeholder="Ville"
+          placeholder="Pseudo (optionnel)"
           placeholderTextColor={theme.text + "99"}
-          value={ville}
-          onChangeText={setVille}
+          value={pseudo}
+          onChangeText={setPseudo}
           style={[
             styles.input,
             { borderColor: theme.primary, color: theme.text },

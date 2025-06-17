@@ -1,20 +1,29 @@
-import React, { useState, useContext } from "react";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import React, { useState, useEffect, useContext } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 
 import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
 
-export default function AccountScreenHeader() {
-  const data = {
-    name: "Allen Iverson",
-    age: 22,
-    city: "Paris",
-    trustability: 65,
-    profilePicture: null,
-  };
-
+export default function AccountScreenHeader({ data }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const { theme } = useContext(ThemeContext);
+
+  if (!data) {
+    return (
+      <View
+        style={[styles.container, { backgroundColor: theme.background_light }]}
+      >
+        <ActivityIndicator size="large" color={theme.primary} />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -35,11 +44,7 @@ export default function AccountScreenHeader() {
         <View style={styles.content}>
           <View style={styles.info}>
             <Text style={[styles.name, { color: theme.text }]}>
-              {data.name}
-            </Text>
-            <Text style={[styles.ageCity, { color: theme.text }]}>
-              {data.age} ans{"\n"}
-              {data.city}
+              {data.nom} {data.prenom}
             </Text>
           </View>
 
@@ -128,10 +133,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "bold",
-  },
-  ageCity: {
-    fontSize: 14,
-    marginTop: 2,
   },
   trustContainer: {
     gap: 4,

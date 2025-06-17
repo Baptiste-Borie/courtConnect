@@ -115,6 +115,7 @@ export default function TerrainFormulaire({ navigation }) {
           placeholder="Adresse"
           placeholderTextColor={theme.text + "99"}
           value={adresse}
+          editable={false}
           onChangeText={setAdresse}
           style={[
             styles.input,
@@ -122,6 +123,7 @@ export default function TerrainFormulaire({ navigation }) {
               backgroundColor: theme.background_light,
               borderColor: theme.primary,
               color: theme.text,
+              opacity: 0.5,
             },
           ]}
         />
@@ -132,7 +134,7 @@ export default function TerrainFormulaire({ navigation }) {
             { color: theme.text, fontWeight: "100", fontSize: 12 },
           ]}
         >
-          Aperçu
+          Placer le marqueur sur la carte pour définir l'adresse
         </Text>
 
         <MapBox

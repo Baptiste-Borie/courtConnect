@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
 
-export default function AccountScreenMainContent() {
+export default function AccountScreenMainContent({ data }) {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
 
@@ -13,7 +13,10 @@ export default function AccountScreenMainContent() {
     {
       icon: assets.icons.edit,
       label: "Modifier mon profil",
-      onPress: () => navigation.navigate("EditAccount"),
+      onPress: () =>
+        navigation.navigate("EditAccount", {
+          data,
+        }),
     },
     {
       icon: assets.icons.Settings,
