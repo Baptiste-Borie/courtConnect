@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useContext } from "react";
 
 import OrangeButton from "../shared/OrangeButton";
@@ -9,11 +8,6 @@ import { ThemeContext } from "../context/ThemeContext";
 
 export default function HomeScreen({ navigation, onLogout }) {
   const { theme } = useContext(ThemeContext);
-
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");
-    onLogout();
-  };
 
   return (
     <PageLayout
@@ -25,7 +19,6 @@ export default function HomeScreen({ navigation, onLogout }) {
         title="Get Started"
         onPress={() => navigation.navigate("Map")}
       />
-      <OrangeButton title="Logout" onPress={handleLogout} />
     </PageLayout>
   );
 }

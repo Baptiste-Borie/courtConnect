@@ -7,7 +7,7 @@ import PageLayout from "../../shared/PageLayout";
 import AccountScreenHeader from "./AccountScreenHeader";
 import AccountScreenMainContent from "./AccountScreenMainContent";
 
-export default function AccountScreen({ navigation }) {
+export default function AccountScreen({ navigation, onLogout }) {
   const [data, setData] = useState(null);
   useFocusEffect(
     React.useCallback(() => {
@@ -34,8 +34,10 @@ export default function AccountScreen({ navigation }) {
     }, [])
   );
 
+  console.log("b:SS", onLogout);
+
   return (
-    <PageLayout style={styles.content}>
+    <PageLayout style={styles.content} onLogout={onLogout}>
       <AccountScreenHeader style={styles.header} data={data} />
       <AccountScreenMainContent data={data} />
     </PageLayout>

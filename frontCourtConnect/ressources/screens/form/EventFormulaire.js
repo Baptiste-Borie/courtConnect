@@ -185,7 +185,7 @@ export default function EventFormulaire({ navigation }) {
             <MapBox
               style={{ width: "100%", height: 250 }}
               region={mapRegion}
-              markers={mapMarkers}
+              terrainMarkers={mapMarkers}
             />
           </>
         )}

@@ -35,14 +35,16 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
           {isAuthenticated ? (
             <>
               <Stack.Screen name="Home">
+                {(props) => <HomeScreen {...props} />}
+              </Stack.Screen>
+              <Stack.Screen name="Account">
                 {(props) => (
-                  <HomeScreen
+                  <AccountScreen
                     {...props}
                     onLogout={() => setIsAuthenticated(false)}
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen name="Account" component={AccountScreen} />
               <Stack.Screen name="EditAccount" component={EditProfileScreen} />
               <Stack.Screen
                 name="AccountSettings"
