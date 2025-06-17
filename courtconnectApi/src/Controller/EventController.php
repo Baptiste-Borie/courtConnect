@@ -28,7 +28,7 @@ class EventController extends AbstractController
     {
 
     }
-    #[Route('/api/getAllEvents', name: 'app_terrain')]
+    #[Route('/getAllEvents', name: 'app_terrain')]
     public function getAll(): Response
     {
         $events = $this->eventRepository->findAll();
@@ -40,14 +40,27 @@ class EventController extends AbstractController
     public function checkEventState(): void
     {
         $events = $this->eventRepository->findAll();
-        $now = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
-        $today = $now->format('Y-m-d');
+        $parisTZ = new \DateTimeZone('Europe/Paris');
+
+        // 1. On crée la date/heure actuelle à Paris
+        $nowParis = new \DateTime('now', $parisTZ);
+
+        // 2. On convertit en UTC pour comparer avec ce qu'il y a en base
+        $nowUtc = clone $nowParis;
+        $nowUtc->setTimezone(new \DateTimeZone('UTC'));
+
         foreach ($events as $event) {
-            $eventDate = $event->getDateHeure()->setTimezone(new \DateTimeZone('Europe/Paris'));
-            $eventDay = $eventDate->format('Y-m-d');
-            dd($eventDate, $now);
-            if ($eventDate < $now) {
-                $etat = $eventDay === $today ? 1 : 2;
+            // 3. On récupère la date de l'événement (stockée en UTC en base)
+            $eventDateUtc = $event->getDateHeure();
+
+            // 4. On compare les dates en UTC (ce qui est cohérent)
+//            dd($eventDateUtc, $nowUtc);
+            if ($eventDateUtc <= $nowUtc) {
+                // 5. On reconvertit en heure de Paris seulement pour vérifier si c'est le même jour
+                $eventDateParis = clone $eventDateUtc;
+                $eventDateParis->setTimezone($parisTZ);
+
+                $etat = ($eventDateParis->format('Y-m-d') === $nowParis->format('Y-m-d')) ? 1 : 2;
                 $event->setEtat($etat);
                 $this->em->persist($event);
             }
@@ -59,7 +72,7 @@ class EventController extends AbstractController
 
 
 
-    #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
+        #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
     public function getEventById(int $id): JsonResponse
     {
         $event = $this->eventRepository->find($id);
