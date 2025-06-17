@@ -90,5 +90,16 @@ class EventManager
         }
     }
 
+    public function changeState(EventDTO $eventDTO, $event) {
+        $event->setEtat($eventDTO->etat);
+        try {
+            $this->em->persist($event);
+            $this->em->flush();
+            return $event;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 
 }

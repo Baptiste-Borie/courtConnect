@@ -10,6 +10,7 @@ use App\Repository\EventRepository;
 use App\Repository\TerrainRepository;
 use App\Repository\TypeEventRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,39 +29,31 @@ class EventController extends AbstractController
     {
 
     }
-    #[Route('/getAllEvents', name: 'app_terrain')]
+    #[Route('/api/getAllEvents', name: 'app_terrain')]
     public function getAll(): Response
     {
         $events = $this->eventRepository->findAll();
-        $this->checkEventState($events);
+        $this->checkEventState();
 
         return $this->json($events, 200, [], ['groups' => ['all_events']]);
     }
 
+    /**
+     * Met à jour l'état des événements en fonction de leur date
+     *
+     * - État 1 (En cours) si l'événement a lieu aujourd'hui
+     * - État 2 (Terminé) si l'événement est passé et date d'un autre jour
+     */
     public function checkEventState(): void
     {
         $events = $this->eventRepository->findAll();
-        $parisTZ = new \DateTimeZone('Europe/Paris');
-
-        // 1. On crée la date/heure actuelle à Paris
-        $nowParis = new \DateTime('now', $parisTZ);
-
-        // 2. On convertit en UTC pour comparer avec ce qu'il y a en base
-        $nowUtc = clone $nowParis;
-        $nowUtc->setTimezone(new \DateTimeZone('UTC'));
-
+        $now = new \DateTime('now');
+        $today = $now->format('Y-m-d');
         foreach ($events as $event) {
-            // 3. On récupère la date de l'événement (stockée en UTC en base)
-            $eventDateUtc = $event->getDateHeure();
-
-            // 4. On compare les dates en UTC (ce qui est cohérent)
-//            dd($eventDateUtc, $nowUtc);
-            if ($eventDateUtc <= $nowUtc) {
-                // 5. On reconvertit en heure de Paris seulement pour vérifier si c'est le même jour
-                $eventDateParis = clone $eventDateUtc;
-                $eventDateParis->setTimezone($parisTZ);
-
-                $etat = ($eventDateParis->format('Y-m-d') === $nowParis->format('Y-m-d')) ? 1 : 2;
+            $eventDate = $event->getDateHeure();
+            $eventDay = $eventDate->format('Y-m-d');
+            if ($eventDate < $now) {
+                $etat = $eventDay === $today ? 1 : 2;
                 $event->setEtat($etat);
                 $this->em->persist($event);
             }
@@ -72,13 +65,13 @@ class EventController extends AbstractController
 
 
 
-        #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
+    #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
     public function getEventById(int $id): JsonResponse
     {
         $event = $this->eventRepository->find($id);
 
         if (!$event) {
-            return $this->json(['message' => 'Evenement non trouvé'], Response::HTTP_NOT_FOUND);
+            return $this->json(['message' => 'Evenement non trouvé'], 404);
         }
 
         return $this->json($event, Response::HTTP_OK, [], ['groups' => ['all_events']]);
@@ -86,32 +79,31 @@ class EventController extends AbstractController
 
 
     #[Route('/api/addEvent', name: 'app_add_event', methods: ['POST'])]
-    public function addEvent(Request $request, EventManager $eventManager): JsonResponse
+    public function addEvent(Request $request): JsonResponse
     {
-        return $this->handleEvent($request, $eventManager);
+        return $this->handleEvent($request);
     }
 
     #[Route('/api/updateEvent/{id}', name: 'app_update_event', methods: ['POST'])]
-    public function updateEvent(Request $request, EventManager $eventManager, $id): JsonResponse
+    public function updateEvent(Request $request, $id): JsonResponse
     {
         $event = $this->eventRepository->find($id);
         if (!$event) {
             return $this->json(['message' => 'Événement non trouvé.'], 404);
         }
 
-        return $this->handleEvent($request, $eventManager, $event);
+        return $this->handleEvent($request, $event);
     }
 
     /**
      * Gère la création ou la mise à jour d'un événement.
      *
      * @param Request $request         La requête HTTP contenant les données JSON de l'événement.
-     * @param EventManager $eventManager Le gestionnaire d'événements utilisé pour persister les données.
      * @param Event|null $event        L'événement à mettre à jour, ou null pour en créer un nouveau.
      *
      * @return JsonResponse           Réponse JSON contenant l'événement créé/mis à jour ou un message d'erreur.
      */
-    private function handleEvent(Request $request, EventManager $eventManager, ?Event $event = null): JsonResponse
+    private function handleEvent(Request $request, ?Event $event = null): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $user = $this->getUser();
@@ -135,8 +127,8 @@ class EventController extends AbstractController
         $dto->type_event = $this->typeEventRepository->findOneBy(['id' => $data['typeEvent']]);
 
         $result = $event
-            ? $eventManager->updateEvent($dto, $event)
-            : $eventManager->addEvent($dto);
+            ? $this->eventManager->updateEvent($dto, $event)
+            : $this->eventManager->addEvent($dto);
 
         if (!$result) {
             return $this->json([
@@ -149,8 +141,15 @@ class EventController extends AbstractController
         return $this->json($result, 200, [], ['groups' => ['all_events']]);
     }
 
+    /**
+     * Permet à un utilisateur de rejoindre un événement
+     *
+     * @param int $id ID de l'événement à rejoindre
+     * @return JsonResponse Réponse JSON indiquant le succès ou l'échec de l'opération
+     * @throws Exception Si l'utilisateur a déjà rejoint l'événement ou si l'événement n'existe pas
+     */
     #[Route('/api/joinEvent/{id}', name: 'app_join_event', methods: ['POST'])]
-    public function joinEvent(Request $request, $id, EventManager $eventManager): JsonResponse
+    public function joinEvent($id): JsonResponse
     {
         $user = $this->getUser();
         $event = $this->eventRepository->find($id);
@@ -160,7 +159,7 @@ class EventController extends AbstractController
 
         $eventDto = new EventDTO();
         $eventDto->joueur = $user;
-        $result = $eventManager->joinEvent($eventDto, $event);
+        $result = $this->eventManager->joinEvent($eventDto, $event);
 
         if (!$result) {
             return $this->json(['message' => 'Evenement deja rejoint'], 404);
@@ -169,8 +168,15 @@ class EventController extends AbstractController
 
     }
 
+    /**
+     * Permet à un utilisateur de quitter un événement
+     *
+     * @param int $id ID de l'événement à quitter
+     * @return JsonResponse Réponse JSON avec le résultat de l'opération
+     * @throws Exception Si l'utilisateur n'est pas inscrit à l'événement
+     */
     #[Route('/api/leaveEvent/{id}', name: 'app_leave_event', methods: ['POST'])]
-    public function leaveEvent(Request $request, $id, EventManager $eventManager): JsonResponse
+    public function leaveEvent($id): JsonResponse
     {
         $user = $this->getUser();
         $event = $this->eventRepository->find($id);
@@ -186,13 +192,50 @@ class EventController extends AbstractController
         $eventDto = new EventDTO();
         $eventDto->joueur = $user;
 
-        $result = $eventManager->leaveEvent($eventDto, $event);
+        $result = $this->eventManager->leaveEvent($eventDto, $event);
 
         if (!$result) {
             return $this->json(['message' => 'Vous n\'êtes pas inscrit à cet événement.'], 400);
         }
 
         return $this->json(['message' => 'Vous avez quitté l\'événement avec succès.'], 200);
+    }
+
+
+    /**
+     * Change l'état d'un événement si l'utilisateur est son créateur
+     *
+     * @param int $id ID de l'événement à modifier
+     * @return JsonResponse Réponse JSON indiquant le succès ou l'échec de l'opération
+     */
+    #[Route('/api/changeState/{id}', name: 'app_change_state_event', methods: ['POST'])]
+    public function changeState($id): JsonResponse
+    {
+        $event = $this->eventRepository->find($id);
+        if (!$event) {
+            return $this->json(['message' => 'Aucun événement trouvé'], 404);
+        }
+
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Non autorisé'], 401);
+        }
+
+        if ($user === $event->getCreatedBy()) {
+            $dto = new EventDTO();
+            if ($event->getEtat() === 0) {
+                $dto->etat = 1;
+            } elseif ($event->getEtat() === 1) {
+                $dto->etat = 2;
+            } else {
+                return $this->json(['message' => "L'événement a déjà atteint son état final"], 400);
+            }
+
+            $this->eventManager->changeState($dto, $event);
+            return $this->json(['message' => "État de l'événement mis à jour avec succès"], 200);
+        }
+
+        return $this->json(['message' => "Vous n'êtes pas autorisé à modifier cet événement"], 403);
     }
 
 }
