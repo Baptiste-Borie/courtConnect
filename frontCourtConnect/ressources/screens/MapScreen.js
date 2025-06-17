@@ -2,11 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
 
-
 import PageLayout from "../shared/PageLayout";
 import useLocation from "../customHooks/useLocation";
 import MapBox from "../shared/MapBox";
-
 
 const MapScreen = ({ navigation }) => {
   const { latitude, longitude, errorMsg } = useLocation();
@@ -32,13 +30,15 @@ const MapScreen = ({ navigation }) => {
     const fetchTerrains = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        const response = await fetch("https://courtconnect.alwaysdata.net/api/getAllValidatedTerrains", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const response = await fetch(
+          "https://courtconnect.alwaysdata.net/getAllValidatedTerrains",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -56,7 +56,6 @@ const MapScreen = ({ navigation }) => {
           title: terrain.nom,
         }));
         setTerrainMarkers(markers);
-
       } catch (error) {
         console.error("Erreur de récupération des terrains :", error);
       } finally {
@@ -66,7 +65,6 @@ const MapScreen = ({ navigation }) => {
 
     fetchTerrains();
   }, []);
-
 
   if (errorMsg) {
     return (

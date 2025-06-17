@@ -59,7 +59,7 @@ export default function EventFormulaire({ navigation }) {
           return;
         }
 
-        const res = await authFetch("api/getAllValidatedTerrains", {
+        const res = await authFetch("getAllValidatedTerrains", {
           method: "GET",
         });
 
