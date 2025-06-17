@@ -67,11 +67,10 @@ class UserController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $dto = new UserDTO();
         $dto->username = $data['username'];
-//        $dto->password = $passwordHasher->hashPassword($user, $data['password']);
         $dto->nom = $data['nom'];
         $dto->prenom = $data['prenom'];
+        $dto->pseudo = $data['pseudo'];
         $dto->image_url = $data['imageUrl'];
-        $dto->trustability = $data['trustability'];
 
         $user = $userManager->updateUser($dto, $user);
 

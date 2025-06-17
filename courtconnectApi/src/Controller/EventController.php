@@ -91,7 +91,7 @@ class EventController extends AbstractController
         $dto->date_heure = $data['dateHeure'];
         $dto->max_joueurs = $data['maxJoueurs'];
         $dto->niveau = $data['niveau'];
-        $dto->etat = $data['etat'];
+        $dto->etat = 0;
         $dto->type_event = $this->typeEventRepository->findOneBy(['id' => $data['typeEvent']]);
 
         $result = $event
