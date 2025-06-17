@@ -79,7 +79,13 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
 
   return (
     <PageLayout headerContent="Créer un événement" showFooter={false}>
-      <StepTracker currentStep={2} />
+      <StepTracker
+        currentStep={2}
+        onStepChange={(step) => {
+          if (step === 1) navigation.goBack();
+        }}
+      />
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.label, { color: theme.text }]}>Description</Text>
         <TextInput

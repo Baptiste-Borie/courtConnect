@@ -113,7 +113,13 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
 
   return (
     <PageLayout headerContent="Ajouter un terrain" showFooter={false}>
-      <StepTracker currentStep={2} />
+      <StepTracker
+        currentStep={2}
+        onStepChange={(step) => {
+          if (step === 1) navigation.goBack();
+        }}
+      />
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[styles.label, { color: theme.text }]}>
           Nombres de paniers

@@ -1,43 +1,49 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 
-const StepTracker = ({ currentStep }) => {
+const StepTracker = ({ currentStep, onStepChange }) => {
   const { theme } = useContext(ThemeContext);
 
   const renderStep = (stepNumber) => {
     const isActive = currentStep === stepNumber;
 
     return (
-      <View
-        style={[
-          styles.step,
-          {
-            backgroundColor: isActive ? theme.primary : "transparent",
-            borderColor: theme.primary,
-          },
-        ]}
+      <TouchableOpacity
+        onPress={() => {
+          if (stepNumber !== currentStep && onStepChange) {
+            onStepChange(stepNumber);
+          }
+        }}
       >
-        <Text
+        <View
           style={[
-            styles.stepText,
+            styles.step,
             {
-              color: isActive ? theme.background : theme.primary,
+              backgroundColor: isActive ? theme.primary : "transparent",
+              borderColor: theme.primary,
             },
           ]}
         >
-          {stepNumber}
-        </Text>
-      </View>
+          <Text
+            style={[
+              styles.stepText,
+              {
+                color: isActive ? theme.background : theme.primary,
+              },
+            ]}
+          >
+            {stepNumber}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
   return (
     <View style={styles.container}>
       {renderStep(1)}
-
       <View style={[styles.dashedLine, { borderColor: theme.primary }]} />
-
       {renderStep(2)}
     </View>
   );

@@ -108,7 +108,12 @@ export default function EventFormulaire({ navigation }) {
 
   return (
     <PageLayout showFooter={false} headerContent={"Créer un événement"}>
-      <StepTracker currentStep={1} />
+      <StepTracker
+        currentStep={1}
+        onStepChange={(step) => {
+          if (step === 2) handleGoToNextStep();
+        }}
+      />
       <View style={styles.container}>
         <Text style={[styles.label, { color: theme.text }]}>
           Nom de l'événement
