@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,95 +6,39 @@ import {
   Image,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
-import assets from "../../constants/assets";
-import Button from "../../shared/Button";
 import PageLayout from "../../shared/PageLayout";
-import AuthContext from "../../context/AuthContext";
+import assets from "../../constants/assets";
+import TerrainDetailTab from "./TerrainDetailTab";
+import TerrainEventsTab from "./TerrainEventsTab";
 
-export default function EventDetailScreen({ route }) {
+export default function TerrainDetailScreen({ route }) {
   const { theme } = useTheme();
-  const { user } = useContext(AuthContext);
-  const eventId = route.params?.eventId;
-
-  const [event, setEvent] = useState(null);
-  const [participants, setParticipants] = useState([]);
-  const [joined, setJoined] = useState(false);
+  const terrainId = route.params?.terrainId;
+  const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("details"); // 👈 tab: "details" | "events"
 
   useEffect(() => {
-    if (!eventId) return;
-
-    const fetchData = async () => {
+    const fetchTerrain = async () => {
       try {
-        const res = await authFetch(`api/getEvent/${eventId}`);
+        const res = await authFetch(`api/getTerrain/${terrainId}`);
         const data = await res.json();
-        setEvent(data);
-
-        const usersRes = await authFetch(`api/getUsersOfThisEvent/${eventId}`);
-        const users = await usersRes.json();
-
-        setParticipants(users);
-        setJoined(users.some((u) => u.id === user?.id));
+        setTerrain(data);
       } catch (err) {
-        console.error("Erreur lors du chargement de l'événement :", err);
+        console.error("Erreur chargement terrain :", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [eventId, user]);
+    if (terrainId) fetchTerrain();
+  }, [terrainId]);
 
-  const handleJoinOrLeave = async () => {
-    try {
-      const routeName = joined ? "leaveEvent" : "joinEvent";
-      const res = await authFetch(`api/${routeName}/${eventId}`, {
-        method: "POST",
-      });
-
-      if (res.ok) {
-        const updatedUsersRes = await authFetch(
-          `api/getUsersOfThisEvent/${eventId}`
-        );
-        const updatedUsers = await updatedUsersRes.json();
-        setParticipants(updatedUsers);
-        setJoined(updatedUsers.some((u) => u.id === user?.id));
-      } else {
-        console.error("Erreur lors de la participation/désinscription");
-      }
-    } catch (err) {
-      console.error("Erreur join/leave:", err);
-    }
-  };
-
-  const getLevelLabel = (levelValue) => {
-    switch (levelValue?.toString()) {
-      case "0":
-        return "Débutant";
-      case "1":
-        return "Intermédiaire";
-      case "2":
-        return "Expert";
-      default:
-        return "Non précisé";
-    }
-  };
-
-  const formatDate = (rawDate) => {
-    const date = new Date(rawDate);
-    return date.toLocaleString("fr-FR", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  if (loading || !event) {
+  if (loading || !terrain) {
     return (
       <View style={[styles.container]}>
         <ActivityIndicator size="large" color={theme.primary} />
@@ -104,85 +48,59 @@ export default function EventDetailScreen({ route }) {
 
   return (
     <PageLayout>
-      <View style={[styles.container, { backgroundColor: theme.background }]}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          style={{ flex: 1 }}
-        >
-          <View style={styles.imagePlaceholder} />
-          <View style={[styles.header, { backgroundColor: theme.card }]}>
-            <View style={styles.headerTop}>
-              <Text style={[styles.title, { color: theme.text }]}>
-                {event.nom}
-              </Text>
+      <ScrollView>
+        {/* Image */}
+        <View style={styles.imagePlaceholder} />
 
-              <View style={styles.playersCount}>
-                <Text style={{ color: theme.primary, marginRight: 4 }}>
-                  {participants.length}/{event.max_joueurs}
-                </Text>
-                <Image
-                  source={assets.icons.person_active}
-                  style={{ width: 16, height: 16, tintColor: theme.primary }}
-                />
-              </View>
-            </View>
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              activeTab === "details" && {
+                borderBottomColor: theme.primary,
+                borderBottomWidth: 2,
+              },
+            ]}
+            onPress={() => setActiveTab("details")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                { color: activeTab === "details" ? theme.primary : theme.text },
+              ]}
+            >
+              Détail
+            </Text>
+          </TouchableOpacity>
 
-            <View style={styles.details}>
-              <View style={styles.labelRow}>
-                <Text style={[styles.label, { color: theme.text, flex: 1 }]}>
-                  Terrain : {event.terrain.nom}, {event.terrain.ville}
-                </Text>
-                <Image
-                  source={assets.terrain}
-                  style={{
-                    width: 35,
-                    height: 23.33,
-                    marginLeft: 8,
-                    marginTop: 4,
-                  }}
-                />
-              </View>
-
-              <Text
-                style={[
-                  styles.label,
-                  {
-                    color: theme.text,
-                    borderBottomWidth: 1,
-                    paddingBottom: 8,
-                    borderColor: theme.text + "99",
-                  },
-                ]}
-              >
-                Date : {formatDate(event.date_heure)}
-              </Text>
-
-              <Text style={[styles.label, { color: theme.text }]}>
-                Niveau : {getLevelLabel(event.niveau)}
-              </Text>
-
-              <Text style={[styles.label, { color: theme.text }]}>
-                Type : {event.type_event.nom}
-              </Text>
-
-              <Text style={[styles.label, { color: theme.text + "99" }]}>
-                Crée par :
-                {event.created_by.prenom + " " + event.created_by.nom ||
-                  event.created_by.username}
-              </Text>
-            </View>
-          </View>
-          <View style={{ height: 80 }} />
-        </ScrollView>
-
-        <View style={styles.buttonWrapper}>
-          <Button
-            onPress={handleJoinOrLeave}
-            title={joined ? "Se désinscrire" : "Rejoindre"}
-            {...(joined ? { color: "background_light" } : { color: "primary" })}
-          />
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              activeTab === "events" && {
+                borderBottomColor: theme.primary,
+                borderBottomWidth: 2,
+              },
+            ]}
+            onPress={() => setActiveTab("events")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                { color: activeTab === "events" ? theme.primary : theme.text },
+              ]}
+            >
+              Événements
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
+
+        {activeTab === "details" ? (
+          <TerrainDetailTab terrain={terrain} theme={theme} />
+        ) : (
+          <TerrainEventsTab terrainId={terrain.id} theme={theme} />
+        )}
+      </ScrollView>
     </PageLayout>
   );
 }
@@ -190,53 +108,66 @@ export default function EventDetailScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   imagePlaceholder: {
     height: 250,
     backgroundColor: "#ccc",
   },
-  header: {
-    flex: 1,
-    padding: 20,
+  card: {
+    padding: 16,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    marginTop: 8,
   },
-  headerTop: {
+  sectionTitle: {
+    fontWeight: "bold",
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  starsRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     marginBottom: 16,
   },
-  title: {
-    fontWeight: "bold",
-    fontSize: 24,
-    flexShrink: 1,
-    marginRight: 8,
+  starIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 4,
   },
-  playersCount: {
+  infoRow: {
     flexDirection: "row",
-    alignItems: "center",
-  },
-  details: {
-    flex: 1,
-    justifyContent: "space-evenly",
-  },
-  labelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
+    marginBottom: 8,
   },
   label: {
-    fontSize: 16,
-    marginTop: 10,
+    fontWeight: "bold",
+    width: 100,
   },
-  buttonWrapper: {
-    position: "absolute",
-    alignSelf: "center",
-    width: "50%",
-    bottom: 16,
+  value: {
+    flex: 1,
+  },
+  detailsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    marginTop: 16,
+    justifyContent: "space-between",
+  },
+  detailItem: {
+    width: "48%",
+    marginBottom: 12,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 8,
+  },
+  tabButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

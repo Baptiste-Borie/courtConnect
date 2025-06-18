@@ -6,7 +6,10 @@ import {
   Image,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 import { useTheme } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
@@ -17,6 +20,8 @@ import AuthContext from "../../context/AuthContext";
 export default function EventDetailScreen({ route }) {
   const { theme } = useTheme();
   const { user } = useContext(AuthContext);
+  const navigation = useNavigation();
+
   const eventId = route.params?.eventId;
 
   const [event, setEvent] = useState(null);
@@ -110,7 +115,7 @@ export default function EventDetailScreen({ route }) {
           style={{ flex: 1 }}
         >
           <View style={styles.imagePlaceholder} />
-          <View style={[styles.header, { backgroundColor: theme.card }]}>
+          <View style={[styles.header]}>
             <View style={styles.headerTop}>
               <Text style={[styles.title, { color: theme.text }]}>
                 {event.nom}
@@ -129,18 +134,28 @@ export default function EventDetailScreen({ route }) {
 
             <View style={styles.details}>
               <View style={styles.labelRow}>
-                <Text style={[styles.label, { color: theme.text, flex: 1 }]}>
-                  Terrain : {event.terrain.nom}, {event.terrain.ville}
-                </Text>
-                <Image
-                  source={assets.terrain}
-                  style={{
-                    width: 35,
-                    height: 23.33,
-                    marginLeft: 8,
-                    marginTop: 4,
-                  }}
-                />
+                <TouchableOpacity
+                  style={styles.labelRow}
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigation.navigate("TerrainDetail", {
+                      terrainId: event.terrain.id,
+                    })
+                  }
+                >
+                  <Text style={[styles.label, { color: theme.text, flex: 1 }]}>
+                    Terrain : {event.terrain.nom}, {event.terrain.ville}
+                  </Text>
+                  <Image
+                    source={assets.terrain}
+                    style={{
+                      width: 35,
+                      height: 23.33,
+                      marginLeft: 8,
+                      marginTop: 4,
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
 
               <Text
