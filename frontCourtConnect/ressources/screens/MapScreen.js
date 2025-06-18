@@ -66,7 +66,7 @@ const MapScreen = ({ navigation }) => {
     );
   }
 
-  if (!latitude || !longitude) {
+  if (!latitude || !longitude || loadingTerrains) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;
   }
 
