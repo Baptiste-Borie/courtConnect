@@ -5,17 +5,22 @@ import { Ionicons } from '@expo/vector-icons'; // Import des icônes
 
 import assets from "../constants/assets";
 import { getDistance } from '../utils/GetDistance';
+import { recenterMarker } from '../utils/RecenterOnMarker';
 
-const MarkerCourt = ({ marker, onPress, userLocation }) => {
+
+const MarkerCourt = ({ marker, userLocation, mapRef  }) => {
   const coordinate = marker.coordinate;
   const markerRef = useRef(null);
-
-  const distance = getDistance(
+  const distance = userLocation ? getDistance(
     userLocation.coordinate.latitude,
     userLocation.coordinate.longitude,
     marker.coordinate.latitude,
     marker.coordinate.longitude
-  ).toFixed(2);
+  ).toFixed(2) : 'N/A';
+
+  const handlePress = () => {
+    recenterMarker(markerRef, mapRef, coordinate);
+  };
 
   useEffect(() => {
     if (markerRef.current) {
@@ -26,7 +31,7 @@ const MarkerCourt = ({ marker, onPress, userLocation }) => {
   return (
     <Marker
       coordinate={coordinate}
-      onPress={onPress}
+      onPress={handlePress}
       ref={markerRef}
     >
       <Image
