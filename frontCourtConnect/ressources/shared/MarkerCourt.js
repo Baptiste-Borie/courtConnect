@@ -17,10 +17,6 @@ const MarkerCourt = ({ marker, userLocation, mapRef  }) => {
     marker.coordinate.longitude
   ).toFixed(2) : 'N/A';
 
-  const handlePress = () => {
-    recenterMarker(markerRef, mapRef, coordinate);
-  };
-
   useEffect(() => {
     if (userLocation && markerRef.current) {
       markerRef.current.showCallout();
@@ -30,7 +26,7 @@ const MarkerCourt = ({ marker, userLocation, mapRef  }) => {
   return (
     <Marker
       coordinate={coordinate}
-      onPress={handlePress}
+      onPress={() => recenterMarker(markerRef, mapRef, coordinate)}
       ref={markerRef}
     >
       <Image
