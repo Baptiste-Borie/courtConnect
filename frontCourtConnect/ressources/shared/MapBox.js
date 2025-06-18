@@ -51,9 +51,12 @@ const MapBox = forwardRef(({
             coordinate={userLocation.coordinate}
             title={userLocation.title}
             pinColor="blue"
-            onPress={() => recenterMarker(markerRef, mapRef, coordinate)}  
+            onPress={() =>
+              recenterMarker(userMarkerRef, ref, userLocation.coordinate)
+            }
             ref={userMarkerRef}
           />
+
         )}
         {terrainMarkers.map((marker, index) => {
           return (
