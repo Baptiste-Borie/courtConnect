@@ -4,10 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 
-import { ThemeContext } from "../context/ThemeContext";
-import ReturnButton from "./ReturnButton";
-import Button from "./Button";
-import assets from "../constants/assets";
+import { ThemeContext } from "../../context/ThemeContext";
+import ReturnButton from "../ReturnButton";
+import assets from "../../constants/assets";
 
 const Header = ({ content, onLogout }) => {
   const navigation = useNavigation();

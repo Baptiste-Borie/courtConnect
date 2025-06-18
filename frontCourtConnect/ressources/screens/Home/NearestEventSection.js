@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -76,7 +76,6 @@ export default function NearestEventSection({ style }) {
               event={event}
               distance={event.distance}
               theme={theme}
-              onPress={() => {}}
             />
           ))}
         </ScrollView>

@@ -4,7 +4,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
 
-export default function PremiumSection({ style }) {
+export default function AlmostFullEvents({ style }) {
   const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState(null);

@@ -90,6 +90,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         <Text style={[styles.label, { color: theme.text }]}>Description</Text>
         <TextInput
           placeholder="Ex: match entre amis"
+          placeholderTextColor={theme.text + "99"}
           value={description}
           onChangeText={setDescription}
           style={[
@@ -109,6 +110,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         </Text>
         <TextInput
           keyboardType="numeric"
+          placeholderTextColor={theme.text + "99"}
           value={String(maxJoueurs)}
           onChangeText={(value) => setMaxJoueurs(parseInt(value) || 0)}
           style={[

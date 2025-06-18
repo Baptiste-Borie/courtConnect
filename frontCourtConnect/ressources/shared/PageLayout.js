@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { StyleSheet, View } from "react-native";
 
-import Header from "./Header";
+import Header from "./nav/Header";
 import Footer from "./nav/Footer";
 import { ThemeContext } from "../context/ThemeContext";
 

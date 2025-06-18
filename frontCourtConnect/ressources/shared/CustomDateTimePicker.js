@@ -49,7 +49,13 @@ export default function CustomDateTimePicker({
       <View style={styles.row}>
         <TouchableOpacity
           onPress={() => setShowDateModal(true)}
-          style={[styles.inputBlock, { borderColor: theme.primary }]}
+          style={[
+            styles.inputBlock,
+            {
+              borderColor: theme.primary,
+              backgroundColor: theme.background_light,
+            },
+          ]}
         >
           <Text style={{ color: theme.text }}>
             {tempDateTime.toLocaleDateString()}
@@ -58,7 +64,13 @@ export default function CustomDateTimePicker({
 
         <TouchableOpacity
           onPress={() => setShowTimeModal(true)}
-          style={[styles.inputBlock, { borderColor: theme.primary }]}
+          style={[
+            styles.inputBlock,
+            {
+              borderColor: theme.primary,
+              backgroundColor: theme.background_light,
+            },
+          ]}
         >
           <Text style={{ color: theme.text }}>
             {tempDateTime.toLocaleTimeString([], {
@@ -76,7 +88,7 @@ export default function CustomDateTimePicker({
               <View
                 style={[
                   styles.modalContainer,
-                  { backgroundColor: theme.background_light },
+                  { backgroundColor: theme.background },
                 ]}
               >
                 <Text style={[styles.modalTitle, { color: theme.text }]}>
@@ -87,7 +99,7 @@ export default function CustomDateTimePicker({
                     selectedValue={tempDay}
                     onValueChange={(itemValue) => setTempDay(itemValue)}
                     style={styles.picker}
-                    itemStyle={{ fontSize: 14 }}
+                    itemStyle={{ fontSize: 14, color: theme.text }}
                   >
                     {days.map((d) => (
                       <Picker.Item
@@ -101,7 +113,7 @@ export default function CustomDateTimePicker({
                     selectedValue={tempMonth}
                     onValueChange={(itemValue) => setTempMonth(itemValue)}
                     style={styles.picker}
-                    itemStyle={{ fontSize: 14 }}
+                    itemStyle={{ fontSize: 14, color: theme.text }}
                   >
                     {months.map((m) => (
                       <Picker.Item
@@ -115,7 +127,7 @@ export default function CustomDateTimePicker({
                     selectedValue={tempYear}
                     onValueChange={(itemValue) => setTempYear(itemValue)}
                     style={styles.picker}
-                    itemStyle={{ fontSize: 14 }}
+                    itemStyle={{ fontSize: 14, color: theme.text }}
                   >
                     {years.map((y) => (
                       <Picker.Item key={y} label={String(y)} value={y} />
