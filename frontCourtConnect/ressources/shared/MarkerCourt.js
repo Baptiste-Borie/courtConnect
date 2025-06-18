@@ -13,7 +13,7 @@ export default function MarkerCourt({ coordinate, title, onPress }) {
       onPress={onPress}
     >
       <Image
-        source={assets.courtMarker}
+        source={assets.courtMarkerOrange}
         style={{ width: 40, height: 40 }} 
         resizeMode="contain"
       />
