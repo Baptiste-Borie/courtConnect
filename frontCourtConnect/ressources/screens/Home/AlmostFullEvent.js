@@ -88,7 +88,7 @@ export default function AlmostFullEvents({ style }) {
         Soyez parmi les derniers à rejoindre !!
       </Text>
 
-      {events.slice(0, 4).map((item) => {
+      {events.map((item) => {
         const isLoading = loadingEventsIds.includes(item.id);
 
         return (
