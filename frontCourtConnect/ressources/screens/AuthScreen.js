@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import OrangeButton from "../shared/OrangeButton";
+import Button from "../shared/Button";
 import PageLayout from "../shared/PageLayout";
 import { ThemeContext } from "../context/ThemeContext";
 
@@ -43,11 +43,6 @@ const AuthScreen = ({ onLogin }) => {
       }
 
       if (response.ok) {
-        console.log(
-          `✅ ${isLogin ? "Connexion" : "Inscription"} réussie`,
-          data
-        );
-
         if (isLogin) {
           await AsyncStorage.setItem("token", data.token);
           await AsyncStorage.setItem("refresh_token", data.refresh_token);
@@ -98,7 +93,7 @@ const AuthScreen = ({ onLogin }) => {
         />
       </View>
 
-      <OrangeButton
+      <Button
         title={isLogin ? "Se connecter" : "S'inscrire"}
         onPress={handleSubmit}
       />

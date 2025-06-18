@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -6,38 +6,15 @@ import { authFetch } from "../../utils/AuthFetch";
 import PageLayout from "../../shared/PageLayout";
 import AccountScreenHeader from "./AccountScreenHeader";
 import AccountScreenMainContent from "./AccountScreenMainContent";
+import AuthContext from "../../context/AuthContext";
 
-export default function AccountScreen({ navigation }) {
-  const [data, setData] = useState(null);
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchUser = async () => {
-        try {
-          const res = await authFetch("api/userConnected", {
-            method: "GET",
-          });
-
-          if (!res.ok) {
-            const errText = await res.text();
-            console.error("Erreur API userConnected :", errText);
-            return;
-          }
-
-          const user = await res.json();
-          setData(user);
-        } catch (err) {
-          console.error("Erreur fetch userConnected :", err);
-        }
-      };
-
-      fetchUser();
-    }, [])
-  );
+export default function AccountScreen({ navigation, onLogout }) {
+  const { user } = useContext(AuthContext);
 
   return (
-    <PageLayout style={styles.content}>
-      <AccountScreenHeader style={styles.header} data={data} />
-      <AccountScreenMainContent data={data} />
+    <PageLayout style={styles.content} onLogout={onLogout}>
+      <AccountScreenHeader style={styles.header} data={user} />
+      <AccountScreenMainContent data={user} />
     </PageLayout>
   );
 }

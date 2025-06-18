@@ -14,7 +14,7 @@ import PageLayout from "../../shared/PageLayout";
 import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import MapBox from "../../shared/MapBox";
-import OrangeButton from "../../shared/OrangeButton";
+import Button from "../../shared/Button";
 import { authFetch } from "../../utils/AuthFetch";
 
 export default function EventFormulaire({ navigation }) {
@@ -185,11 +185,11 @@ export default function EventFormulaire({ navigation }) {
             <MapBox
               style={{ width: "100%", height: 250 }}
               region={mapRegion}
-              markers={mapMarkers}
+              terrainMarkers={mapMarkers}
             />
           </>
         )}
-        <OrangeButton
+        <Button
           title="Suivant"
           onPress={handleGoToNextStep}
           style={{ marginVertical: 10 }}

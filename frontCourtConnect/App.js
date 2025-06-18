@@ -8,7 +8,7 @@ import { ThemeProvider, useTheme } from "./ressources/context/ThemeContext";
 import AuthContext from "./ressources/context/AuthContext";
 
 import AuthScreen from "./ressources/screens/AuthScreen";
-import HomeScreen from "./ressources/screens/HomeScreen";
+import HomeScreen from "./ressources/screens/Home/HomeScreen";
 import MapScreen from "./ressources/screens/MapScreen";
 import AccountScreen from "./ressources/screens/Account/AccountScreen";
 import EditProfileScreen from "./ressources/screens/Account/EditProfileScreen";
@@ -17,6 +17,9 @@ import TerrainFormulaire from "./ressources/screens/form/TerrainFormulaire";
 import TerrainFormulaireSecondStep from "./ressources/screens/form/TerrainFormulaireSecondStep";
 import EventFormulaire from "./ressources/screens/form/EventFormulaire";
 import EventFormulaireSecondStep from "./ressources/screens/form/EventFormulaireSecondStep";
+import EventDetailScreen from "./ressources/screens/detail/EventDetailScreen";
+
+import { authFetch } from "./ressources/utils/AuthFetch";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,15 +37,15 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
           <Stack.Screen name="Map" component={MapScreen} />
           {isAuthenticated ? (
             <>
-              <Stack.Screen name="Home">
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Account">
                 {(props) => (
-                  <HomeScreen
+                  <AccountScreen
                     {...props}
                     onLogout={() => setIsAuthenticated(false)}
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen name="Account" component={AccountScreen} />
               <Stack.Screen name="EditAccount" component={EditProfileScreen} />
               <Stack.Screen
                 name="AccountSettings"
@@ -58,6 +61,7 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
                 name="AddEventSecond"
                 component={EventFormulaireSecondStep}
               />
+              <Stack.Screen name="EventDetail" component={EventDetailScreen} />
             </>
           ) : (
             <Stack.Screen name="Auth">
@@ -77,23 +81,48 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem("token");
-      setIsAuthenticated(!!token);
-      setLoading(false);
+    const initAuth = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          setIsAuthenticated(false);
+          setUser(null);
+          return;
+        }
+
+        const res = await authFetch("api/userConnected");
+        if (!res.ok) {
+          setIsAuthenticated(false);
+          setUser(null);
+          return;
+        }
+
+        const userData = await res.json();
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.error("Erreur lors de la récupération de l'utilisateur :", err);
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    checkToken();
+    initAuth();
   }, []);
 
   if (loading) return null;
 
   return (
     <ThemeProvider>
-      <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+      <AuthContext.Provider
+        value={{ isAuthenticated, setIsAuthenticated, user, setUser }}
+      >
         <AppContent
           isAuthenticated={isAuthenticated}
           setIsAuthenticated={setIsAuthenticated}

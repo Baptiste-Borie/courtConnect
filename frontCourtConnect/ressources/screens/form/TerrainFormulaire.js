@@ -16,7 +16,7 @@ import StepTracker from "./StepTracker";
 import { ThemeContext } from "../../context/ThemeContext";
 import MapBox from "../../shared/MapBox";
 import assets from "../../constants/assets";
-import OrangeButton from "../../shared/OrangeButton";
+import Button from "../../shared/Button";
 
 export default function TerrainFormulaire({ navigation }) {
   const { theme } = useContext(ThemeContext);
@@ -188,7 +188,7 @@ export default function TerrainFormulaire({ navigation }) {
           ))}
         </View>
 
-        <OrangeButton title="Suivant" onPress={handleGoToNextStep} />
+        <Button title="Suivant" onPress={handleGoToNextStep} />
       </View>
     </PageLayout>
   );

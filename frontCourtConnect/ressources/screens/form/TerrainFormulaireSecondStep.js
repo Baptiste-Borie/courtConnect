@@ -126,6 +126,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         </Text>
         <TextInput
           keyboardType="numeric"
+          placeholderTextColor={theme.text + "99"}
           value={String(nombrePaniers)}
           onChangeText={(value) => setNombrePaniers(parseInt(value) || 0)}
           style={[
@@ -185,6 +186,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         <Text style={[styles.label, { color: theme.text }]}>Remarques</Text>
         <TextInput
           placeholder="Tapez ici ..."
+          placeholderTextColor={theme.text + "99"}
           value={remarques}
           onChangeText={setRemarques}
           multiline
