@@ -1,10 +1,11 @@
-import React, { forwardRef, useContext } from "react";
+import React, { forwardRef, useContext, useRef } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Callout, Marker } from "react-native-maps";
 
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
 import MarkerCourt from "./MarkerCourt";
+import { recenterMarker } from '../utils/RecenterOnMarker';
 
 const MapBox = forwardRef(({
   style = {},
@@ -17,6 +18,7 @@ const MapBox = forwardRef(({
 }, ref) => {
   const { themeName } = useContext(ThemeContext);
 
+  const userMarkerRef = useRef(null);
 
 
   return (
@@ -49,14 +51,20 @@ const MapBox = forwardRef(({
             coordinate={userLocation.coordinate}
             title={userLocation.title}
             pinColor="blue"
+            onPress={() =>
+              recenterMarker(userMarkerRef, ref, userLocation.coordinate)
+            }
+            ref={userMarkerRef}
           />
+
         )}
         {terrainMarkers.map((marker, index) => {
           return (
             <MarkerCourt
               key={index}
               userLocation={userLocation}
-              marker = {marker}
+              marker={marker}
+              mapRef={ref}
             >
             </MarkerCourt>
           );

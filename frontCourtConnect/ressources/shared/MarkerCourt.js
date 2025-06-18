@@ -3,20 +3,19 @@ import { Marker, Callout } from "react-native-maps";
 import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import assets from "../constants/assets";
-import { getDistance } from "../utils/GetDistance";
+import { getDistance } from '../utils/GetDistance';
+import { recenterMarker } from '../utils/RecenterOnMarker';
 
-const MarkerCourt = ({ marker, onPress, userLocation }) => {
+
+const MarkerCourt = ({ marker, userLocation, mapRef  }) => {
   const coordinate = marker.coordinate;
   const markerRef = useRef(null);
-
-  const distance = userLocation
-    ? getDistance(
-        userLocation.coordinate.latitude,
-        userLocation.coordinate.longitude,
-        marker.coordinate.latitude,
-        marker.coordinate.longitude
-      ).toFixed(2)
-    : null;
+  const distance = userLocation ? getDistance(
+    userLocation.coordinate.latitude,
+    userLocation.coordinate.longitude,
+    marker.coordinate.latitude,
+    marker.coordinate.longitude
+  ).toFixed(2) : 'N/A';
 
   useEffect(() => {
     if (userLocation && markerRef.current) {
@@ -25,7 +24,11 @@ const MarkerCourt = ({ marker, onPress, userLocation }) => {
   }, [userLocation]);
 
   return (
-    <Marker coordinate={coordinate} onPress={onPress} ref={markerRef}>
+    <Marker
+      coordinate={coordinate}
+      onPress={() => recenterMarker(markerRef, mapRef, coordinate)}
+      ref={markerRef}
+    >
       <Image
         source={assets.courtMarkerOrange}
         style={{ width: 40, height: 40 }}
