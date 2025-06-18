@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import OrangeButton from "../shared/OrangeButton";
+import Button from "../shared/Button";
 import PageLayout from "../shared/PageLayout";
 import { ThemeContext } from "../context/ThemeContext";
 
@@ -98,7 +98,7 @@ const AuthScreen = ({ onLogin }) => {
         />
       </View>
 
-      <OrangeButton
+      <Button
         title={isLogin ? "Se connecter" : "S'inscrire"}
         onPress={handleSubmit}
       />
