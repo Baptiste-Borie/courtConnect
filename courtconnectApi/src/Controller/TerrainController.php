@@ -290,4 +290,68 @@ class TerrainController extends AbstractController
     }
 
 
+    /**
+     * Upload et enregistre l'image de profil d'un terrain donné.
+     *
+     * @param Request $request Requête HTTP contenant le fichier image.
+     * @param int $id Identifiant du terrain auquel l'image est associée.
+     *
+     * @return JsonResponse Réponse JSON indiquant le succès ou l'échec de l'opération.
+     */
+    #[Route('/api/uploadTerrainPicture/{id}', name: 'upload_terrain_picture', methods: ['POST'])]
+    public function uploadProfilePicture(Request $request, $id): JsonResponse
+    {
+        $file = $request->files->get('image');
+
+        if (!$file || !$file->isValid()) {
+            return $this->json(['message' => 'Image invalide.'], 400);
+        }
+
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/terrains/' . $id;
+
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0775, true);
+        }
+
+        $extension = $file->guessExtension() ?: 'jpg';
+        $filename = 'image.' . $extension;
+
+        try {
+            $existingFiles = glob($uploadDir . '/image.*');
+            foreach ($existingFiles as $oldFile) {
+                unlink($oldFile);
+            }
+            $file->move($uploadDir, $filename);
+
+            return $this->json(['message' => 'Image enregistrée.'], 200);
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Erreur lors de l’enregistrement.'], 500);
+        }
+    }
+
+    /**
+     * Retourne l'URL de la photo de profil de l'utilisateur connecté.
+     * Cherche automatiquement le fichier d'image quel que soit son format (jpg, png, etc.).
+     *
+     * @return JsonResponse Contient l'URL de l'image ou un message d'erreur si aucune image n'est trouvée.
+     */
+    #[Route('/api/terrain/{id}/getPicture', name: 'get_terrain_picture', methods: ['GET'])]
+    public function getProfilePictureUrl($id): JsonResponse
+    {
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/terrains/' . $id;
+        $files = glob($uploadDir . '/image.*');
+
+        if (!$files || count($files) === 0) {
+            return $this->json(['message' => 'Aucune image trouvée.'], 404);
+        }
+
+        $filename = basename($files[0]);
+        $imagePath = '/uploads/terrains/' . $id . '/' . $filename;
+
+        return $this->json([
+            'imageUrl' => $imagePath
+        ], 200);
+    }
+
+
 }

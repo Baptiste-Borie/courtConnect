@@ -37,6 +37,14 @@ class EventController extends AbstractController
         return $this->json($events, 200, [], ['groups' => ['all_events']]);
     }
 
+    #[Route('/api/getOnGoingEvents', name: 'app_get_ongoing_events')]
+    public function getOnGoingEvents(): Response
+    {
+        $events = $this->eventRepository->findEventsWithEtatOneOrTwo();
+        return $this->json($events, 200, [], ['groups' => ['all_events']]);
+
+    }
+
     #[Route('/api/getUsersOfThisEvent/{id}', name: 'app_get_users_of_this_event', methods: ['GET'])]
     public function getUsersOfThisEvent($id): JsonResponse
     {
@@ -140,6 +148,8 @@ class EventController extends AbstractController
         $result = $event
             ? $this->eventManager->updateEvent($dto, $event)
             : $this->eventManager->addEvent($dto);
+
+        $this->joinEvent($result->getId());
 
         if (!$result) {
             return $this->json([

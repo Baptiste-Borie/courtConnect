@@ -40,4 +40,15 @@ class EventRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findEventsWithEtatOneOrTwo()
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.etat IN (:etats)')
+            ->setParameter('etats', [0, 1])
+            ->orderBy('e.date_heure', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }
