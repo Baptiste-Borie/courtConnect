@@ -34,8 +34,6 @@ export default function AccountScreen({ navigation, onLogout }) {
     }, [])
   );
 
-  console.log("b:SS", onLogout);
-
   return (
     <PageLayout style={styles.content} onLogout={onLogout}>
       <AccountScreenHeader style={styles.header} data={data} />

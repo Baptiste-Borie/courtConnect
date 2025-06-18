@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import OrangeButton from "../../shared/OrangeButton";
+import Button from "../../shared/Button";
 import PageLayout from "../../shared/PageLayout";
 import { ThemeContext } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
@@ -128,7 +128,7 @@ export default function EditProfileScreen({ navigation, route }) {
           ]}
         />
 
-        <OrangeButton title="Valider" onPress={handleSubmit} />
+        <Button title="Valider" onPress={handleSubmit} />
       </ScrollView>
     </PageLayout>
   );

@@ -6,7 +6,7 @@ import { useContext } from "react";
 
 import { ThemeContext } from "../context/ThemeContext";
 import ReturnButton from "./ReturnButton";
-import OrangeButton from "./OrangeButton";
+import Button from "./Button";
 import assets from "../constants/assets";
 
 const Header = ({ content, onLogout }) => {
@@ -28,9 +28,14 @@ const Header = ({ content, onLogout }) => {
       />
 
       <Text style={[styles.title, { color: theme.text }]}>{content}</Text>
-      <TouchableOpacity style={styles.logout} onPress={handleLogout}>
-        <Image source={assets.icons.logout} style={{ width: 24, height: 24 }} />
-      </TouchableOpacity>
+      {onLogout && (
+        <TouchableOpacity style={styles.logout} onPress={handleLogout}>
+          <Image
+            source={assets.icons.logout}
+            style={{ width: 24, height: 24 }}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
