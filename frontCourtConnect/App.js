@@ -8,7 +8,7 @@ import { ThemeProvider, useTheme } from "./ressources/context/ThemeContext";
 import AuthContext from "./ressources/context/AuthContext";
 
 import AuthScreen from "./ressources/screens/AuthScreen";
-import HomeScreen from "./ressources/screens/HomeScreen";
+import HomeScreen from "./ressources/screens/Home/HomeScreen";
 import MapScreen from "./ressources/screens/MapScreen";
 import AccountScreen from "./ressources/screens/Account/AccountScreen";
 import EditProfileScreen from "./ressources/screens/Account/EditProfileScreen";
