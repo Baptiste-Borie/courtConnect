@@ -50,6 +50,7 @@ class Event
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'events')]
+    #[Groups(['userOfEvent'])]
     private Collection $joueurs;
 
     #[ORM\Column(length: 255)]
