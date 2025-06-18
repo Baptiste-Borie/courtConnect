@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Image } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import { useNavigation } from "@react-navigation/native"; // 👈
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
 
 export default function AlmostFullEvents({ style }) {
   const { theme } = useTheme();
+  const navigation = useNavigation(); // 👈
+
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState(null);
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
@@ -80,7 +90,17 @@ export default function AlmostFullEvents({ style }) {
         const isLoading = loadingEventsIds.includes(item.id);
 
         return (
-          <View key={item.id} style={styles.eventCard}>
+          <TouchableOpacity
+            key={item.id}
+            onPress={() =>
+              navigation.navigate("EventDetail", { eventId: item.id })
+            }
+            style={[
+              styles.eventCard,
+              { backgroundColor: theme.background_light },
+            ]}
+            activeOpacity={0.8}
+          >
             <View style={styles.iconPlaceholder} />
             <View style={{ flex: 1 }}>
               <Text style={[{ color: theme.text, fontWeight: "bold" }]}>
@@ -111,7 +131,7 @@ export default function AlmostFullEvents({ style }) {
                 </>
               )}
             </View>
-          </View>
+          </TouchableOpacity>
         );
       })}
     </View>

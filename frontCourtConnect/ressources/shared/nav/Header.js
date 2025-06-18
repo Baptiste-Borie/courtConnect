@@ -10,7 +10,6 @@ import assets from "../../constants/assets";
 
 const Header = ({ content, onLogout }) => {
   const navigation = useNavigation();
-
   const { theme } = useContext(ThemeContext);
 
   const handleLogout = async () => {
@@ -20,15 +19,16 @@ const Header = ({ content, onLogout }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.primary }]}>
-      <ReturnButton
-        onPress={() => {
-          navigation.goBack();
-        }}
-      />
+      <ReturnButton onPress={() => navigation.goBack()} />
 
       <Text style={[styles.title, { color: theme.text }]}>{content}</Text>
+
       {onLogout && (
-        <TouchableOpacity style={styles.logout} onPress={handleLogout}>
+        <TouchableOpacity
+          style={styles.logoutTouchArea}
+          onPress={handleLogout}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // facultatif, pour encore plus de confort
+        >
           <Image
             source={assets.icons.logout}
             style={{ width: 24, height: 24 }}
@@ -49,17 +49,22 @@ const styles = StyleSheet.create({
   },
   title: {
     position: "absolute",
-    bottom: 10, // même que le paddingBottom de container
+    bottom: 10,
     left: 0,
     right: 0,
     textAlign: "center",
     fontSize: 18,
-    pointerEvents: "none", // pour éviter que le texte bloque les interactions avec ReturnButton
+    pointerEvents: "none",
   },
-  logout: {
+  logoutTouchArea: {
     position: "absolute",
-    bottom: 10,
+    bottom: 5,
     right: 10,
+    padding: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
