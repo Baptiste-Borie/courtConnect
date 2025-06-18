@@ -17,9 +17,6 @@ const MapBox = forwardRef(({
   onRegionChange = () => { },
 }, ref) => {
   const { themeName } = useContext(ThemeContext);
-  const handlePress = () => {
-    recenterMarker(userMarkerRef, ref, userLocation.coordinate);
-  };
 
   const userMarkerRef = useRef(null);
 
@@ -54,7 +51,7 @@ const MapBox = forwardRef(({
             coordinate={userLocation.coordinate}
             title={userLocation.title}
             pinColor="blue"
-            onPress={handlePress}  
+            onPress={() => recenterMarker(markerRef, mapRef, coordinate)}  
             ref={userMarkerRef}
           />
         )}
