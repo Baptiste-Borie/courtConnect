@@ -1,6 +1,6 @@
 import React, { forwardRef, useContext } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Callout, Marker } from "react-native-maps";
 
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
@@ -11,11 +11,13 @@ const MapBox = forwardRef(({
   height = 200,
   region,
   centerMaker = false,
-  userLocation ,
-  terrainMarkers = [], 
-  onRegionChange = () => {},
+  userLocation,
+  terrainMarkers = [],
+  onRegionChange = () => { },
 }, ref) => {
   const { themeName } = useContext(ThemeContext);
+
+
 
   return (
     <View style={[{ flex: 1 }, { height }, style]}>
@@ -49,13 +51,17 @@ const MapBox = forwardRef(({
             pinColor="blue"
           />
         )}
-        {terrainMarkers.map((marker, index) => (
-          <MarkerCourt
-            key={index}
-            coordinate={marker.coordinate}
-            title={marker.title}
-            pinColor="orange"
-          />))}
+        {terrainMarkers.map((marker, index) => {
+          return (
+            <MarkerCourt
+              key={index}
+              userLocation={userLocation}
+              marker = {marker}
+            >
+            </MarkerCourt>
+          );
+        })}
+
       </MapView>
 
       {centerMaker && (
