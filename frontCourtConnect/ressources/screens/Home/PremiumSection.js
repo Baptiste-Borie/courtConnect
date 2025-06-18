@@ -1,34 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
-import { authFetch } from "../../utils/AuthFetch";
-import Button from "../../shared/Button";
 import { useNavigation } from "@react-navigation/native";
+import AuthContext from "../../context/AuthContext"; // 💡 Import du contexte
+import Button from "../../shared/Button";
 
 export default function PremiumSection({ style }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
-  const [favorites, setFavorites] = useState(null);
-  const [premiumUser, setPremiumUser] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-    const checkPremium = async () => {
+  const [favorites, setFavorites] = useState(null);
+
+  /*   useEffect(() => {
+    const fetchFavorites = async () => {
       try {
-        const res = await authFetch("api/userConnected");
+        const res = await authFetch("api/getFavorites");
         const data = await res.json();
-        setPremiumUser(data.roles.includes("ROLE_PREMIUM"));
+        setFavorites(data);
       } catch (err) {
-        console.error("Erreur fetch userConnected:", err);
-      } finally {
-        setLoading(false);
+        console.error("Erreur fetch favorites:", err);
       }
     };
+    if (user?.roles.includes("ROLE_PREMIUM")) fetchFavorites();
+  }, [user]); */
 
-    checkPremium();
-  }, []);
-
-  if (loading) {
+  if (!user) {
     return (
       <View
         style={[styles.container, style, { backgroundColor: theme.primary }]}
@@ -41,7 +38,9 @@ export default function PremiumSection({ style }) {
     );
   }
 
-  if (!premiumUser) {
+  const isPremium = user.roles?.includes("ROLE_PREMIUM");
+
+  if (!isPremium) {
     return (
       <View
         style={[styles.container, style, { backgroundColor: theme.primary }]}
@@ -82,6 +81,7 @@ export default function PremiumSection({ style }) {
       <Text style={[styles.title, { color: theme.text }]}>
         Terrains favoris
       </Text>
+      {/* Affichage des favoris ici  */}
     </View>
   );
 }

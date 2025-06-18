@@ -43,11 +43,6 @@ const AuthScreen = ({ onLogin }) => {
       }
 
       if (response.ok) {
-        console.log(
-          `✅ ${isLogin ? "Connexion" : "Inscription"} réussie`,
-          data
-        );
-
         if (isLogin) {
           await AsyncStorage.setItem("token", data.token);
           await AsyncStorage.setItem("refresh_token", data.refresh_token);
