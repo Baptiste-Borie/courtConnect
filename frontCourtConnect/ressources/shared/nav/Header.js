@@ -27,7 +27,7 @@ const Header = ({ content, onLogout }) => {
         <TouchableOpacity
           style={styles.logoutTouchArea}
           onPress={handleLogout}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // facultatif, pour encore plus de confort
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Image
             source={assets.icons.logout}

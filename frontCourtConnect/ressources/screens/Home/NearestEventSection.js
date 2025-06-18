@@ -24,7 +24,7 @@ export default function NearestEventSection({ style }) {
 
     const fetchTerrains = async () => {
       try {
-        const res = await authFetch("api/getAllEvents");
+        const res = await authFetch("api/getOnGoingEvents");
         const data = await res.json();
 
         const sorted = data

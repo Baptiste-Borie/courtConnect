@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigation } from "@react-navigation/native";
-import AuthContext from "../../context/AuthContext"; // 💡 Import du contexte
+import AuthContext from "../../context/AuthContext";
 import Button from "../../shared/Button";
 
 export default function PremiumSection({ style }) {

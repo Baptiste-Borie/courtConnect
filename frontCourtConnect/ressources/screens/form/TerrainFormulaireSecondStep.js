@@ -43,7 +43,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         ville: match[3].trim(),
       };
     }
-    return { adresse, code_postal: "", ville: "" }; // fallback si format non reconnux
+    return { adresse, code_postal: "", ville: "" }; // fallback si format non reconnu
   };
 
   const handleValidation = async () => {

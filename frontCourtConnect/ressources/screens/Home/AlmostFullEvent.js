@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -8,66 +8,68 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
-import { useNavigation } from "@react-navigation/native"; // 👈
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
 
 export default function AlmostFullEvents({ style }) {
   const { theme } = useTheme();
-  const navigation = useNavigation(); // 👈
+  const navigation = useNavigation();
 
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState(null);
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await authFetch("api/getAllEvents");
-        const data = await res.json();
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const res = await authFetch("api/getOnGoingEvents");
+          const data = await res.json();
 
-        setLoadingEventsIds(data.map((e) => e.id));
+          setLoadingEventsIds(data.map((e) => e.id));
 
-        const eventsWithUsers = await Promise.all(
-          data.map(async (event) => {
-            try {
-              const userRes = await authFetch(
-                `api/getUsersOfThisEvent/${event.id}`
-              );
-              const users = await userRes.json();
-              return {
-                ...event,
-                currentPlayers: users.length,
-                fillingRate: users.length / event.max_joueurs,
-              };
-            } catch {
-              return {
-                ...event,
-                currentPlayers: 0,
-                fillingRate: 0,
-              };
-            } finally {
-              setLoadingEventsIds((prev) =>
-                prev.filter((id) => id !== event.id)
-              );
-            }
-          })
-        );
+          const eventsWithUsers = await Promise.all(
+            data.map(async (event) => {
+              try {
+                const userRes = await authFetch(
+                  `api/getUsersOfThisEvent/${event.id}`
+                );
+                const users = await userRes.json();
+                return {
+                  ...event,
+                  currentPlayers: users.length,
+                  fillingRate: users.length / event.max_joueurs,
+                };
+              } catch {
+                return {
+                  ...event,
+                  currentPlayers: 0,
+                  fillingRate: 0,
+                };
+              } finally {
+                setLoadingEventsIds((prev) =>
+                  prev.filter((id) => id !== event.id)
+                );
+              }
+            })
+          );
 
-        const sorted = eventsWithUsers.sort(
-          (a, b) => b.fillingRate - a.fillingRate
-        );
+          const sorted = eventsWithUsers.sort(
+            (a, b) => b.fillingRate - a.fillingRate
+          );
 
-        setEvents(sorted);
-      } catch (err) {
-        console.error("Erreur récupération events + users :", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+          setEvents(sorted);
+        } catch (err) {
+          console.error("Erreur récupération events + users :", err);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchData();
-  }, []);
+      fetchData();
+    }, [])
+  );
 
   if (loading && !events) {
     return (
