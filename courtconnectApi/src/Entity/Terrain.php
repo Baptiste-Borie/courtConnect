@@ -34,11 +34,11 @@ class Terrain
     private ?string $code_postal = null;
 
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?float $latitude = null;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?float $longitude = null;
 
     #[ORM\Column]

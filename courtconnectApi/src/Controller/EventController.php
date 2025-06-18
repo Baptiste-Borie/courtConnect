@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Dto\EventDTO;
 use App\Entity\Event;
-use App\Entity\Terrain;
 use App\Manager\EventManager;
 use App\Repository\EventRepository;
 use App\Repository\TerrainRepository;
@@ -36,6 +35,18 @@ class EventController extends AbstractController
         $this->checkEventState();
 
         return $this->json($events, 200, [], ['groups' => ['all_events']]);
+    }
+
+    #[Route('/api/getUsersOfThisEvent/{id}', name: 'app_get_users_of_this_event', methods: ['GET'])]
+    public function getUsersOfThisEvent($id): JsonResponse
+    {
+        $event = $this->eventRepository->find($id);
+        if (!$event) {
+            return $this->json(['message' => 'Aucun événement trouvé'], 404);
+        }
+
+        $users = $event->getJoueurs();
+        return $this->json($users, 200, [], ['groups' => ['userOfEvent']]);
     }
 
     /**
@@ -204,6 +215,7 @@ class EventController extends AbstractController
 
     /**
      * Change l'état d'un événement si l'utilisateur est son créateur
+     * Permet de démarer ou mettre fin à l'événement
      *
      * @param int $id ID de l'événement à modifier
      * @return JsonResponse Réponse JSON indiquant le succès ou l'échec de l'opération
@@ -237,5 +249,6 @@ class EventController extends AbstractController
 
         return $this->json(['message' => "Vous n'êtes pas autorisé à modifier cet événement"], 403);
     }
+
 
 }

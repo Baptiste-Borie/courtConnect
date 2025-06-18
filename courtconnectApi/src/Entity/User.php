@@ -17,11 +17,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain', 'user', 'all_events'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['terrain', 'user', 'all_events'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
     private ?string $username = null;
 
     /**
@@ -38,15 +38,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user', 'all_events'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user', 'all_events'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user', 'all_events'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
