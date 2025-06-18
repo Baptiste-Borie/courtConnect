@@ -101,5 +101,32 @@ class EventManager
         }
     }
 
+    public function givePoints(EventDTO $dto, $participants)
+    {
+        foreach ($participants as $participant) {
+            $participant->setTrustability($participant->getTrustability() + 5);
+            $this->em->persist($participant);
+        }
+        $createur = $dto->created_by;
+        $createur->setTrustability($dto->created_by->getTrustability() + 5);
+        $this->em->persist($createur);
+        try {
+            $this->em->flush();
+            return $createur;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function deleteEvent(Event $event) {
+        try {
+            $this->em->remove($event);
+            $this->em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 
 }

@@ -16,5 +16,8 @@ class EventDTO
     public $type_event;
     public $joueur;
 
+    public $participants;
+
+
 
 }
