@@ -21,9 +21,6 @@ class UserManager
         $newUser->setPassword($userDTO->password);
         $newUser->setTrustability(0);
 
-        $this->em->persist($newUser);
-        $this->em->flush();
-
         try {
             $this->em->persist($newUser);
             $this->em->flush();
@@ -42,9 +39,6 @@ class UserManager
         $user->setPseudo($userDTO->pseudo);
         $user->setImageUrl($userDTO->image_url);
 
-        $this->em->persist($user);
-        $this->em->flush();
-
         try {
             $this->em->persist($user);
             $this->em->flush();
@@ -53,6 +47,18 @@ class UserManager
             return null;
         }
 
+    }
+
+    public function changeRole(UserDTO $dto, User $user)
+    {
+        $user->setRoles($dto->roles);
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
+            return $user;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
 }

@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Dto\EventDTO;
+use App\Dto\UserDTO;
 use App\Entity\Event;
 use App\Manager\EventManager;
+use App\Manager\UserManager;
 use App\Repository\EventRepository;
 use App\Repository\TerrainRepository;
 use App\Repository\TypeEventRepository;
@@ -18,16 +20,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class EventController extends AbstractController
 {
-    public function __construct(private EventRepository $eventRepository,
-                                private TypeEventRepository $typeEventRepository,
-                                private TerrainRepository $terrainRepository,
-                                private EventManager $eventManager,
+    public function __construct(private EventRepository        $eventRepository,
+                                private TypeEventRepository    $typeEventRepository,
+                                private TerrainRepository      $terrainRepository,
+                                private EventManager           $eventManager,
                                 private EntityManagerInterface $em,
+                                private UserManager           $userManager,
 
     )
     {
 
     }
+
     #[Route('/api/getAllEvents', name: 'app_terrain')]
     public function getAll(): Response
     {
@@ -45,6 +49,14 @@ class EventController extends AbstractController
 
     }
 
+    #[Route('/api/getEventsOfTerrain/{id}', name: 'app_get_events_of_terrain')]
+    public function getEventsOfTerrain($id): Response
+    {
+        $events = $this->eventRepository->findBy(['terrain' => $id]);
+        return $this->json($events, 200, [], ['groups' => ['all_events']]);
+
+    }
+
     #[Route('/api/getUsersOfThisEvent/{id}', name: 'app_get_users_of_this_event', methods: ['GET'])]
     public function getUsersOfThisEvent($id): JsonResponse
     {
@@ -55,6 +67,13 @@ class EventController extends AbstractController
 
         $users = $event->getJoueurs();
         return $this->json($users, 200, [], ['groups' => ['userOfEvent']]);
+    }
+
+    #[Route('/api/getEventsCreatedByUser', name: 'app_get_events_created_by_user', methods: ['GET'])]
+    public function getEventCreatedByUser(): JsonResponse
+    {
+        $events = $this->eventRepository->findBy(['created_by' => $this->getUser()]);
+        return $this->json($events, 200, [], ['groups' => ['all_events']]);
     }
 
     /**
@@ -68,20 +87,28 @@ class EventController extends AbstractController
         $events = $this->eventRepository->findAll();
         $now = new \DateTime('now');
         $today = $now->format('Y-m-d');
+
         foreach ($events as $event) {
             $eventDate = $event->getDateHeure();
             $eventDay = $eventDate->format('Y-m-d');
+            $previousEtat = $event->getEtat();
+
             if ($eventDate < $now) {
-                $etat = $eventDay === $today ? 1 : 2;
-                $event->setEtat($etat);
-                $this->em->persist($event);
+                $newEtat = $eventDay === $today ? 1 : 2;
+
+                if ($newEtat !== $previousEtat) {
+                    $event->setEtat($newEtat);
+                    $this->em->persist($event);
+
+                    if ($previousEtat === 1 && $newEtat === 2) {
+                        $this->givePoints($event);
+                    }
+                }
             }
         }
 
         $this->em->flush();
     }
-
-
 
 
     #[Route('/api/getEvent/{id}', name: 'app_get_event_by_id', methods: ['GET'])]
@@ -100,8 +127,33 @@ class EventController extends AbstractController
     #[Route('/api/addEvent', name: 'app_add_event', methods: ['POST'])]
     public function addEvent(Request $request): JsonResponse
     {
-        return $this->handleEvent($request);
+        $user = $this->getUser();
+        $roles = $user->getRoles();
+        $events = $this->eventRepository->findBy(['created_by' => $user]);
+        $eventCount = count($events);
+
+        if (in_array('ROLE_PREMIUM', $roles)) {
+            return $this->handleEvent($request);
+        }
+
+        if (in_array('ROLE_TRUSTED', $roles)) {
+            if ($eventCount >= 30) {
+                return $this->json(['message' => 'Limite de 30 événements atteinte pour les utilisateurs TRUSTED.'], 403);
+            }
+            return $this->handleEvent($request);
+        }
+
+        if (in_array('ROLE_USER', $roles)) {
+            if ($eventCount >= 10) {
+                return $this->json(['message' => 'Limite de 10 événements atteinte pour les utilisateurs standard.'], 403);
+            }
+            return $this->handleEvent($request);
+        }
+
+        return $this->json(['message' => 'Rôle utilisateur non reconnu.'], 403);
     }
+
+
 
     #[Route('/api/updateEvent/{id}', name: 'app_update_event', methods: ['POST'])]
     public function updateEvent(Request $request, $id): JsonResponse
@@ -114,11 +166,27 @@ class EventController extends AbstractController
         return $this->handleEvent($request, $event);
     }
 
+    #[Route('/api/deleteEvent/{id}', name: 'app_delete_event', methods: ['DELETE'])]
+    public function deleteEvent($id): JsonResponse
+    {
+        $event = $this->eventRepository->find($id);
+        if (!$event) {
+            return $this->json(['message' => 'Événement non trouvé.'], 404);
+        }
+        $result = $this->eventManager->deleteEvent($event);
+
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de la suppression'], 404);
+        }
+        return $this->json(['message' => 'Evénement supprimé avec succès'], 200);
+
+    }
+
     /**
      * Gère la création ou la mise à jour d'un événement.
      *
-     * @param Request $request         La requête HTTP contenant les données JSON de l'événement.
-     * @param Event|null $event        L'événement à mettre à jour, ou null pour en créer un nouveau.
+     * @param Request $request La requête HTTP contenant les données JSON de l'événement.
+     * @param Event|null $event L'événement à mettre à jour, ou null pour en créer un nouveau.
      *
      * @return JsonResponse           Réponse JSON contenant l'événement créé/mis à jour ou un message d'erreur.
      */
@@ -249,6 +317,7 @@ class EventController extends AbstractController
                 $dto->etat = 1;
             } elseif ($event->getEtat() === 1) {
                 $dto->etat = 2;
+                $this->givePoints($event);
             } else {
                 return $this->json(['message' => "L'événement a déjà atteint son état final"], 400);
             }
@@ -258,6 +327,54 @@ class EventController extends AbstractController
         }
 
         return $this->json(['message' => "Vous n'êtes pas autorisé à modifier cet événement"], 403);
+    }
+
+
+    /**
+     * Attribue 10 points au créateur et 5 points aux participants de l'événement
+     *
+     * @param Event $event
+     * @return JsonResponse
+     */
+    public function givePoints(Event $event): JsonResponse
+    {
+        $participants = $event->getJoueurs();
+        if (count($participants) > 1) {
+            $createur = $event->getCreatedBy();
+            $dto = new EventDTO();
+            $dto->created_by = $createur;
+            $result = $this->eventManager->givePoints($dto, $participants);
+            $this->checkStatus();
+            if (!$result) {
+                return $this->json(['message' => 'Erreur lors de l\'ajout des points.'], 400);
+            }
+            return $this->json(['message' => "Points attribué avec succès"], 200, [], ['groups' => ['all_events']]);
+        }
+
+        return $this->json(['message' => 'Erreur pas assez de participants.'], 400);
+    }
+
+    public function checkStatus(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if ($user->getTrustability() >= 100 ) {
+            $dto = new UserDTO();
+            $newRole = 'ROLE_TRUSTED';
+            $roles = $user->getRoles();
+            if (!in_array($newRole, $roles)) {
+                $roles[] = $newRole;
+                $dto->roles = $roles;
+                $result = $this->userManager->changeRole($dto, $user);
+                if (!$result) {
+                    return $this->json(['message' => 'Erreur lors de l\'attribution de role'], 404);
+                }
+            }
+
+            return $this->json(['message' => 'ROLE_TRUSTED attribué'], 200);
+        }
+        return $this->json(['message' => 'Pas assez de points pour changer de role'], 200);
+
     }
 
 
