@@ -80,4 +80,76 @@ class UserController extends AbstractController
 
         return $this->json($user, 200, [], ['groups' => ['user']]);
     }
+
+
+    /**
+     * Upload la photo de profil de l'utilisateur connecté.
+     *
+     * Cette fonction reçoit une image depuis le front,
+     * la stocke dans un dossier dédié à l'utilisateur (/public/uploads/users/{id}),
+     * et la nomme "image.{extension}".
+     *
+     * @param Request $request La requête HTTP contenant le fichier image.
+     * @return JsonResponse Réponse JSON indiquant le succès ou l'échec de l'opération.
+     */
+    #[Route('/api/uploadProfilePicture', name: 'upload_profile_picture', methods: ['POST'])]
+    public function uploadProfilePicture(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        $file = $request->files->get('image');
+
+        if (!$file || !$file->isValid()) {
+            return $this->json(['message' => 'Image invalide.'], 400);
+        }
+
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/users/' . $user->getId();
+
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0775, true);
+        }
+
+        $extension = $file->guessExtension() ?: 'jpg';
+        $filename = 'image.' . $extension;
+
+        try {
+            $existingFiles = glob($uploadDir . '/image.*');
+            foreach ($existingFiles as $oldFile) {
+                unlink($oldFile);
+            }
+            $file->move($uploadDir, $filename);
+
+            return $this->json(['message' => 'Image enregistrée.'], 200);
+        } catch (\Exception $e) {
+            return $this->json(['message' => 'Erreur lors de l’enregistrement.'], 500);
+        }
+    }
+
+    /**
+     * Retourne l'URL de la photo de profil de l'utilisateur connecté.
+     * Cherche automatiquement le fichier d'image quel que soit son format (jpg, png, etc.).
+     *
+     * @return JsonResponse Contient l'URL de l'image ou un message d'erreur si aucune image n'est trouvée.
+     */
+    #[Route('/api/user/getProfilPicture', name: 'get_profile_picture', methods: ['GET'])]
+    public function getProfilePictureUrl(): JsonResponse
+    {
+        $user = $this->getUser()->getId();
+
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/users/' . $user;
+        $files = glob($uploadDir . '/image.*');
+
+        if (!$files || count($files) === 0) {
+            return $this->json(['message' => 'Aucune image trouvée.'], 404);
+        }
+
+        $filename = basename($files[0]);
+        $imagePath = '/uploads/users/' . $user . '/' . $filename;
+
+        return $this->json([
+            'imageUrl' => $imagePath
+        ], 200);
+    }
+
+
+
 }
