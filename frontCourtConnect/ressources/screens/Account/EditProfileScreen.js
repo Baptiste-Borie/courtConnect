@@ -13,9 +13,11 @@ import Button from "../../shared/Button";
 import PageLayout from "../../shared/PageLayout";
 import { ThemeContext } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
+import AuthContext from "../../context/AuthContext";
 
 export default function EditProfileScreen({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
+  const { setUser } = useContext(AuthContext);
 
   const user = route.params?.data || {};
 
@@ -41,12 +43,15 @@ export default function EditProfileScreen({ navigation, route }) {
         body: JSON.stringify(payload),
       });
 
+      const user = await data.json();
+
       if (!data) {
         throw new Error(
           data.message || "Erreur lors de la mise à jour du profil."
         );
       }
 
+      setUser(user);
       Alert.alert(
         "Profil mis à jour",
         "Vos informations ont été enregistrées."
