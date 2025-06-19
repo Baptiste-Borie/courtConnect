@@ -4,9 +4,11 @@ import { useNavigation } from "@react-navigation/native";
 
 import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
+import AuthContext from "../../context/AuthContext";
 
 export default function AccountScreenMainContent({ data }) {
   const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
   const { theme } = useContext(ThemeContext);
 
   const options = [
@@ -28,12 +30,14 @@ export default function AccountScreenMainContent({ data }) {
     {
       icon: assets.icons.Star,
       label: "Gérer l’abonnement",
-      onPress: () => {},
+      onPress: () => {
+        navigation.navigate("SubscribeScreen");
+      },
     },
     {
       icon: assets.icons.heart,
       label: "Terrains favoris",
-      onPress: () => {},
+      onPress: () => { },
     },
     {
       icon: assets.icons.time,
