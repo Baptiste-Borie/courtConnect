@@ -131,10 +131,18 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         remarque: remarques,
       };
 
-      const response = await authFetch("api/addTerrain", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
+      let response;
+      if (editMode) {
+        response = await authFetch(`api/updateTerrain/${editMode.id}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      } else {
+        const response = await authFetch("api/addTerrain", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      }
 
       if (!response.ok) {
         const errorText = await response.text();

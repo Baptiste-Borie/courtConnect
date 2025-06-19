@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,9 +13,12 @@ import { authFetch } from "../../utils/AuthFetch";
 import PageLayout from "../../shared/PageLayout";
 import TerrainDetailTab from "./TerrainDetailTab";
 import TerrainEventsTab from "./TerrainEventsTab";
+import AuthContext from "../../context/AuthContext";
 
 export default function TerrainDetailScreen({ route }) {
   const { theme } = useTheme();
+  const { user } = useContext(AuthContext);
+
   const terrainId = route.params?.terrainId;
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,8 +59,9 @@ export default function TerrainDetailScreen({ route }) {
     );
   }
 
+  const isOwner = user?.id === terrain?.created_by?.id;
   return (
-    <PageLayout editMode={{ type: "terrain", data: terrain }}>
+    <PageLayout editMode={isOwner ? { type: "terrain", data: terrain } : null}>
       <ScrollView>
         {imageUri ? (
           <Image

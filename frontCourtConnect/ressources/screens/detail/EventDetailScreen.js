@@ -107,8 +107,10 @@ export default function EventDetailScreen({ route }) {
     );
   }
 
+  const isOwner = user?.id === event?.created_by?.id;
+
   return (
-    <PageLayout editMode={{ data: event, type: "event" }}>
+    <PageLayout editMode={isOwner ? { data: event, type: "event" } : null}>
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
