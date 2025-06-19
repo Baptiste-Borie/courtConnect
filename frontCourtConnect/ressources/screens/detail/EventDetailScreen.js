@@ -116,7 +116,16 @@ export default function EventDetailScreen({ route }) {
           contentContainerStyle={styles.scrollContent}
           style={{ flex: 1 }}
         >
-          <View style={styles.imagePlaceholder} />
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              style={{ height: 250, width: "100%" }}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.imagePlaceholder} />
+          )}
+
           <View style={[styles.header]}>
             <View style={styles.headerTop}>
               <Text style={[styles.title, { color: theme.text }]}>

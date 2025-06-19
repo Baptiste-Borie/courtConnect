@@ -191,7 +191,7 @@ export default function TerrainFormulaire({ navigation, route }) {
         <MapBox
           style={{ width: "100%", height: 250 }}
           centerMaker={true}
-          region={{
+          initalRegion={{
             ...selectedCoords,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
