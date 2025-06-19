@@ -22,6 +22,7 @@ import TerrainDetailScreen from "./ressources/screens/detail/TerrainDetailScreen
 import WaitingCourtsScreen from "./ressources/screens/WaitingCourtsScreen";
 
 import { authFetch } from "./ressources/utils/AuthFetch";
+import SubscribeScreen from "./ressources/screens/SubscribeScreen";
 
 
 const Stack = createNativeStackNavigator();
@@ -72,6 +73,10 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
               <Stack.Screen
                 name="WaitingCourts"
                 component={WaitingCourtsScreen}
+              />
+              <Stack.Screen
+                name="Subscribe"
+                component={SubscribeScreen}
               />
             </>
           ) : (

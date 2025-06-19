@@ -56,7 +56,7 @@ export default function PremiumSection({ style }) {
             title="2.99€/mois"
             color="background"
             style={{ width: "50%", marginTop: 20 }}
-            onPress={() => navigation.navigate("Premium")}
+            onPress={() => navigation.navigate("Subscribe")}
           />
         </View>
       </View>
