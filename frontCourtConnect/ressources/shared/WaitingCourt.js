@@ -17,6 +17,18 @@ export default function WaitingCourtScreen({ style }) {
     const [loading, setLoading] = useState(true);
     const [courts, setCourts] = useState([]);
 
+    const handleValidation = async (terrainId, action) => {
+        try {
+            await authFetch(`/api/terrain/${terrainId}/${action}`, {
+                method: "POST",
+            });
+            setCourts((prev) => prev.filter((t) => t.id !== terrainId));
+        } catch (err) {
+            console.error(`Erreur lors de la ${action} du terrain ${terrainId} :`, err);
+        }
+    };
+
+
     useEffect(() => {
         const fetchCourts = async () => {
             try {
@@ -68,12 +80,20 @@ export default function WaitingCourtScreen({ style }) {
                         </TouchableOpacity>
 
                         <View style={styles.actions}>
-                            <TouchableOpacity style={styles.iconButton}>
+                            <TouchableOpacity
+                                style={styles.iconButton}
+                                onPress={() => handleValidation(terrain.id, "validate")}
+                            >
                                 <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.iconButton}>
+
+                            <TouchableOpacity
+                                style={styles.iconButton}
+                                onPress={() => handleValidation(terrain.id, "refuse")}
+                            >
                                 <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
                             </TouchableOpacity>
+
                         </View>
                     </View>
                     <Text style={[styles.info, { color: theme.text + "99" }]}>
@@ -82,10 +102,14 @@ export default function WaitingCourtScreen({ style }) {
                     {terrain.created_by && (
                         <View style={{ alignItems: "flex-end" }}>
                             <Text style={[styles.info, { color: theme.text + "99" }]}>
-                                Ajouté par : {terrain.created_by.prenom} {terrain.created_by.nom}
+                                Ajouté par :{" "}
+                                {terrain.created_by.prenom && terrain.created_by.nom
+                                    ? `${terrain.created_by.prenom} ${terrain.created_by.nom}`
+                                    : "Inconnu"}
                             </Text>
                         </View>
                     )}
+
                 </View>
             ))}
 
