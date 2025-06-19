@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, ActivityIndicator, StyleSheet, Text } from "react-native";
+import { View, ActivityIndicator, StyleSheet, Alert } from "react-native";
 
 import PageLayout from "../shared/PageLayout";
 import useLocation from "../customHooks/useLocation";
@@ -7,25 +7,50 @@ import MapBox from "../shared/MapBox";
 import RecenterButton from "../shared/RecenterButton";
 import { authFetch } from "../utils/AuthFetch";
 
+const DEFAULT_PARIS_COORDS = {
+  latitude: 48.8566,
+  longitude: 2.3522,
+};
+
 const MapScreen = ({ navigation }) => {
-  const { latitude, longitude, errorMsg } = useLocation();
+  const { latitude, longitude, errorMsg, permissionGranted } = useLocation();
   const mapRef = useRef(null);
+
   const [terrainMarkers, setTerrainMarkers] = useState([]);
   const [loadingTerrains, setLoadingTerrains] = useState(true);
+  const [alertShown, setAlertShown] = useState(false);
+
+  const mapLatitude = permissionGranted
+    ? latitude
+    : DEFAULT_PARIS_COORDS.latitude;
+  const mapLongitude = permissionGranted
+    ? longitude
+    : DEFAULT_PARIS_COORDS.longitude;
 
   useEffect(() => {
-    if (latitude && longitude && mapRef.current) {
+    if (mapLatitude && mapLongitude && mapRef.current) {
       mapRef.current.animateToRegion(
         {
-          latitude,
-          longitude,
+          latitude: mapLatitude,
+          longitude: mapLongitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         },
         1000
       );
     }
-  }, [latitude, longitude]);
+  }, [mapLatitude, mapLongitude]);
+
+  useEffect(() => {
+    if (!permissionGranted && !alertShown) {
+      Alert.alert(
+        "Localisation refusée",
+        "Vous avez refusé l'accès à la localisation. Certaines fonctionnalités seront limitées.",
+        [{ text: "OK" }]
+      );
+      setAlertShown(true);
+    }
+  }, [permissionGranted]);
 
   useEffect(() => {
     const fetchTerrains = async () => {
@@ -59,15 +84,7 @@ const MapScreen = ({ navigation }) => {
     fetchTerrains();
   }, []);
 
-  if (errorMsg) {
-    return (
-      <View>
-        <Text>{errorMsg}</Text>
-      </View>
-    );
-  }
-
-  if (!latitude || !longitude || loadingTerrains) {
+  if ((!latitude || !longitude) && permissionGranted && loadingTerrains) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;
   }
 
@@ -77,22 +94,28 @@ const MapScreen = ({ navigation }) => {
         style={{ flex: 1 }}
         ref={mapRef}
         region={{
-          latitude,
-          longitude,
+          latitude: mapLatitude,
+          longitude: mapLongitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        userLocation={{
-          coordinate: { latitude, longitude },
-          title: "Vous êtes ici",
-        }}
+        userLocation={
+          permissionGranted
+            ? {
+                coordinate: { latitude, longitude },
+                title: "Vous êtes ici",
+              }
+            : null
+        }
         terrainMarkers={terrainMarkers}
       />
-      <RecenterButton
-        mapRef={mapRef}
-        latitude={latitude}
-        longitude={longitude}
-      />
+      {permissionGranted && (
+        <RecenterButton
+          mapRef={mapRef}
+          latitude={latitude}
+          longitude={longitude}
+        />
+      )}
     </PageLayout>
   );
 };

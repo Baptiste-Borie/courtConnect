@@ -14,7 +14,7 @@ import useLocation from "../../customHooks/useLocation";
 
 export default function NearestEventSection({ style }) {
   const { theme } = useTheme();
-  const { latitude, longitude } = useLocation();
+  const { latitude, longitude, permissionGranted } = useLocation();
 
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [events, setEvents] = useState([]);
@@ -48,6 +48,20 @@ export default function NearestEventSection({ style }) {
 
     fetchTerrains();
   }, [latitude, longitude]);
+
+  if (!permissionGranted) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Événements autour de moi
+        </Text>
+        <Text style={{ color: theme.text + "99" }}>
+          Veuillez autoriser l'accès à votre position pour voir les événements
+          autour de vous.
+        </Text>
+      </View>
+    );
+  }
 
   if (!latitude || !longitude) {
     return (
