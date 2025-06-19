@@ -41,6 +41,11 @@ export default function EditProfileScreen({ navigation, route }) {
   }, []);
 
   const handleSubmit = async () => {
+    if (!username.trim()) {
+      Alert.alert("Champ requis", "L'email ne peut pas être vide.");
+      return;
+    }
+
     try {
       const payload = {
         username,
@@ -133,16 +138,12 @@ export default function EditProfileScreen({ navigation, route }) {
           );
           return;
         }
-
-        // Re render image
       } catch (err) {
         console.error("❌ Erreur fetch image :", err);
         Alert.alert("Erreur", "Une erreur est survenue pendant l'envoi.");
       }
     }
   };
-
-  console.log("b:", imageUrl);
 
   return (
     <PageLayout showFooter={false}>
@@ -217,7 +218,7 @@ export default function EditProfileScreen({ navigation, route }) {
         />
 
         <TextInput
-          placeholder="Pseudo (optionnel)"
+          placeholder="Pseudo"
           placeholderTextColor={theme.text + "99"}
           value={pseudo}
           onChangeText={setPseudo}
