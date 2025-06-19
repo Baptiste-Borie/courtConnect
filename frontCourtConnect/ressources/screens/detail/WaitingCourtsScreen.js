@@ -10,8 +10,6 @@ export default function WaitingCourtsScreen() {
     const { theme } = useContext(ThemeContext);
     const { user } = useContext(AuthContext);
 
-
-
     return (
         <PageLayout headerContent={"Terrains en attente"}>
             <ScrollView>
