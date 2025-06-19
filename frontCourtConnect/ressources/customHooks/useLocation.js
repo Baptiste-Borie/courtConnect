@@ -6,6 +6,7 @@ export default function useLocation() {
   const [errorMsg, setErrorMsg] = useState("");
   const [longitude, setLongitude] = useState("");
   const [latitude, setLatitude] = useState("");
+  const [permissionGranted, setPermissionGranted] = useState(true);
 
   const getUserLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -14,8 +15,11 @@ export default function useLocation() {
       setErrorMsg(
         "La permission d'accès à la localisation n'a pas été accordé"
       );
+      setPermissionGranted(false);
       return;
     }
+
+    setPermissionGranted(true);
 
     let { coords } = await Location.getCurrentPositionAsync();
 
@@ -34,5 +38,5 @@ export default function useLocation() {
     getUserLocation();
   }, []);
 
-  return { latitude, longitude, errorMsg };
+  return { latitude, longitude, errorMsg, permissionGranted };
 }

@@ -20,10 +20,11 @@ const assets = {
     star_filled: require("../../assets/star_filled.png"),
     time: require("../../assets/Hourglass.png"),
     logout: require("../../assets/logout.png"),
+    more: require("../../assets/more.png"),
   },
   terrain: require("../../assets/terrain.png"),
   ballon: require("../../assets/ballon.png"),
-  courtMarkerOrange: require("../../assets/courtMarkerOrange.png")
+  courtMarkerOrange: require("../../assets/courtMarkerOrange.png"),
 };
 
 export default assets;

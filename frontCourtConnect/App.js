@@ -19,6 +19,7 @@ import EventFormulaire from "./ressources/screens/form/EventFormulaire";
 import EventFormulaireSecondStep from "./ressources/screens/form/EventFormulaireSecondStep";
 import EventDetailScreen from "./ressources/screens/detail/EventDetailScreen";
 import TerrainDetailScreen from "./ressources/screens/detail/TerrainDetailScreen";
+import WaitingCourtsScreen from "./ressources/screens/WaitingCourtsScreen";
 
 import { authFetch } from "./ressources/utils/AuthFetch";
 
@@ -66,6 +67,10 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
               <Stack.Screen
                 name="TerrainDetail"
                 component={TerrainDetailScreen}
+              />
+              <Stack.Screen
+                name="WaitingCourts"
+                component={WaitingCourtsScreen}
               />
             </>
           ) : (

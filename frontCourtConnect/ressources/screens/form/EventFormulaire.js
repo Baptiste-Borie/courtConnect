@@ -17,7 +17,8 @@ import MapBox from "../../shared/MapBox";
 import Button from "../../shared/Button";
 import { authFetch } from "../../utils/AuthFetch";
 
-export default function EventFormulaire({ navigation }) {
+export default function EventFormulaire({ navigation, route }) {
+  const { data: event } = route.params || {};
   const { theme } = useContext(ThemeContext);
 
   const [isLoadingTerrains, setIsLoadingTerrains] = useState(true);
@@ -27,6 +28,31 @@ export default function EventFormulaire({ navigation }) {
   const [selectedTerrain, setSelectedTerrain] = useState(null);
   const [mapRegion, setMapRegion] = useState(null);
   const [mapMarkers, setMapMarkers] = useState([]);
+
+  useEffect(() => {
+    if (event) {
+      setNom(event.nom);
+      setSelectedTerrain(event.terrain.id);
+      if (event.terrain) {
+        setMapRegion({
+          latitude: event.terrain.latitude,
+          longitude: event.terrain.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        });
+        setMapMarkers([
+          {
+            coordinate: {
+              latitude: event.terrain.latitude,
+              longitude: event.terrain.longitude,
+            },
+            title: event.terrain.nom,
+            description: event.terrain.adresse || "",
+          },
+        ]);
+      }
+    }
+  }, [event]);
 
   const handleGoToNextStep = () => {
     if (!nom || !selectedTerrain) {
@@ -46,6 +72,7 @@ export default function EventFormulaire({ navigation }) {
     navigation.navigate("AddEventSecond", {
       nom,
       terrainId: terrain.id,
+      editMode: event,
     });
   };
 
@@ -107,7 +134,10 @@ export default function EventFormulaire({ navigation }) {
   }, [selectedTerrain, terrains]);
 
   return (
-    <PageLayout showFooter={false} headerContent={"Créer un événement"}>
+    <PageLayout
+      showFooter={false}
+      headerContent={event ? "Modifier l'événement" : "Créer un événement"}
+    >
       <StepTracker
         currentStep={1}
         onStepChange={(step) => {
