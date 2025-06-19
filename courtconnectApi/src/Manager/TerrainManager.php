@@ -108,4 +108,17 @@ class TerrainManager
         $this->em->flush();
 
     }
+
+    public function deleteVotes($votes)
+    {
+        foreach ($votes as $vote) {
+            $this->em->remove($vote);
+        }
+        try {
+            $this->em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

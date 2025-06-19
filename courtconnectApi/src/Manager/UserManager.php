@@ -61,4 +61,23 @@ class UserManager
         }
     }
 
+    public function deleteUser(User $user, $terrains, $events)
+    {
+        foreach ($terrains as $terrain) {
+            $terrain->setCreatedBy(null);
+            $this->em->persist($terrain);
+        }
+        foreach ($events as $event) {
+            $event->setCreatedBy(null);
+            $this->em->persist($event);
+        }
+        try {
+            $this->em->remove($user);
+            $this->em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 }

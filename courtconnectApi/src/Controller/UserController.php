@@ -199,4 +199,44 @@ class UserController extends AbstractController
         return $this->json(['message' => 'L\'utilisateur possède déjà les rôles requis'], 200);
     }
 
+    #[Route('/api/unsubscribe', name: 'app_unsubscribe', methods: ['POST'])]
+    public function unsubscribe(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        $dto = new UserDTO();
+        $roles = $user->getRoles();
+
+        if (!in_array('ROLE_PREMIUM', $roles)) {
+            return $this->json(['message' => 'L\'utilisateur ne possède pas le rôle PREMIUM.'], 200);
+        }
+
+        $roles = array_filter($roles, fn($role) => $role !== 'ROLE_PREMIUM');
+        $dto->roles = array_values($roles);
+
+        $result = $this->userManager->changeRole($dto, $user);
+
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de la suppression du rôle PREMIUM.'], 500);
+        }
+
+        return $this->json(['message' => 'Rôle PREMIUM retiré avec succès.'], 200);
+    }
+
+
+
+    #[Route('/api/deleteUser', name: 'app_delete_user', methods: ['DELETE'])]
+    public function deleteUser(): JsonResponse
+    {
+        $user = $this->getUser();
+        $events = $user->getEvents();
+        $terrains = $user->getTerrains();
+        $result = $this->userManager->deleteUser($user, $terrains, $events);
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de la suppression'], 500);
+        }
+
+        return $this->json(['message' => 'Utilisateur supprimé'], 200);
+    }
+
 }

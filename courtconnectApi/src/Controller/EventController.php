@@ -151,9 +151,13 @@ class EventController extends AbstractController
     #[Route('/api/updateEvent/{id}', name: 'app_update_event', methods: ['POST'])]
     public function updateEvent(Request $request, $id): JsonResponse
     {
+        $user = $this->getUser();
         $event = $this->eventRepository->find($id);
         if (!$event) {
             return $this->json(['message' => 'Événement non trouvé.'], 404);
+        }
+        if ($user !== $event->getCreatedBy()) {
+            return $this->json(['message' => 'Vous n\'etes pas le créateur.'], 404);
         }
 
         return $this->handleEvent($request, $event);
