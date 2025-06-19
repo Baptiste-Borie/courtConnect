@@ -16,6 +16,7 @@ import assets from "../../constants/assets";
 import Button from "../../shared/Button";
 import PageLayout from "../../shared/PageLayout";
 import AuthContext from "../../context/AuthContext";
+import { getTerrainImageUri } from "../../utils/GetImage";
 
 export default function EventDetailScreen({ route }) {
   const { theme } = useTheme();
@@ -28,6 +29,7 @@ export default function EventDetailScreen({ route }) {
   const [participants, setParticipants] = useState([]);
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [imageUri, setImageUri] = useState(null);
 
   useEffect(() => {
     if (!eventId) return;
@@ -37,6 +39,9 @@ export default function EventDetailScreen({ route }) {
         const res = await authFetch(`api/getEvent/${eventId}`);
         const data = await res.json();
         setEvent(data);
+
+        const image = await getTerrainImageUri(event?.terrain?.id);
+        setImageUri(image);
 
         const usersRes = await authFetch(`api/getUsersOfThisEvent/${eventId}`);
         const users = await usersRes.json();
@@ -116,15 +121,11 @@ export default function EventDetailScreen({ route }) {
           contentContainerStyle={styles.scrollContent}
           style={{ flex: 1 }}
         >
-          {imageUri ? (
-            <Image
-              source={{ uri: imageUri }}
-              style={{ height: 250, width: "100%" }}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.imagePlaceholder} />
-          )}
+          <Image
+            source={{ uri: imageUri }}
+            style={{ height: 250, width: "100%" }}
+            resizeMode="cover"
+          />
 
           <View style={[styles.header]}>
             <View style={styles.headerTop}>
