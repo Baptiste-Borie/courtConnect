@@ -10,6 +10,7 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { authFetch } from "../../utils/AuthFetch";
+import { getTerrainImageUri } from "../../utils/GetImage";
 import assets from "../../constants/assets";
 
 export default function AlmostFullEvents({ style }) {
@@ -19,6 +20,7 @@ export default function AlmostFullEvents({ style }) {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState(null);
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
+  const [imagesUriMap, setImagesUriMap] = useState({});
 
   useFocusEffect(
     useCallback(() => {
@@ -60,6 +62,15 @@ export default function AlmostFullEvents({ style }) {
           );
 
           setEvents(sorted);
+
+          const imagesMap = {};
+          await Promise.all(
+            sorted.map(async (event) => {
+              const uri = await getTerrainImageUri(event.terrain.id);
+              imagesMap[event.id] = uri;
+            })
+          );
+          setImagesUriMap(imagesMap);
         } catch (err) {
           console.error("Erreur récupération events + users :", err);
         } finally {
@@ -90,6 +101,7 @@ export default function AlmostFullEvents({ style }) {
 
       {events.map((item) => {
         const isLoading = loadingEventsIds.includes(item.id);
+        const imageUri = imagesUriMap[item.id];
 
         return (
           <TouchableOpacity
@@ -103,7 +115,12 @@ export default function AlmostFullEvents({ style }) {
             ]}
             activeOpacity={0.8}
           >
-            <View style={styles.iconPlaceholder} />
+            <Image
+              source={{ uri: imageUri }}
+              style={{ height: 80, width: 80 }}
+              resizeMode="cover"
+            />
+
             <View style={{ flex: 1 }}>
               <Text style={[{ color: theme.text, fontWeight: "bold" }]}>
                 {item.nom}
@@ -158,12 +175,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-  },
-  iconPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 6,
-    backgroundColor: "#ccc",
   },
   playersCount: {
     flexDirection: "row",

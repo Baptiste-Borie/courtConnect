@@ -14,6 +14,7 @@ import PageLayout from "../../shared/PageLayout";
 import TerrainDetailTab from "./TerrainDetailTab";
 import TerrainEventsTab from "./TerrainEventsTab";
 import AuthContext from "../../context/AuthContext";
+import { getTerrainImageUri } from "../../utils/GetImage";
 
 export default function TerrainDetailScreen({ route }) {
   const { theme } = useTheme();
@@ -33,14 +34,8 @@ export default function TerrainDetailScreen({ route }) {
         const data = await res.json();
         setTerrain(data);
 
-        // Charger l'URL de l'image
-        const imageRes = await authFetch(`api/terrain/${terrainId}/getPicture`);
-        const imageData = await imageRes.json();
-
-        if (imageRes.ok && imageData.imageUrl) {
-          const fullUrl = `https://courtconnect.alwaysdata.net${imageData.imageUrl}`;
-          setImageUri(fullUrl);
-        }
+        const image = await getTerrainImageUri(terrainId);
+        setImageUri(image);
       } catch (err) {
         console.error("Erreur chargement terrain :", err);
       } finally {
@@ -63,15 +58,11 @@ export default function TerrainDetailScreen({ route }) {
   return (
     <PageLayout editMode={isOwner ? { type: "terrain", data: terrain } : null}>
       <ScrollView>
-        {imageUri ? (
-          <Image
-            source={{ uri: imageUri }}
-            style={{ height: 250, width: "100%" }}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={styles.imagePlaceholder} />
-        )}
+        <Image
+          source={{ uri: imageUri }}
+          style={{ height: 250, width: "100%" }}
+          resizeMode="cover"
+        />
 
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -114,7 +105,6 @@ export default function TerrainDetailScreen({ route }) {
             </Text>
           </TouchableOpacity>
         </View>
-
         {activeTab === "details" ? (
           <TerrainDetailTab terrain={terrain} theme={theme} />
         ) : (

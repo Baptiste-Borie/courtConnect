@@ -7,7 +7,6 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Button from "../../shared/Button";
 import PageLayout from "../../shared/PageLayout";
@@ -116,17 +115,6 @@ export default function EditProfileScreen({ navigation, route }) {
           placeholderTextColor={theme.text + "99"}
           value={pseudo}
           onChangeText={setPseudo}
-          style={[
-            styles.input,
-            { borderColor: theme.primary, color: theme.text },
-          ]}
-        />
-
-        <TextInput
-          placeholder="Image URL (optionnel)"
-          placeholderTextColor={theme.text + "99"}
-          value={imageUrl}
-          onChangeText={setImageUrl}
           style={[
             styles.input,
             { borderColor: theme.primary, color: theme.text },

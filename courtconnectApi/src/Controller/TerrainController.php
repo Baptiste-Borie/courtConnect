@@ -105,13 +105,34 @@ class TerrainController extends AbstractController
     #[Route('/api/addTerrain', name: 'app_add_terrain', methods: ['POST'])]
     public function addTerrain(Request $request): JsonResponse
     {
-        return $this->handleTerrain($request);
+        $user = $this->getUser();
+        $roles = $user->getRoles();
+        $terrains = $this->terrainRepository->findBy(['created_by' => $user]);
+        $terrainCount = count($terrains);
+
+        if (in_array('ROLE_PREMIUM', $roles) || in_array('ROLE_TRUSTED', $roles)) {
+            return $this->handleTerrain($request);
+        }
+
+        if (in_array('ROLE_USER', $roles)) {
+            if ($terrainCount >= 1) {
+                return $this->json(['message' => 'Limite de 1 terrain atteinte pour les utilisateurs standard.'], 403);
+            }
+            return $this->handleTerrain($request);
+        }
+
+        return $this->json(['message' => 'Rôle utilisateur non reconnu.'], 403);
     }
+
 
     #[Route('/api/updateTerrain/{id}', name: 'app_update_terrain', methods: ['POST'])]
     public function updateTerrain(Request $request, $id): JsonResponse
     {
+        $user = $this->getUser();
         $terrain = $this->terrainRepository->find($id);
+        if ($user !== $terrain->getCreatedBy()) {
+            return $this->json(['message' => 'Vous n\'etes pas le créateur.'], 404);
+        }
         if (!$terrain) {
             return $this->json(['message' => 'Terrain non trouvé.'], 404);
         }
@@ -269,7 +290,7 @@ class TerrainController extends AbstractController
         if (!$result) {
             return $this->json(['message' => "Erreur lors du changement d'état du terrain."], 500);
         }
-
+        $this->deleteVote($terrain);
         return $this->json(['message' => "L'état du terrain a été mis à jour avec succès."], 200);
     }
 
@@ -351,6 +372,22 @@ class TerrainController extends AbstractController
         return $this->json([
             'imageUrl' => $imagePath
         ], 200);
+    }
+
+    /**
+     * Supprime les votes lié au terrain
+     *
+     * @param Terrain $terrain
+     * @return JsonResponse
+     */
+    public function deleteVote(Terrain $terrain): JsonResponse
+    {
+        $votes = $terrain->getVotes();
+        $result = $this->terrainManager->deleteVotes($votes);
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de la suppression des votes.'], 404);
+        }
+        return $this->json(['message' => 'Votes supprimés avec succes.'], 200);
     }
 
 

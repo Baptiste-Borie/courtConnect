@@ -80,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, RefreshToken>
      */
-    #[ORM\OneToMany(targetEntity: RefreshToken::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: RefreshToken::class, mappedBy: 'user',  cascade: ['persist', 'remove'])]
     private Collection $refreshTokens;
 
     /**

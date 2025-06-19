@@ -1,20 +1,32 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { getTerrainImageUri } from "../../utils/GetImage";
 
 export default function EventCard({ event, distance, theme }) {
   const navigation = useNavigation();
   const handlePress = () => {
     navigation.navigate("EventDetail", { eventId: event.id });
   };
+
+  const [imageUri, setImageUri] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const uri = await getTerrainImageUri(event.terrain.id);
+      setImageUri(uri);
+    };
+    fetchImage();
+  }, [event.terrain.id]);
+
   return (
     <TouchableOpacity style={[styles.card]} onPress={handlePress}>
-      <View
-        style={[
-          styles.imagePlaceholder,
-          { backgroundColor: theme.background_light },
-        ]}
+      <Image
+        source={{ uri: imageUri }}
+        style={{ height: 100, width: "100%" }}
+        resizeMode="cover"
       />
+
       <Text style={[styles.name, { color: theme.text }]}>{event.nom}</Text>
       <Text style={{ color: theme.primary, fontSize: 12 }}>
         {distance.toFixed(1)} km
@@ -30,12 +42,6 @@ const styles = StyleSheet.create({
     padding: 8,
     marginRight: 12,
     alignItems: "flex-start",
-  },
-  imagePlaceholder: {
-    width: "100%",
-    height: 100,
-    borderRadius: 6,
-    marginBottom: 6,
   },
   name: {
     fontWeight: "bold",
