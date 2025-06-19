@@ -16,7 +16,7 @@ class Vote
     #[ORM\ManyToOne(inversedBy: 'votes')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'votes', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'votes')]
     private ?Terrain $terrain = null;
 
     #[ORM\Column]

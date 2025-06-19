@@ -54,7 +54,7 @@ class Terrain
     private ?bool $spectateur = null;
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
-    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', onDelete:"SET NULL")]
     #[Groups(['terrain', 'all_events'])]
     private ?User $created_by = null;
 

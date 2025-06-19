@@ -38,7 +38,7 @@ class Event
     private ?int $niveau = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
-    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', onDelete:"SET NULL")]
     #[Groups(['all_events'])]
     private ?User $created_by = null;
 
