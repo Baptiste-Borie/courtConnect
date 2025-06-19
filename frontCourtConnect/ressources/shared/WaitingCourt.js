@@ -137,18 +137,5 @@ const styles = StyleSheet.create({
     info: {
         fontSize: 12,
         marginTop: 4,
-        justifyContent: "flex-end",
-    }, headerRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
     },
-    actions: {
-        flexDirection: "row",
-        gap: 8,
-    },
-    iconButton: {
-        padding: 4,
-    },
-
 });
