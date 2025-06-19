@@ -13,14 +13,15 @@ import MapScreen from "./ressources/screens/MapScreen";
 import AccountScreen from "./ressources/screens/Account/AccountScreen";
 import EditProfileScreen from "./ressources/screens/Account/EditProfileScreen";
 import AccountSettings from "./ressources/screens/Account/AccountSettings";
-import TerrainFormulaire from "./ressources/screens/form/TerrainFormulaire";
-import TerrainFormulaireSecondStep from "./ressources/screens/form/TerrainFormulaireSecondStep";
-import EventFormulaire from "./ressources/screens/form/EventFormulaire";
-import EventFormulaireSecondStep from "./ressources/screens/form/EventFormulaireSecondStep";
-import EventDetailScreen from "./ressources/screens/detail/EventDetailScreen";
-import TerrainDetailScreen from "./ressources/screens/detail/TerrainDetailScreen";
-
+import TerrainFormulaire from "./ressources/screens/Form/TerrainFormulaire";
+import TerrainFormulaireSecondStep from "./ressources/screens/Form/TerrainFormulaireSecondStep";
+import EventFormulaire from "./ressources/screens/Form/EventFormulaire";
+import EventFormulaireSecondStep from "./ressources/screens/Form/EventFormulaireSecondStep";
+import EventDetailScreen from "./ressources/screens/Detail/EventDetailScreen";
+import TerrainDetailScreen from "./ressources/screens/Detail/TerrainDetailScreen";
+import WaitingCourtsScreen from "./ressources/screens/Detail/WaitingCourtsScreen";
 import { authFetch } from "./ressources/utils/AuthFetch";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,10 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
               <Stack.Screen
                 name="TerrainDetail"
                 component={TerrainDetailScreen}
+              />
+              <Stack.Screen
+                name="WaitingCourts"
+                component={WaitingCourtsScreen}
               />
             </>
           ) : (

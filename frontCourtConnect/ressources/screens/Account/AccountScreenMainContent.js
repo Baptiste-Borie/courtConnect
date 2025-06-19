@@ -38,7 +38,11 @@ export default function AccountScreenMainContent({ data }) {
     {
       icon: assets.icons.time,
       label: "Terrains en attente",
-      onPress: () => {},
+      onPress: () => {
+        navigation.navigate("WaitingCourts", {
+          data,
+        })
+      },
     },
   ];
 
