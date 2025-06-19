@@ -22,6 +22,8 @@ export default function WaitingCourtScreen({ style }) {
             try {
                 const res = await authFetch("/api/getAllNoVotedTerrains");
                 const data = await res.json();
+                console.log("Terrains reçus :", JSON.stringify(data));
+
                 setCourts(data);
             } catch (err) {
                 console.error("Erreur récupération terrains :", err);
@@ -50,21 +52,43 @@ export default function WaitingCourtScreen({ style }) {
                 Terrains en attente de validation ({courts.length})
             </Text>
             {courts.map((terrain) => (
-                <TouchableOpacity
+                <View
                     key={terrain.id}
                     style={[styles.card, { backgroundColor: theme.background_light }]}
-                    onPress={() =>
-                        navigation.navigate("CourtDetail", { terrainId: terrain.id })
-                    }
                 >
-                    <View>
-                        <Text style={[styles.name, { color: theme.text }]}>{terrain.nom}</Text>
-                        <Text style={[styles.info, { color: theme.text + "99" }]}>
-                            {terrain.adresse || "Adresse inconnue"}
-                        </Text>
+                    <View style={styles.headerRow}>
+                        <TouchableOpacity
+                            onPress={() =>
+                                navigation.navigate("CourtDetail", { terrainId: terrain.id })
+                            }
+                        >
+                            <Text style={[styles.name, { color: theme.text }]}>
+                                {terrain.nom}
+                            </Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.actions}>
+                            <TouchableOpacity style={styles.iconButton}>
+                                <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.iconButton}>
+                                <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </TouchableOpacity>
+                    <Text style={[styles.info, { color: theme.text + "99" }]}>
+                        {terrain.adresse || "Adresse inconnue"}
+                    </Text>
+                    {terrain.created_by && (
+                        <View style={{ alignItems: "flex-end" }}>
+                            <Text style={[styles.info, { color: theme.text + "99" }]}>
+                                Ajouté par : {terrain.created_by.prenom} {terrain.created_by.nom}
+                            </Text>
+                        </View>
+                    )}
+                </View>
             ))}
+
         </View>
     );
 }
@@ -91,5 +115,18 @@ const styles = StyleSheet.create({
     info: {
         fontSize: 12,
         marginTop: 4,
+        justifyContent: "flex-end",
+    }, headerRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
+    actions: {
+        flexDirection: "row",
+        gap: 8,
+    },
+    iconButton: {
+        padding: 4,
+    },
+
 });
