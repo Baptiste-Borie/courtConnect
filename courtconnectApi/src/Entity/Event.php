@@ -14,27 +14,27 @@ class Event
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?\DateTimeImmutable $date_heure = null;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?int $max_joueurs = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?int $niveau = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
@@ -43,23 +43,23 @@ class Event
     private ?User $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?Terrain $terrain = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'events')]
-    #[Groups(['userOfEvent'])]
+    #[Groups(['all_events'])]
     private Collection $joueurs;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?int $etat = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(name: 'type_event', referencedColumnName: 'id')]
-    #[Groups(['all_events'])]
+    #[Groups(['all_events', 'createdByUser'])]
     private ?TypeEvent $type_event = null;
 
     public function __construct()

@@ -44,7 +44,7 @@ class EventController extends AbstractController
     #[Route('/api/getOnGoingEvents', name: 'app_get_ongoing_events')]
     public function getOnGoingEvents(): Response
     {
-        $events = $this->eventRepository->findEventsWithEtatOneOrTwo();
+        $events = $this->eventRepository->findEventsWithEtatZeroOrOne();
         return $this->json($events, 200, [], ['groups' => ['all_events']]);
 
     }
@@ -52,7 +52,7 @@ class EventController extends AbstractController
     #[Route('/api/getEventsOfTerrain/{id}', name: 'app_get_events_of_terrain')]
     public function getEventsOfTerrain($id): Response
     {
-        $events = $this->eventRepository->findBy(['terrain' => $id]);
+        $events = $this->eventRepository->findEventsWithEtatZeroOrOneOfTerrain($id);
         return $this->json($events, 200, [], ['groups' => ['all_events']]);
 
     }
@@ -67,13 +67,6 @@ class EventController extends AbstractController
 
         $users = $event->getJoueurs();
         return $this->json($users, 200, [], ['groups' => ['userOfEvent']]);
-    }
-
-    #[Route('/api/getEventsCreatedByUser', name: 'app_get_events_created_by_user', methods: ['GET'])]
-    public function getEventCreatedByUser(): JsonResponse
-    {
-        $events = $this->eventRepository->findBy(['created_by' => $this->getUser()]);
-        return $this->json($events, 200, [], ['groups' => ['all_events']]);
     }
 
     /**
@@ -217,8 +210,9 @@ class EventController extends AbstractController
             ? $this->eventManager->updateEvent($dto, $event)
             : $this->eventManager->addEvent($dto);
 
-        $this->joinEvent($result->getId());
-
+        if (!$data['orgaOnly']) {
+            $this->joinEvent($result->getId());
+        }
         if (!$result) {
             return $this->json([
                 'message' => $event
@@ -354,6 +348,13 @@ class EventController extends AbstractController
         return $this->json(['message' => 'Erreur pas assez de participants.'], 400);
     }
 
+
+    /**
+     * Vérifie si l'utilisateur a suffisamment de "trustability" pour obtenir le rôle "ROLE_TRUSTED".
+     * Si c'est le cas et qu'il ne possède pas encore ce rôle, il lui est attribué.
+     *
+     * @return JsonResponse Retourne un message indiquant si le rôle a été attribué ou non.
+     */
     public function checkStatus(): JsonResponse
     {
         $user = $this->getUser();

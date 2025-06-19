@@ -14,48 +14,48 @@ class Terrain
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?string $ville = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?string $code_postal = null;
 
     #[ORM\Column]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?float $latitude = null;
 
     #[ORM\Column(type: 'float')]
-    #[Groups(['terrain', 'all_events'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?float $longitude = null;
 
     #[ORM\Column]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?int $nb_panier = null;
 
     #[ORM\Column(type: 'boolean')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?bool $spectateur = null;
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
     #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events'])]
     private ?User $created_by = null;
 
 
@@ -72,15 +72,15 @@ class Terrain
     private Collection $favori;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?int $etat = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?string $remarque = null;
 
     #[ORM\Column(type: 'integer')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?int $usure = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -88,17 +88,17 @@ class Terrain
     private ?string $image_url = null;
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     #[ORM\JoinColumn(name: 'type_filet', referencedColumnName: 'id')]
     private ?TypeFilet $type_filet = null;
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     #[ORM\JoinColumn(name: 'type_panier', referencedColumnName: 'id')]
     private ?TypePanier $type_panier = null;
 
     #[ORM\ManyToOne(inversedBy: 'terrains')]
-    #[Groups(['terrain'])]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     #[ORM\JoinColumn(name: 'type_sol', referencedColumnName: 'id')]
     private ?TypeSol $type_sol = null;
 

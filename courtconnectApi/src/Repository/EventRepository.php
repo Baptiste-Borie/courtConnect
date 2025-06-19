@@ -41,11 +41,23 @@ class EventRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function findEventsWithEtatOneOrTwo()
+    public function findEventsWithEtatZeroOrOne()
     {
         return $this->createQueryBuilder('e')
             ->where('e.etat IN (:etats)')
             ->setParameter('etats', [0, 1])
+            ->orderBy('e.date_heure', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findEventsWithEtatZeroOrOneOfTerrain($terrainId)
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.etat IN (:etats)')
+            ->andWhere('e.terrain = :terrainId')
+            ->setParameter('etats', [0, 1])
+            ->setParameter('terrainId', $terrainId)
             ->orderBy('e.date_heure', 'DESC')
             ->getQuery()
             ->getResult();

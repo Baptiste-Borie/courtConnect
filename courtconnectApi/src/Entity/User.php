@@ -17,18 +17,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent', 'createdByUser'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent', 'createdByUser'])]
     private ?string $username = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['terrain', 'user', 'all_events'])]
+    #[Groups(['terrain', 'user', 'all_events', 'createdByUser'])]
     private array $roles = [];
 
     /**
@@ -38,15 +38,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent', 'createdByUser'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent' ,'createdByUser'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent'])]
+    #[Groups(['terrain', 'user', 'all_events', 'userOfEvent', 'createdByUser'])]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -57,12 +57,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Terrain>
      */
     #[ORM\OneToMany(targetEntity: Terrain::class, mappedBy: 'created_by')]
+    #[Groups(['createdByUser'])]
     private Collection $terrains;
 
     /**
      * @var Collection<int, Event>
      */
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'created_by')]
+    #[Groups(['createdByUser'])]
     private Collection $events;
 
     /**
