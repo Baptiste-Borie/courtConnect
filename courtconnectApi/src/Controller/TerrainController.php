@@ -100,6 +100,86 @@ class TerrainController extends AbstractController
         return $this->json($terrain, Response::HTTP_OK, [], ['groups' => ['terrain']]);
     }
 
+    #[Route('/api/getAllFavoriteTerrains', name: 'app_get_all_favorite_terrains', methods: ['GET'])]
+    public function getAllFavoriteTerrains(): JsonResponse
+    {
+        $user = $this->getUser();
+        $roles = $user->getRoles();
+        $terrains = $user->getFavori();
+        if (!in_array('ROLE_PREMIUM', $roles)) {
+            return $this->json(['message' => 'Accès refusé. Rôle PREMIUM requis.'], 403);
+        }
+        return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
+    }
+
+    /**
+     * Ajoute un terrain aux favoris de l'utilisateur connecté.
+     * Accessible uniquement aux utilisateurs ayant le rôle ROLE_PREMIUM.
+     * Vérifie si le terrain existe et s'il n'est pas déjà dans les favoris.
+     *
+     * @param int $id L'identifiant du terrain à ajouter en favori.
+     * @return JsonResponse Réponse JSON indiquant le résultat de l'opération.
+     */
+    #[Route('/api/addTerrainToFavorite/{id}', name: 'app_add_terrain_to_favorite', methods: ['POST'])]
+    public function addTerrainToFavorite(int $id): JsonResponse
+    {
+        $user = $this->getUser();
+        $roles = $user->getRoles();
+        $terrain = $this->terrainRepository->find($id);
+
+        if (!$terrain) {
+            return $this->json(['message' => 'Terrain introuvable.'], 404);
+        }
+
+        if (!in_array('ROLE_PREMIUM', $roles)) {
+            return $this->json(['message' => 'Accès refusé. Rôle PREMIUM requis.'], 403);
+        }
+
+        $favoris = $user->getFavori();
+
+        if ($favoris->contains($terrain)) {
+            return $this->json(['message' => 'Terrain déjà dans les favoris.'], 500);
+        }
+
+        $result = $this->terrainManager->addFavorite($terrain, $user);
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de l\'ajout aux favoris.'], 500);
+        }
+
+        return $this->json(['message' => 'Ajout aux favoris avec succès.'], 200);
+    }
+
+    /**
+     * Supprime un terrain des favoris de l'utilisateur connecté.
+     * Accessible uniquement aux utilisateurs ayant le rôle ROLE_PREMIUM.
+     * Vérifie que le terrain existe et qu'il est bien dans les favoris avant suppression.
+     *
+     * @param int $id L'identifiant du terrain à supprimer des favoris.
+     * @return JsonResponse Réponse JSON indiquant le résultat de l'opération.
+     */
+    #[Route('/api/deleteTerrainFromFavorite/{id}', name: 'app_add_terrain_from_favorite', methods: ['POST'])]
+    public function deleteTerrainFromFavorite(int $id): JsonResponse
+    {
+        $user = $this->getUser();
+        $roles = $user->getRoles();
+        $favoris = $user->getFavori();
+        $terrain = $this->terrainRepository->find($id);
+        if (!$terrain) {
+            return $this->json(['message' => 'Terrain introuvable.'], 404);
+        }
+        if (!$favoris->contains($terrain)) {
+            return $this->json(['message' => 'Terrain introuvable dans les favoris'], 403);
+        }
+        if (!in_array('ROLE_PREMIUM', $roles)) {
+            return $this->json(['message' => 'Accès refusé. Rôle PREMIUM requis.'], 403);
+        }
+        $result = $this->terrainManager->deleteTerrainFromFavorite($user, $terrain);
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de la supression des favoris.'], 500);
+        }
+
+        return $this->json(['message' => 'Supression des favoris avec succès.'], 200);
+    }
 
 
     #[Route('/api/addTerrain', name: 'app_add_terrain', methods: ['POST'])]

@@ -4,6 +4,7 @@ namespace App\Manager;
 
 use App\Dto\TerrainDTO;
 use App\Entity\Terrain;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
 class TerrainManager
@@ -114,6 +115,28 @@ class TerrainManager
         foreach ($votes as $vote) {
             $this->em->remove($vote);
         }
+        try {
+            $this->em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function addFavorite(Terrain $terrain, User $user)
+    {
+        $user->addFavori($terrain);
+        try {
+            $this->em->flush();
+            return $terrain;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function deleteTerrainFromFavorite($user, $terrain)
+    {
+        $user->removeFavori($terrain);
         try {
             $this->em->flush();
             return true;
