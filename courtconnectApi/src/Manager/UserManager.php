@@ -61,6 +61,18 @@ class UserManager
         }
     }
 
+    public function plus100($user)
+    {
+        $user->setTrustability(100);
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
+            return $user;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     public function deleteUser(User $user, $terrains, $events)
     {
         foreach ($terrains as $terrain) {

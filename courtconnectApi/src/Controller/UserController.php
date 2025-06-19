@@ -190,6 +190,9 @@ class UserController extends AbstractController
         if ($modified) {
             $dto->roles = $roles;
             $result = $this->userManager->changeRole($dto, $user);
+            if ($user->getTrustability() < 100) {
+                $this->userManager->plus100($user);
+            }
             if (!$result) {
                 return $this->json(['message' => 'Erreur lors de l\'attribution des rôles'], 500);
             }
