@@ -163,4 +163,40 @@ class UserController extends AbstractController
         return $this->json(['terrains' => $terrains, 'events' => $events], 200, [], ['groups' => ['createdByUser']]);
     }
 
+    /**
+     * Attribue les rôles ROLE_TRUSTED et ROLE_PREMIUM à l'utilisateur connecté s'il ne les possède pas déjà.
+     * Retourne un message indiquant le résultat de l'opération.
+     */
+    #[Route('/api/subscribe', name: 'app_subscribe', methods: ['POST'])]
+    public function subscribe(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        $dto = new UserDTO();
+        $roles = $user->getRoles();
+
+        $modified = false;
+
+        if (!in_array('ROLE_TRUSTED', $roles)) {
+            $roles[] = 'ROLE_TRUSTED';
+            $modified = true;
+        }
+
+        if (!in_array('ROLE_PREMIUM', $roles)) {
+            $roles[] = 'ROLE_PREMIUM';
+            $modified = true;
+        }
+
+        if ($modified) {
+            $dto->roles = $roles;
+            $result = $this->userManager->changeRole($dto, $user);
+            if (!$result) {
+                return $this->json(['message' => 'Erreur lors de l\'attribution des rôles'], 500);
+            }
+            return $this->json(['message' => 'Rôles attribués avec succès'], 200);
+        }
+
+        return $this->json(['message' => 'L\'utilisateur possède déjà les rôles requis'], 200);
+    }
+
 }
