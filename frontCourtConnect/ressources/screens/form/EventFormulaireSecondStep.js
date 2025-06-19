@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { authFetch } from "../../utils/AuthFetch";
 
 export default function EventFormulaireSecondStep({ route, navigation }) {
   const { theme, themeName } = useContext(ThemeContext);
-  const { nom, terrainId } = route.params;
+  const { nom, terrainId, editMode } = route.params;
 
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date());
@@ -28,6 +28,17 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
   const [niveau, setNiveau] = useState("1");
   const [typeEvent, setTypeEvent] = useState("");
   const [orgaOnly, setOrgaOnly] = useState(false);
+
+  useEffect(() => {
+    if (editMode) {
+      setDescription(editMode.description || "");
+      setDate(new Date(editMode.date_heure));
+      setMaxJoueurs(editMode.maxJoueurs || 10);
+      setNiveau(String(editMode.niveau ?? "1"));
+      setTypeEvent(editMode.type_event?.nom || "");
+      setOrgaOnly(editMode.orgaOnly || false);
+    }
+  }, [editMode]);
 
   const { items: typeEvents, loading: loadingTypes } = useTypeList("event");
 
@@ -51,10 +62,18 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         orgaOnly: orgaOnly,
       };
 
-      const response = await authFetch("api/addEvent", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
+      let response;
+      if (editMode) {
+        response = await authFetch(`api/updateEvent/${editMode.id}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      } else {
+        response = await authFetch("api/addEvent", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -80,7 +99,10 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
   }
 
   return (
-    <PageLayout headerContent="Créer un événement" showFooter={false}>
+    <PageLayout
+      headerContent={editMode ? "Modifier l'événement" : "Créer l'événement"}
+      showFooter={false}
+    >
       <StepTracker
         currentStep={2}
         onStepChange={(step) => {
@@ -172,7 +194,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
           onPress={handleValidation}
         >
           <Text style={{ color: "#fff", fontWeight: "bold" }}>
-            Créer l'événement
+            {editMode ? "Modifier l'événement" : "Créer l'événement"}
           </Text>
         </TouchableOpacity>
       </ScrollView>

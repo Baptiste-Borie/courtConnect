@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,16 +11,20 @@ import {
 import { useTheme } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
 import PageLayout from "../../shared/PageLayout";
-import assets from "../../constants/assets";
 import TerrainDetailTab from "./TerrainDetailTab";
 import TerrainEventsTab from "./TerrainEventsTab";
+import AuthContext from "../../context/AuthContext";
 
 export default function TerrainDetailScreen({ route }) {
   const { theme } = useTheme();
+  const { user } = useContext(AuthContext);
+
   const terrainId = route.params?.terrainId;
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("details"); // 👈 tab: "details" | "events"
+  const [activeTab, setActiveTab] = useState("details");
+
+  const [imageUri, setImageUri] = useState(null);
 
   useEffect(() => {
     const fetchTerrain = async () => {
@@ -28,6 +32,15 @@ export default function TerrainDetailScreen({ route }) {
         const res = await authFetch(`api/getTerrain/${terrainId}`);
         const data = await res.json();
         setTerrain(data);
+
+        // Charger l'URL de l'image
+        const imageRes = await authFetch(`api/terrain/${terrainId}/getPicture`);
+        const imageData = await imageRes.json();
+
+        if (imageRes.ok && imageData.imageUrl) {
+          const fullUrl = `https://courtconnect.alwaysdata.net${imageData.imageUrl}`;
+          setImageUri(fullUrl);
+        }
       } catch (err) {
         console.error("Erreur chargement terrain :", err);
       } finally {
@@ -46,13 +59,20 @@ export default function TerrainDetailScreen({ route }) {
     );
   }
 
+  const isOwner = user?.id === terrain?.created_by?.id;
   return (
-    <PageLayout>
+    <PageLayout editMode={isOwner ? { type: "terrain", data: terrain } : null}>
       <ScrollView>
-        {/* Image */}
-        <View style={styles.imagePlaceholder} />
+        {imageUri ? (
+          <Image
+            source={{ uri: imageUri }}
+            style={{ height: 250, width: "100%" }}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.imagePlaceholder} />
+        )}
 
-        {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[

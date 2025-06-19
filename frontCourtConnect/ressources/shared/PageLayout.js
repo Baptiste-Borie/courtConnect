@@ -12,12 +12,19 @@ const PageLayout = ({
   headerContent = null,
   onLogout = null,
   style = {},
+  editMode = false,
 }) => {
   const { theme } = useContext(ThemeContext);
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {showHeader && <Header content={headerContent} onLogout={onLogout} />}
+      {showHeader && (
+        <Header
+          content={headerContent}
+          onLogout={onLogout}
+          editMode={editMode}
+        />
+      )}
       <View
         style={[styles.content, { backgroundColor: theme.background }, style]}
       >

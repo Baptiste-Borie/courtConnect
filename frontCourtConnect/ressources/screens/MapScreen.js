@@ -46,6 +46,7 @@ const MapScreen = ({ navigation }) => {
             longitude: terrain.longitude,
           },
           title: terrain.nom,
+          id: terrain.id,
         }));
         setTerrainMarkers(markers);
       } catch (error) {

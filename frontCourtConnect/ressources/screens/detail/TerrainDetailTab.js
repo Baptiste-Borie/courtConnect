@@ -5,22 +5,33 @@ import assets from "../../constants/assets";
 export default function TerrainDetailTab({ terrain, theme }) {
   return (
     <View style={styles.card}>
-      <Text style={[styles.sectionTitle, { color: theme.text }]}>Usure</Text>
-      <View style={styles.starsRow}>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Image
-            key={i}
-            source={
-              i <= terrain.usure ? assets.icons.star_filled : assets.icons.star
-            }
-            style={styles.starIcon}
-          />
-        ))}
+      <View style={styles.infoRow}>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>Usure</Text>
+        <View style={styles.starsRow}>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Image
+              key={i}
+              source={
+                i <= terrain.usure
+                  ? assets.icons.star_filled
+                  : assets.icons.star
+              }
+              style={styles.starIcon}
+            />
+          ))}
+        </View>
       </View>
 
       <View style={styles.infoRow}>
         <Text style={[styles.label, { color: theme.text }]}>Nom :</Text>
         <Text style={[styles.value, { color: theme.text }]}>{terrain.nom}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
+        <Text style={[styles.label, { color: theme.text }]}>Remarques :</Text>
+        <Text style={[styles.value, { color: theme.text }]}>
+          {terrain.remarque}
+        </Text>
       </View>
 
       <View style={styles.infoRow}>
@@ -91,6 +102,7 @@ const styles = StyleSheet.create({
   },
   starsRow: {
     flexDirection: "row",
+    marginLeft: 8,
     marginBottom: 16,
   },
   starIcon: {

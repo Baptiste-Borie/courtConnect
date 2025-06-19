@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { authFetch } from "../../utils/AuthFetch";
 
 export default function TerrainFormulaireSecondStep({ route, navigation }) {
   const { theme, themeName } = useContext(ThemeContext);
-  const { nom, adresse, coords, usure } = route.params;
+  const { nom, adresse, coords, usure, photo, editMode } = route.params;
 
   const [nombrePaniers, setNombrePaniers] = useState(0);
   const [typePanier, setTypePanier] = useState("");
@@ -28,6 +28,18 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
   const [typeSol, setTypeSol] = useState("");
   const [zoneSpectateurs, setZoneSpectateurs] = useState(false);
   const [remarques, setRemarques] = useState("");
+
+  useEffect(() => {
+    if (editMode) {
+      console.log("b:", editMode);
+      setNombrePaniers(editMode.nb_panier || 0);
+      setTypePanier(editMode.type_panier?.nom || "");
+      setTypeFilet(editMode.type_filet?.nom || "");
+      setTypeSol(editMode.type_sol?.nom || "");
+      setZoneSpectateurs(editMode.spectateur || false);
+      setRemarques(editMode.remarque || "");
+    }
+  }, [editMode]);
 
   const { items: typesFilet, loading: loadingFilet } = useTypeList("filet");
   const { items: typesPanier, loading: loadingPanier } = useTypeList("panier");
@@ -46,6 +58,44 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
     return { adresse, code_postal: "", ville: "" }; // fallback si format non reconnu
   };
 
+  const uploadTerrainImage = async (terrainId) => {
+    if (!photo) return;
+
+    const formData = new FormData();
+    formData.append("image", {
+      uri: photo,
+      name: "terrain.jpg",
+      type: "image/jpeg",
+    });
+
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await fetch(
+        `https://courtconnect.alwaysdata.net/api/uploadTerrainPicture/${terrainId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("Erreur upload image :", err);
+        Alert.alert(
+          "Image non envoyée",
+          "Le terrain est créé mais l'image a échoué."
+        );
+      }
+    } catch (err) {
+      console.error("❌ Erreur fetch image :", err);
+    }
+  };
+
   const handleValidation = async () => {
     const typePanierId = typesPanier.find(
       (item) => item.nom === typePanier
@@ -59,8 +109,6 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
     }
 
     try {
-      const token = await AsyncStorage.getItem("token");
-
       const {
         adresse: adresseSansVille,
         codePostal,
@@ -83,10 +131,18 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
         remarque: remarques,
       };
 
-      const response = await authFetch("api/addTerrain", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
+      let response;
+      if (editMode) {
+        response = await authFetch(`api/updateTerrain/${editMode.id}`, {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      } else {
+        const response = await authFetch("api/addTerrain", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -95,6 +151,8 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
       }
 
       const data = await response.json();
+      await uploadTerrainImage(data.id);
+
       Alert.alert("Succès", "Le terrain a été ajouté avec succès !");
       navigation.navigate("Home");
     } catch (err) {
