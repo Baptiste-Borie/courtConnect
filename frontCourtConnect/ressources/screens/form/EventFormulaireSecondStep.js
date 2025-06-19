@@ -32,7 +32,11 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
   useEffect(() => {
     if (editMode) {
       setDescription(editMode.description || "");
-      setDate(new Date(editMode.date_heure));
+
+      const rawDate = new Date(editMode.date_heure);
+      const adjustedDate = new Date(rawDate.getTime() + 2 * 60 * 60 * 1000);
+      setDate(adjustedDate);
+
       setMaxJoueurs(editMode.maxJoueurs || 10);
       setNiveau(String(editMode.niveau ?? "1"));
       setTypeEvent(editMode.type_event?.nom || "");
