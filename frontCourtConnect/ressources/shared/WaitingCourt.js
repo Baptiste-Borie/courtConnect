@@ -34,8 +34,6 @@ export default function WaitingCourtScreen({ style }) {
             try {
                 const res = await authFetch("/api/getAllNoVotedTerrains");
                 const data = await res.json();
-                console.log("Terrains reçus :", JSON.stringify(data));
-
                 setCourts(data);
             } catch (err) {
                 console.error("Erreur récupération terrains :", err);
