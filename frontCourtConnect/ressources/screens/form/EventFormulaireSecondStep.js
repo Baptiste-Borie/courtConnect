@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Switch,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CustomDateTimePicker from "../../shared/CustomDateTimePicker";
 import PageLayout from "../../shared/PageLayout";
@@ -19,7 +19,7 @@ import useTypeList from "../../customHooks/useTypeList";
 import { authFetch } from "../../utils/AuthFetch";
 
 export default function EventFormulaireSecondStep({ route, navigation }) {
-  const { theme } = useContext(ThemeContext);
+  const { theme, themeName } = useContext(ThemeContext);
   const { nom, terrainId } = route.params;
 
   const [description, setDescription] = useState("");
@@ -27,6 +27,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
   const [maxJoueurs, setMaxJoueurs] = useState(10);
   const [niveau, setNiveau] = useState("1");
   const [typeEvent, setTypeEvent] = useState("");
+  const [orgaOnly, setOrgaOnly] = useState(false);
 
   const { items: typeEvents, loading: loadingTypes } = useTypeList("event");
 
@@ -47,6 +48,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
         niveau: parseInt(niveau),
         terrain: terrainId,
         typeEvent: typeEventId,
+        orgaOnly: orgaOnly,
       };
 
       const response = await authFetch("api/addEvent", {
@@ -143,6 +145,28 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
           onChange={setTypeEvent}
           theme={theme}
         />
+
+        <View style={styles.row}>
+          <Text style={{ color: theme.text }}>Organisateur uniquement</Text>
+          <Text
+            style={{
+              color: theme.text + "99",
+              marginBottom: 8,
+              marginTop: 4,
+              fontSize: 12,
+            }}
+          >
+            Vous ne validerez que 5 points au lieu de 10 si cette option est
+            activée
+          </Text>
+          <Switch
+            value={orgaOnly}
+            onValueChange={() => setOrgaOnly(!orgaOnly)}
+            trackColor={{ true: theme.primary }}
+            thumbColor={themeName === "dark" ? "#fff" : "#fff"}
+          />
+        </View>
+
         <TouchableOpacity
           style={[styles.button, { backgroundColor: theme.primary }]}
           onPress={handleValidation}
