@@ -179,6 +179,27 @@ class EventController extends AbstractController
 
     }
 
+    #[Route('/api/cancelEvent/{id}', name: 'app_cancel_event', methods: ['POST'])]
+    public function cancelEvent($id): JsonResponse
+    {
+        $user = $this->getUser();
+        $event = $this->eventRepository->find($id);
+        if (!$event) {
+            return $this->json(['message' => 'Événement non trouvé.'], 404);
+        }
+        if ($user !== $event->getCreatedBy()) {
+            return $this->json(['message' => 'Vous n\'êtes pas le créateur'], 404);
+        }
+        $dto = new EventDTO();
+        $dto->etat = 3;
+        $result = $this->eventManager->changeState($dto, $event);
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors de l\'annulation de l\'événement'], 404);
+        }
+
+        return $this->json(['message' => 'Evénement annulé avec succès'], 200);
+    }
+
     /**
      * Gère la création ou la mise à jour d'un événement.
      *
