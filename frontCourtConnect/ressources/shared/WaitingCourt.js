@@ -34,8 +34,6 @@ export default function WaitingCourtScreen({ style }) {
             try {
                 const res = await authFetch("/api/getAllNoVotedTerrains");
                 const data = await res.json();
-                console.log("Terrains reçus :", JSON.stringify(data));
-
                 setCourts(data);
             } catch (err) {
                 console.error("Erreur récupération terrains :", err);
@@ -139,18 +137,5 @@ const styles = StyleSheet.create({
     info: {
         fontSize: 12,
         marginTop: 4,
-        justifyContent: "flex-end",
-    }, headerRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
     },
-    actions: {
-        flexDirection: "row",
-        gap: 8,
-    },
-    iconButton: {
-        padding: 4,
-    },
-
 });
