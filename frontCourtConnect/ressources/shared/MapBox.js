@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useRef } from "react";
+import React, { forwardRef, useContext, useRef, useState } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Callout, Marker } from "react-native-maps";
 
@@ -6,6 +6,7 @@ import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
 import MarkerCourt from "./MarkerCourt";
 import { recenterMarker } from '../utils/RecenterOnMarker';
+import CourtModal from "./CourtModal";
 
 const MapBox = forwardRef(({
   style = {},
@@ -15,10 +16,13 @@ const MapBox = forwardRef(({
   userLocation,
   terrainMarkers = [],
   onRegionChange = () => { },
+  navigation,
 }, ref) => {
   const { themeName } = useContext(ThemeContext);
 
   const userMarkerRef = useRef(null);
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
 
   return (
@@ -65,13 +69,28 @@ const MapBox = forwardRef(({
               userLocation={userLocation}
               marker={marker}
               mapRef={ref}
+              navigation={navigation}
+              onPress={(marker) => {
+                setSelectedMarker(marker);
+                setModalVisible(true);
+              }}
             >
+
             </MarkerCourt>
           );
         })}
 
       </MapView>
-
+      <CourtModal
+        visible={modalVisible}
+        marker={selectedMarker}
+        onClose={() => setModalVisible(false)}
+        onNavigate={() => {
+          setModalVisible(false);
+          navigation.navigate("EventFormulaire");
+        }}
+        userLocation={userLocation}
+      />
       {centerMaker && (
         <View style={styles.markerFixed}>
           <Image source={assets.icons.marker} style={styles.marker} />
