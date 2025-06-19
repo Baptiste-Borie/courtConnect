@@ -18,7 +18,7 @@ import Button from "../../shared/Button";
 import { authFetch } from "../../utils/AuthFetch";
 
 export default function EventFormulaire({ navigation, route }) {
-  const { event } = route.params || {};
+  const { data: event } = route.params || {};
   const { theme } = useContext(ThemeContext);
 
   const [isLoadingTerrains, setIsLoadingTerrains] = useState(true);

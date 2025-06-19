@@ -57,9 +57,8 @@ export default function TerrainDetailScreen({ route }) {
   }
 
   return (
-    <PageLayout>
+    <PageLayout editMode={{ type: "terrain", data: terrain }}>
       <ScrollView>
-        {/* Image */}
         {imageUri ? (
           <Image
             source={{ uri: imageUri }}
@@ -70,7 +69,6 @@ export default function TerrainDetailScreen({ route }) {
           <View style={styles.imagePlaceholder} />
         )}
 
-        {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[

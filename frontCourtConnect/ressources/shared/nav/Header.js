@@ -53,7 +53,10 @@ const Header = ({ content, onLogout, editMode }) => {
               <TouchableOpacity
                 onPress={() => {
                   setShowMenu(false);
-                  navigation.navigate("AddEvent", { event: editMode.data });
+                  navigation.navigate(
+                    editMode.type === "event" ? "AddEvent" : "AddTerrain",
+                    { data: editMode.data }
+                  );
                 }}
               >
                 <Text style={{ color: theme.text, padding: 8 }}>Modifier</Text>

@@ -19,8 +19,9 @@ import MapBox from "../../shared/MapBox";
 import assets from "../../constants/assets";
 import Button from "../../shared/Button";
 
-export default function TerrainFormulaire({ navigation }) {
+export default function TerrainFormulaire({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
+  const { data: terrain } = route.params || {};
 
   const debounceTimer = useRef(null);
 
@@ -32,6 +33,22 @@ export default function TerrainFormulaire({ navigation }) {
   });
   const [usure, setUsure] = useState(3);
   const [photo, setPhoto] = useState(null);
+
+  useEffect(() => {
+    if (terrain) {
+      setNom(terrain.nom || "");
+      setAdresse(terrain.adresse || "");
+      setSelectedCoords({
+        latitude: terrain.coords?.latitude || 48.8566,
+        longitude: terrain.coords?.longitude || 2.3522,
+      });
+      setUsure(terrain.usure || 3);
+      fetchAddress({
+        latitude: terrain.coords?.latitude || 48.8566,
+        longitude: terrain.coords?.longitude || 2.3522,
+      });
+    }
+  }, [terrain]);
 
   // Reverse geocoding à chaque changement de position
   const fetchAddress = async (coords) => {
@@ -78,6 +95,7 @@ export default function TerrainFormulaire({ navigation }) {
       coords: selectedCoords,
       usure,
       photo,
+      editMode: terrain,
     });
   };
 
@@ -112,7 +130,10 @@ export default function TerrainFormulaire({ navigation }) {
   ];
 
   return (
-    <PageLayout showFooter={false} headerContent={"Créer un terrain"}>
+    <PageLayout
+      showFooter={false}
+      headerContent={terrain ? "Modifier le terrain" : "Ajouter un terrain"}
+    >
       <StepTracker
         currentStep={1}
         onStepChange={(step) => {
