@@ -22,21 +22,18 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
     }
 
     /**
-     * Gère la réponse en cas de succès de l'authentification.
-     *
-     * Cette méthode est appelée automatiquement après une authentification réussie.
-     * Elle génère un JWT pour l'utilisateur authentifié ainsi qu'un refresh token
-     * valable pendant 30 jours, et les retourne dans la réponse JSON.
-     *
-     * @param Request $request La requête HTTP d'authentification.
-     * @param TokenInterface $token Le token d'authentification contenant l'utilisateur.
-     *
-     * @return JsonResponse Réponse JSON contenant le JWT et le refresh token.
+     * Génère un JWT et un refresh token lors d'une authentification réussie.
+     * Supprime d'abord tout refresh token existant pour l'utilisateur avant d'en créer un nouveau.
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): JsonResponse
     {
         $user = $token->getUser();
         $jwt = $this->jwtManager->create($user);
+
+        $existingTokens = $this->em->getRepository(RefreshToken::class)->findBy(['user' => $user]);
+        foreach ($existingTokens as $oldToken) {
+            $this->em->remove($oldToken);
+        }
 
         $refreshToken = new RefreshToken();
         $refreshToken->setUser($user);
@@ -51,4 +48,5 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
             'refresh_token' => $refreshToken->getToken(),
         ]);
     }
+
 }
