@@ -18,6 +18,12 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Permettez à CourtConnect d'accéder à votre localisation !"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with the world."
+        }
       ]
     ],
     "ios": {

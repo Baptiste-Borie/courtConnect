@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useRef } from "react";
+import * as ImagePicker from "expo-image-picker";
 
 import PageLayout from "../../shared/PageLayout";
 import StepTracker from "./StepTracker";
@@ -30,6 +31,7 @@ export default function TerrainFormulaire({ navigation }) {
     longitude: 2.3522,
   });
   const [usure, setUsure] = useState(3);
+  const [photo, setPhoto] = useState(null);
 
   // Reverse geocoding à chaque changement de position
   const fetchAddress = async (coords) => {
@@ -75,7 +77,30 @@ export default function TerrainFormulaire({ navigation }) {
       adresse,
       coords: selectedCoords,
       usure,
+      photo,
     });
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission refusée", "L'accès à la galerie est nécessaire.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const imageUri = result.assets[0].uri;
+      setPhoto(imageUri);
+    } else {
+      console.err("❌ Sélection annulée");
+    }
   };
 
   const usureLabels = [
@@ -187,6 +212,40 @@ export default function TerrainFormulaire({ navigation }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        <Text style={[styles.label, { color: theme.text }]}>
+          Photo du terrain (optionnel)
+        </Text>
+
+        <TouchableOpacity
+          onPress={() => {
+            pickImage();
+          }}
+          style={{ marginBottom: 16 }}
+        >
+          {photo ? (
+            <Image
+              source={{ uri: photo }}
+              style={{ width: 200, height: 120, borderRadius: 8 }}
+            />
+          ) : (
+            <View
+              style={{
+                width: 120,
+                height: 70,
+                borderWidth: 1,
+                borderColor: theme.primary,
+                borderRadius: 8,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: theme.text + "99", fontSize: 10 }}>
+                {photo ? "Image sélectionnée" : "Choisir une image"}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         <Button title="Suivant" onPress={handleGoToNextStep} />
       </View>

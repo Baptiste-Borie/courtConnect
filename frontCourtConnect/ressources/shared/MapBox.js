@@ -5,100 +5,100 @@ import MapView, { Callout, Marker } from "react-native-maps";
 import { ThemeContext } from "../context/ThemeContext";
 import assets from "../constants/assets";
 import MarkerCourt from "./MarkerCourt";
-import { recenterMarker } from '../utils/RecenterOnMarker';
+import { recenterMarker } from "../utils/RecenterOnMarker";
 import CourtModal from "./CourtModal";
 
-const MapBox = forwardRef(({
-  style = {},
-  height = 200,
-  region,
-  centerMaker = false,
-  userLocation,
-  terrainMarkers = [],
-  onRegionChange = () => { },
-  navigation,
-}, ref) => {
-  const { themeName } = useContext(ThemeContext);
+const MapBox = forwardRef(
+  (
+    {
+      style = {},
+      height = 200,
+      region,
+      centerMaker = false,
+      userLocation,
+      terrainMarkers = [],
+      onRegionChange = () => {},
+      navigation,
+    },
+    ref
+  ) => {
+    const { themeName } = useContext(ThemeContext);
 
-  const userMarkerRef = useRef(null);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+    const userMarkerRef = useRef(null);
+    const [selectedMarker, setSelectedMarker] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
-
-  return (
-    <View style={[{ flex: 1 }, { height }, style]}>
-      <MapView
-        ref={ref}
-        style={StyleSheet.absoluteFill}
-        userInterfaceStyle={themeName}
-        key={
-          region?.latitude +
-          "-" +
-          region?.longitude +
-          "-" +
-          terrainMarkers
-            .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
-            .join("|")
-        }
-        region={
-          region || {
-            latitude: 48.8566,
-            longitude: 2.3522,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+    return (
+      <View style={[{ flex: 1 }, { height }, style]}>
+        <MapView
+          ref={ref}
+          style={StyleSheet.absoluteFill}
+          userInterfaceStyle={themeName}
+          key={
+            region?.latitude +
+            "-" +
+            region?.longitude +
+            "-" +
+            terrainMarkers
+              .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
+              .join("|")
           }
-        }
-        onRegionChangeComplete={onRegionChange}
-      >
-        {userLocation && (
-          <Marker
-            coordinate={userLocation.coordinate}
-            title={userLocation.title}
-            pinColor="blue"
-            onPress={() =>
-              recenterMarker(userMarkerRef, ref, userLocation.coordinate)
+          region={
+            region || {
+              latitude: 48.8566,
+              longitude: 2.3522,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
             }
-            ref={userMarkerRef}
-          />
-
+          }
+          onRegionChangeComplete={onRegionChange}
+        >
+          {userLocation && (
+            <Marker
+              coordinate={userLocation.coordinate}
+              title={userLocation.title}
+              pinColor="blue"
+              onPress={() =>
+                recenterMarker(userMarkerRef, ref, userLocation.coordinate)
+              }
+              ref={userMarkerRef}
+            />
+          )}
+          {terrainMarkers.map((marker, index) => {
+            return (
+              <MarkerCourt
+                key={index}
+                userLocation={userLocation}
+                marker={marker}
+                mapRef={ref}
+                navigation={navigation}
+                onPress={(marker) => {
+                  setSelectedMarker(marker);
+                  setModalVisible(true);
+                }}
+              ></MarkerCourt>
+            );
+          })}
+        </MapView>
+        <CourtModal
+          visible={modalVisible}
+          marker={selectedMarker}
+          onClose={() => setModalVisible(false)}
+          onNavigate={() => {
+            setModalVisible(false);
+            navigation.navigate("EventFormulaire");
+          }}
+          userLocation={userLocation}
+        />
+        {centerMaker && (
+          <View style={styles.markerFixed}>
+            <Image source={assets.icons.marker} style={styles.marker} />
+          </View>
         )}
-        {terrainMarkers.map((marker, index) => {
-          return (
-            <MarkerCourt
-              key={index}
-              userLocation={userLocation}
-              marker={marker}
-              mapRef={ref}
-              navigation={navigation}
-              onPress={(marker) => {
-                setSelectedMarker(marker);
-                setModalVisible(true);
-              }}
-            >
-
-            </MarkerCourt>
-          );
-        })}
-
-      </MapView>
-      <CourtModal
-        visible={modalVisible}
-        marker={selectedMarker}
-        onClose={() => setModalVisible(false)}
-        onNavigate={() => {
-          setModalVisible(false);
-          navigation.navigate("EventFormulaire");
-        }}
-        userLocation={userLocation}
-      />
-      {centerMaker && (
-        <View style={styles.markerFixed}>
-          <Image source={assets.icons.marker} style={styles.marker} />
-        </View>
-      )}
-    </View>
-  );
-});
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   markerFixed: {

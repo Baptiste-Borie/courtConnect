@@ -20,7 +20,7 @@ import { authFetch } from "../../utils/AuthFetch";
 
 export default function TerrainFormulaireSecondStep({ route, navigation }) {
   const { theme, themeName } = useContext(ThemeContext);
-  const { nom, adresse, coords, usure } = route.params;
+  const { nom, adresse, coords, usure, photo } = route.params;
 
   const [nombrePaniers, setNombrePaniers] = useState(0);
   const [typePanier, setTypePanier] = useState("");
@@ -46,6 +46,44 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
     return { adresse, code_postal: "", ville: "" }; // fallback si format non reconnu
   };
 
+  const uploadTerrainImage = async (terrainId) => {
+    if (!photo) return;
+
+    const formData = new FormData();
+    formData.append("image", {
+      uri: photo,
+      name: "terrain.jpg",
+      type: "image/jpeg",
+    });
+
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await fetch(
+        `https://courtconnect.alwaysdata.net/api/uploadTerrainPicture/${terrainId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("Erreur upload image :", err);
+        Alert.alert(
+          "Image non envoyée",
+          "Le terrain est créé mais l'image a échoué."
+        );
+      }
+    } catch (err) {
+      console.error("❌ Erreur fetch image :", err);
+    }
+  };
+
   const handleValidation = async () => {
     const typePanierId = typesPanier.find(
       (item) => item.nom === typePanier
@@ -59,8 +97,6 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
     }
 
     try {
-      const token = await AsyncStorage.getItem("token");
-
       const {
         adresse: adresseSansVille,
         codePostal,
@@ -95,6 +131,8 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
       }
 
       const data = await response.json();
+      await uploadTerrainImage(data.id);
+
       Alert.alert("Succès", "Le terrain a été ajouté avec succès !");
       navigation.navigate("Home");
     } catch (err) {

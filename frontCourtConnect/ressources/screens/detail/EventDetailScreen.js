@@ -108,7 +108,7 @@ export default function EventDetailScreen({ route }) {
   }
 
   return (
-    <PageLayout>
+    <PageLayout editMode={{ data: event, type: "event" }}>
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -182,7 +182,7 @@ export default function EventDetailScreen({ route }) {
 
               <Text style={[styles.label, { color: theme.text + "99" }]}>
                 Crée par :
-                {event.created_by.prenom + " " + event.created_by.nom ||
+                {" " + event.created_by.prenom + " " + event.created_by.nom ||
                   event.created_by.username}
               </Text>
             </View>

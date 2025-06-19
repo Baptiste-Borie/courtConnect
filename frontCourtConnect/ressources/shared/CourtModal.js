@@ -1,14 +1,21 @@
-import {React, useContext} from "react";
-import {Modal,View,Text,StyleSheet,TouchableOpacity,Dimensions,} from "react-native";
+import { React, useContext } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { getDistance } from "../utils/GetDistance"; 
-import { ThemeContext } from "../context/ThemeContext"; 
+import { getDistance } from "../utils/GetDistance";
+import { ThemeContext } from "../context/ThemeContext";
 
 const { width } = Dimensions.get("window");
 
 const CourtModal = ({ visible, onClose, marker, userLocation }) => {
-  const {theme}  = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const navigation = useNavigation();
 
   if (!marker) return null;
@@ -30,18 +37,22 @@ const CourtModal = ({ visible, onClose, marker, userLocation }) => {
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={[styles.container, {backgroundColor: theme.background}]}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
           <Text style={styles.title}>{marker.title}</Text>
-          <Text style={[styles.description, {color: theme.text}]}>Distance :</Text>
+          <Text style={[styles.description, { color: theme.text }]}>
+            Distance :
+          </Text>
           <Text style={styles.coord}>{distance} km</Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
               onClose();
-              navigation.navigate("AddEvent"); //à CHANGER on veut la page des events du terrain, pas du formulaire
+              navigation.navigate("TerrainDetail", {
+                terrainId: marker.id,
+              });
             }}
           >
-            <Text style={styles.buttonText}>Voir les événements</Text>
+            <Text style={styles.buttonText}>Voir le terrain</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onClose}>
