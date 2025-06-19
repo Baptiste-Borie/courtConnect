@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['username'])]
@@ -311,12 +312,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->trustability;
     }
 
-    public function setTrustability(int $trustability): static
+    public function setTrustability(int $amount): self
     {
-        $this->trustability = $trustability;
+        if ($this->trustability < 100) {
+            $this->trustability = $amount;
+
+            if ($this->trustability > 100) {
+                $this->trustability = 100;
+            }
+        }
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, RefreshToken>
