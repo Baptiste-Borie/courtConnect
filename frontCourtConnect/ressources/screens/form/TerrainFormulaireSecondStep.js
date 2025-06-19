@@ -137,7 +137,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
           body: JSON.stringify(body),
         });
       } else {
-        const response = await authFetch("api/addTerrain", {
+        response = await authFetch("api/addTerrain", {
           method: "POST",
           body: JSON.stringify(body),
         });

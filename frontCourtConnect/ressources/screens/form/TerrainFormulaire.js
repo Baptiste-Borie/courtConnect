@@ -53,12 +53,6 @@ export default function TerrainFormulaire({ navigation, route }) {
   // Reverse geocoding à chaque changement de position
   const fetchAddress = async (coords) => {
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission refusée", "La géolocalisation est nécessaire.");
-        return;
-      }
-
       const [place] = await Location.reverseGeocodeAsync({
         latitude: coords.latitude,
         longitude: coords.longitude,
