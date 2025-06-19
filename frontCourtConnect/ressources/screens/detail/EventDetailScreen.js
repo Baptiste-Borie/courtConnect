@@ -6,7 +6,10 @@ import {
   Image,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 import { useTheme } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
@@ -17,6 +20,8 @@ import AuthContext from "../../context/AuthContext";
 export default function EventDetailScreen({ route }) {
   const { theme } = useTheme();
   const { user } = useContext(AuthContext);
+  const navigation = useNavigation();
+
   const eventId = route.params?.eventId;
 
   const [event, setEvent] = useState(null);
@@ -110,7 +115,7 @@ export default function EventDetailScreen({ route }) {
           style={{ flex: 1 }}
         >
           <View style={styles.imagePlaceholder} />
-          <View style={[styles.header, { backgroundColor: theme.card }]}>
+          <View style={[styles.header]}>
             <View style={styles.headerTop}>
               <Text style={[styles.title, { color: theme.text }]}>
                 {event.nom}
@@ -128,9 +133,30 @@ export default function EventDetailScreen({ route }) {
             </View>
 
             <View style={styles.details}>
-              <Text style={[styles.label, { color: theme.text }]}>
-                Terrain : {event.terrain.nom}, {event.terrain.ville}
-              </Text>
+              <View style={styles.labelRow}>
+                <TouchableOpacity
+                  style={styles.labelRow}
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigation.navigate("TerrainDetail", {
+                      terrainId: event.terrain.id,
+                    })
+                  }
+                >
+                  <Text style={[styles.label, { color: theme.text, flex: 1 }]}>
+                    Terrain : {event.terrain.nom}, {event.terrain.ville}
+                  </Text>
+                  <Image
+                    source={assets.terrain}
+                    style={{
+                      width: 35,
+                      height: 23.33,
+                      marginLeft: 8,
+                      marginTop: 4,
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
 
               <Text
                 style={[
@@ -155,7 +181,7 @@ export default function EventDetailScreen({ route }) {
               </Text>
 
               <Text style={[styles.label, { color: theme.text + "99" }]}>
-                Crée par :{" "}
+                Crée par :
                 {event.created_by.prenom + " " + event.created_by.nom ||
                   event.created_by.username}
               </Text>
@@ -212,6 +238,11 @@ const styles = StyleSheet.create({
   details: {
     flex: 1,
     justifyContent: "space-evenly",
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
   },
   label: {
     fontSize: 16,

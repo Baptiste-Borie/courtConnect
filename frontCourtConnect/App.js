@@ -18,6 +18,7 @@ import TerrainFormulaireSecondStep from "./ressources/screens/form/TerrainFormul
 import EventFormulaire from "./ressources/screens/form/EventFormulaire";
 import EventFormulaireSecondStep from "./ressources/screens/form/EventFormulaireSecondStep";
 import EventDetailScreen from "./ressources/screens/detail/EventDetailScreen";
+import TerrainDetailScreen from "./ressources/screens/detail/TerrainDetailScreen";
 
 import { authFetch } from "./ressources/utils/AuthFetch";
 
@@ -62,6 +63,10 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
                 component={EventFormulaireSecondStep}
               />
               <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+              <Stack.Screen
+                name="TerrainDetail"
+                component={TerrainDetailScreen}
+              />
             </>
           ) : (
             <Stack.Screen name="Auth">

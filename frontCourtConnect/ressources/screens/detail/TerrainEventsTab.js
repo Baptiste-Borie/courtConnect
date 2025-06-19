@@ -1,91 +1,88 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
-  StyleSheet,
   Text,
-  ActivityIndicator,
-  Image,
+  StyleSheet,
   TouchableOpacity,
+  Image,
+  ActivityIndicator,
 } from "react-native";
-import { useTheme } from "../../context/ThemeContext";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
 
-export default function AlmostFullEvents({ style }) {
-  const { theme } = useTheme();
+export default function TerrainEventsTab({ terrainId, theme }) {
   const navigation = useNavigation();
 
-  const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const res = await authFetch("api/getOnGoingEvents");
-          const data = await res.json();
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await authFetch(`api/getEventsOfTerrain/${terrainId}`);
+        const data = await res.json();
 
-          setLoadingEventsIds(data.map((e) => e.id));
+        setLoadingEventsIds(data.map((e) => e.id));
 
-          const eventsWithUsers = await Promise.all(
-            data.map(async (event) => {
-              try {
-                const userRes = await authFetch(
-                  `api/getUsersOfThisEvent/${event.id}`
-                );
-                const users = await userRes.json();
-                return {
-                  ...event,
-                  currentPlayers: users.length,
-                  fillingRate: users.length / event.max_joueurs,
-                };
-              } catch {
-                return {
-                  ...event,
-                  currentPlayers: 0,
-                  fillingRate: 0,
-                };
-              } finally {
-                setLoadingEventsIds((prev) =>
-                  prev.filter((id) => id !== event.id)
-                );
-              }
-            })
-          );
+        const enriched = await Promise.all(
+          data.map(async (event) => {
+            try {
+              const res = await authFetch(
+                `api/getUsersOfThisEvent/${event.id}`
+              );
+              const users = await res.json();
+              return {
+                ...event,
+                currentPlayers: users.length,
+              };
+            } catch {
+              return {
+                ...event,
+                currentPlayers: 0,
+              };
+            } finally {
+              setLoadingEventsIds((prev) =>
+                prev.filter((id) => id !== event.id)
+              );
+            }
+          })
+        );
 
-          const sorted = eventsWithUsers.sort(
-            (a, b) => b.fillingRate - a.fillingRate
-          );
+        setEvents(enriched);
+      } catch (err) {
+        console.error("Erreur chargement events du terrain :", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-          setEvents(sorted);
-        } catch (err) {
-          console.error("Erreur récupération events + users :", err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchData();
-    }, [])
-  );
+    if (terrainId) fetchEvents();
+  }, [terrainId]);
 
   if (loading && !events) {
     return (
-      <View style={[styles.container, style]}>
-        <Text style={[styles.title, { color: theme.text }]}>
-          Soyez parmi les derniers à rejoindre !!
-        </Text>
+      <View style={styles.container}>
         <ActivityIndicator color={theme.primary} />
       </View>
     );
   }
 
+  if (!events || events.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Aucun événement pour ce terrain
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={styles.container}>
       <Text style={[styles.title, { color: theme.text }]}>
-        Soyez parmi les derniers à rejoindre !!
+        Événements organisés ici
       </Text>
 
       {events.map((item) => {
@@ -148,6 +145,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 4,
   },
   eventCard: {
     borderRadius: 8,
