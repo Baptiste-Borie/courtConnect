@@ -108,7 +108,7 @@ class EventManager
             $this->em->persist($participant);
         }
         $createur = $dto->created_by;
-        $createur->setTrustability($dto->created_by->getTrustability() + 5);
+        $createur->setTrustability($createur->getTrustability() + 5);
         $this->em->persist($createur);
         try {
             $this->em->flush();
