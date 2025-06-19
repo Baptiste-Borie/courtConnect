@@ -31,7 +31,6 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
 
   useEffect(() => {
     if (editMode) {
-      console.log("b:", editMode);
       setNombrePaniers(editMode.nb_panier || 0);
       setTypePanier(editMode.type_panier?.nom || "");
       setTypeFilet(editMode.type_filet?.nom || "");
