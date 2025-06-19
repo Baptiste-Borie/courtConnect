@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Dto\UserDTO;
 use App\Entity\User;
 use App\Manager\UserManager;
+use App\Repository\EventRepository;
+use App\Repository\TerrainRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -151,6 +153,14 @@ class UserController extends AbstractController
     }
 
 
+    #[Route('/api/getAllTerrainsAndEventCreatedByUser', name: 'get_all_terrains_and_event_created_by_user', methods: ['GET'])]
+    public function getAllTerrainsAndEventCreatedByUser(TerrainRepository $terrainRepository, EventRepository $eventRepository): JsonResponse
+    {
+        $user = $this->getUser();
+        $terrains = $user->getTerrains();
+        $events = $user->getEvents();
 
+        return $this->json(['terrains' => $terrains, 'events' => $events], 200, [], ['groups' => ['createdByUser']]);
+    }
 
 }
