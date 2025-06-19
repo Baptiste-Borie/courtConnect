@@ -1,14 +1,8 @@
 import React from "react";
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import {Modal,View,Text,StyleSheet,TouchableOpacity,Dimensions,} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { getDistance } from "../utils/GetDistance"; // ← corrige le chemin si besoin
+
+import { getDistance } from "../utils/GetDistance"; 
 
 const { width } = Dimensions.get("window");
 
