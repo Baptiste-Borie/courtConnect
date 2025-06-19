@@ -1,8 +1,6 @@
 import React, { useState, useContext } from "react";
 import { StyleSheet } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 
-import { authFetch } from "../../utils/AuthFetch";
 import PageLayout from "../../shared/PageLayout";
 import AccountScreenHeader from "./AccountScreenHeader";
 import AccountScreenMainContent from "./AccountScreenMainContent";

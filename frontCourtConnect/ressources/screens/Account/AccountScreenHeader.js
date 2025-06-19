@@ -10,10 +10,21 @@ import {
 
 import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
+import { getUserImageUri } from "../../utils/GetImage";
 
 export default function AccountScreenHeader({ data }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const { theme } = useContext(ThemeContext);
+  const [profileImage, setProfileImage] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const uri = await getUserImageUri();
+      setProfileImage(uri);
+    };
+
+    fetchImage();
+  }, []);
 
   if (!data) {
     return (
@@ -31,14 +42,7 @@ export default function AccountScreenHeader({ data }) {
     >
       <View style={styles.headerTop}>
         <View style={styles.avatarContainer}>
-          <Image
-            source={
-              data.profilePicture
-                ? { uri: data.profilePicture }
-                : assets.icons.account
-            }
-            style={styles.avatar}
-          />
+          <Image source={{ uri: profileImage }} style={styles.avatar} />
         </View>
 
         <View style={styles.content}>
@@ -49,9 +53,15 @@ export default function AccountScreenHeader({ data }) {
           </View>
 
           <View style={styles.trustContainer}>
-            <Text style={[styles.trustLabel, { color: theme.primary }]}>
-              Réputation : {data.trustability}/100
-            </Text>
+            {data.trustability === 100 ? (
+              <Text style={[styles.trustLabel, { color: theme.primary }]}>
+                Utilisateur de confiance
+              </Text>
+            ) : (
+              <Text style={[styles.trustLabel, { color: theme.primary }]}>
+                Réputation : {data.trustability}/100
+              </Text>
+            )}
 
             <View style={styles.trustRow}>
               <View

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,18 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  TouchableOpacity,
+  Image,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Button from "../../shared/Button";
 import PageLayout from "../../shared/PageLayout";
 import { ThemeContext } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
 import AuthContext from "../../context/AuthContext";
+import { getUserImageUri } from "../../utils/GetImage";
 
 export default function EditProfileScreen({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
@@ -24,7 +29,16 @@ export default function EditProfileScreen({ navigation, route }) {
   const [prenom, setPrenom] = useState(user.prenom || "");
   const [username, setUsername] = useState(user.username || "");
   const [pseudo, setPseudo] = useState(user.pseudo || "");
-  const [imageUrl, setImageUrl] = useState(user.image_url || "");
+  const [imageUrl, setImageUrl] = useState("");
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const uri = await getUserImageUri();
+      setImageUrl(uri);
+    };
+
+    fetchImage();
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -55,7 +69,7 @@ export default function EditProfileScreen({ navigation, route }) {
         "Profil mis à jour",
         "Vos informations ont été enregistrées."
       );
-      navigation.navigate("Account", { refresh: true });
+      navigation.navigate("Home");
     } catch (error) {
       console.error("Erreur :", error);
       Alert.alert(
@@ -64,6 +78,71 @@ export default function EditProfileScreen({ navigation, route }) {
       );
     }
   };
+
+  const handleImagePick = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission refusée", "L'accès à la galerie est nécessaire.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const imageUri = result.assets[0].uri;
+      setImageUrl(imageUri);
+    }
+
+    if (!result.canceled && result.assets?.length > 0) {
+      const selected = result.assets[0];
+
+      const formData = new FormData();
+      formData.append("image", {
+        uri: selected.uri,
+        name: "profile.jpg",
+        type: "image/jpeg",
+      });
+
+      try {
+        const token = await AsyncStorage.getItem("token");
+
+        const response = await fetch(
+          "https://courtconnect.alwaysdata.net/api/uploadProfilePicture",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+            body: formData,
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error("Erreur upload image :", data);
+          Alert.alert(
+            "Image non envoyée",
+            "L'image n'a pas pu être enregistrée."
+          );
+          return;
+        }
+
+        // Re render image
+      } catch (err) {
+        console.error("❌ Erreur fetch image :", err);
+        Alert.alert("Erreur", "Une erreur est survenue pendant l'envoi.");
+      }
+    }
+  };
+
+  console.log("b:", imageUrl);
 
   return (
     <PageLayout showFooter={false}>
@@ -76,6 +155,33 @@ export default function EditProfileScreen({ navigation, route }) {
         <Text style={[styles.title, { color: theme.text }]}>
           Compléter votre profil
         </Text>
+
+        <TouchableOpacity
+          onPress={handleImagePick}
+          style={{ marginBottom: 16, alignSelf: "center" }}
+        >
+          {imageUrl ? (
+            <Image
+              source={{ uri: imageUrl }}
+              style={{ width: 100, height: 100, borderRadius: 50 }}
+            />
+          ) : (
+            <View
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 50,
+                backgroundColor: theme.text + "22",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: theme.text + "99" }}>
+                Ajouter une photo
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
         <TextInput
           placeholder="Prénom"
