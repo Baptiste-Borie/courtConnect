@@ -14,9 +14,15 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
       return;
     }
 
+    if (terrain.etat !== 0) {
+      Alert.alert("Vote non autorisé", "Ce terrain n’est plus en attente de validation.");
+      return;
+    }
+
     await handleValidation(terrain.id, action);
     setHasVoted(true);
   };
+
 
   const [courts, setCourts] = useState([]);
 
@@ -66,7 +72,7 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
             ]}
           />
         </TouchableOpacity>
-        {user?.roles?.includes("ROLE_TRUSTED") && !hasVoted && (
+        {user?.roles?.includes("ROLE_TRUSTED") && !hasVoted && terrain.etat === 0 && (
           <View style={styles.actions}>
             <TouchableOpacity
               style={styles.iconButton}
@@ -83,6 +89,7 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
             </TouchableOpacity>
           </View>
         )}
+
       </View>
 
 
