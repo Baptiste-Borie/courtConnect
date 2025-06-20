@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -19,13 +21,86 @@ import { getTerrainImageUri } from "../../utils/GetImage";
 export default function TerrainDetailScreen({ route }) {
   const { theme } = useTheme();
   const { user } = useContext(AuthContext);
-
+  const [isFavorite, setIsFavorite] = useState(null);
   const terrainId = route.params?.terrainId;
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("details");
-
   const [imageUri, setImageUri] = useState(null);
+
+
+  const navigation = useNavigation();
+  const toggleFavorite = async () => {
+    if (!user?.roles?.includes("ROLE_PREMIUM")) {
+      Alert.alert(
+        "Fonctionnalité Premium",
+        "Ajoutez ce terrain à vos favoris en devenant membre Premium.",
+        [
+          {
+            text: "S'abonner",
+            onPress: () => navigation.navigate("SubscribeScreen"),
+          },
+          { text: "Annuler", style: "cancel" },
+        ]
+      );
+      return;
+    }
+
+    try {
+      const route = isFavorite
+        ? `api/deleteTerrainFromFavorite/${terrainId}`
+        : `api/addTerrainToFavorite/${terrainId}`;
+
+      const res = await authFetch(route, { method: "POST" });
+      if (res.ok) {
+        setIsFavorite(!isFavorite);
+        Alert.alert(
+          "Favoris mis à jour",
+          isFavorite
+            ? "Le terrain a été retiré de vos favoris."
+            : "Le terrain a été ajouté à vos favoris."
+        );
+      } else {
+        Alert.alert("Erreur", "Une erreur est survenue côté serveur.");
+      }
+    } catch (err) {
+      console.error("Erreur favori :", err);
+      Alert.alert("Erreur", "Impossible de modifier les favoris.");
+    }
+  };
+
+
+  useEffect(() => {
+    const checkIfFavorite = async () => {
+
+      if (!user?.roles?.includes("ROLE_PREMIUM")) {
+        setIsFavorite(false);
+        return;
+      }
+      try {
+        const res = await authFetch('/api/getAllFavoriteTerrains');
+        if (res.ok) {
+          const favorites = await res.json();
+          const isTerrainFavorite = favorites.some(
+            (fav) => fav.id === terrainId
+          );
+          setIsFavorite(isTerrainFavorite);
+        } else {
+          console.error("Erreur lors de la récupération des favoris");
+        }
+      } catch (err) {
+        console.error("Erreur favori :", err);
+      }
+    };
+
+    if (terrainId && user?.id) {
+      checkIfFavorite();
+    } else {
+      setIsFavorite(false);
+    }
+  }, [terrainId, user?.id]);
+
+
 
   useEffect(() => {
     const fetchTerrain = async () => {
@@ -109,7 +184,7 @@ export default function TerrainDetailScreen({ route }) {
           </TouchableOpacity>
         </View>
         {activeTab === "details" ? (
-          <TerrainDetailTab terrain={terrain} theme={theme} />
+          <TerrainDetailTab terrain={terrain} theme={theme} isFavorite={isFavorite} toggleFavorite={toggleFavorite} user={user} />
         ) : (
           <TerrainEventsTab terrainId={terrain.id} theme={theme} />
         )}

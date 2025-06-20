@@ -12,10 +12,12 @@ import { useNavigation } from "@react-navigation/native";
 import { getDistance } from "../utils/GetDistance";
 import { ThemeContext } from "../context/ThemeContext";
 import Button from "./Button";
+import AuthContext from "../context/AuthContext";
 
 const { width } = Dimensions.get("window");
 
 const CourtModal = ({ visible, onClose, marker, userLocation }) => {
+  const {isAuthenticated} = useContext(AuthContext)
   const { theme } = useContext(ThemeContext);
   const navigation = useNavigation();
 
@@ -23,11 +25,11 @@ const CourtModal = ({ visible, onClose, marker, userLocation }) => {
 
   const distance = userLocation
     ? getDistance(
-        userLocation.coordinate.latitude,
-        userLocation.coordinate.longitude,
-        marker.coordinate.latitude,
-        marker.coordinate.longitude
-      ).toFixed(2)
+      userLocation.coordinate.latitude,
+      userLocation.coordinate.longitude,
+      marker.coordinate.latitude,
+      marker.coordinate.longitude
+    ).toFixed(2)
     : "N/A";
 
   return (
@@ -50,6 +52,11 @@ const CourtModal = ({ visible, onClose, marker, userLocation }) => {
           <Button
             title={"Voir le terrain"}
             onPress={() => {
+              if (!isAuthenticated) {
+                onClose();
+                navigation.navigate("Auth");
+                return;
+              }
               onClose();
               navigation.navigate("TerrainDetail", {
                 terrainId: marker.id,
@@ -57,6 +64,7 @@ const CourtModal = ({ visible, onClose, marker, userLocation }) => {
             }}
             style={styles.button}
           />
+
           <TouchableOpacity onPress={onClose}>
             <Text style={styles.close}>Fermer</Text>
           </TouchableOpacity>
