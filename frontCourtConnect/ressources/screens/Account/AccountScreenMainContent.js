@@ -48,6 +48,15 @@ export default function AccountScreenMainContent({ data }) {
         })
       },
     },
+    {
+      icon: assets.icons.time,
+      label: "Mes événements",
+      onPress: () => {
+        navigation.navigate("MyEvents", {
+          data, theme
+        })
+      },
+    },
   ];
 
   return (
