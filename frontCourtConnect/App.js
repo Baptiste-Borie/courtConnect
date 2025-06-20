@@ -75,7 +75,7 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
                 component={WaitingCourtsScreen}
               />
               <Stack.Screen
-                name="Subscribe"
+                name="SubscribeScreen"
                 component={SubscribeScreen}
               />
             </>
