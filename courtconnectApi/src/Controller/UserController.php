@@ -154,7 +154,7 @@ class UserController extends AbstractController
 
 
     #[Route('/api/getAllTerrainsAndEventCreatedByUser', name: 'get_all_terrains_and_event_created_by_user', methods: ['GET'])]
-    public function getAllTerrainsAndEventCreatedByUser(TerrainRepository $terrainRepository, EventRepository $eventRepository): JsonResponse
+    public function getAllTerrainsAndEventCreatedByUser(): JsonResponse
     {
         $user = $this->getUser();
         $terrains = $user->getTerrains();
@@ -229,17 +229,28 @@ class UserController extends AbstractController
 
 
     #[Route('/api/deleteUser', name: 'app_delete_user', methods: ['DELETE'])]
-    public function deleteUser(): JsonResponse
+    public function deleteUser(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
         $user = $this->getUser();
+
+        if (!isset($data['password'])) {
+            return $this->json(['message' => 'Mot de passe requis'], 400);
+        }
+
+        if (!$passwordHasher->isPasswordValid($user, $data['password'])) {
+            return $this->json(['message' => 'Mot de passe incorrect'], 401);
+        }
+
         $events = $user->getEvents();
         $terrains = $user->getTerrains();
+
         $result = $this->userManager->deleteUser($user, $terrains, $events);
         if (!$result) {
             return $this->json(['message' => 'Erreur lors de la suppression'], 500);
         }
 
-        return $this->json(['message' => 'Utilisateur supprimé'], 200);
+        return $this->json(['message' => 'Utilisateur supprimé avec succès'], 200);
     }
 
 }
