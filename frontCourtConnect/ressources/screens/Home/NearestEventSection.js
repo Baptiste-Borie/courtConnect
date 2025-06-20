@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -13,45 +13,49 @@ import { getDistance } from "../../utils/GetDistance";
 import EventCard from "./EventCard";
 import useLocation from "../../customHooks/useLocation";
 
-export default function NearestEventSection({ style }) {
+export default function NearestEventSection({ style, refreshKey }) {
   const { theme } = useTheme();
   const { latitude, longitude, permissionGranted } = useLocation();
 
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [events, setEvents] = useState([]);
 
+  const fetchTerrains = useCallback(async () => {
+    if (!latitude || !longitude) return;
+
+    setLoadingEvents(true);
+    try {
+      const res = await authFetch("api/getOnGoingEvents");
+      const data = await res.json();
+
+      const sorted = data
+        .map((e) => ({
+          ...e,
+          distance: getDistance(
+            latitude,
+            longitude,
+            e.terrain.latitude,
+            e.terrain.longitude
+          ),
+        }))
+        .sort((a, b) => a.distance - b.distance);
+
+      setEvents(sorted);
+    } catch (err) {
+      console.error("Erreur chargement events :", err);
+    } finally {
+      setLoadingEvents(false);
+    }
+  }, [latitude, longitude]);
+
+  useEffect(() => {
+    fetchTerrains();
+  }, [fetchTerrains, refreshKey]);
+
   useFocusEffect(
     useCallback(() => {
-      if (!latitude || !longitude) return;
-
-      const fetchTerrains = async () => {
-        setLoadingEvents(true);
-        try {
-          const res = await authFetch("api/getOnGoingEvents");
-          const data = await res.json();
-
-          const sorted = data
-            .map((e) => ({
-              ...e,
-              distance: getDistance(
-                latitude,
-                longitude,
-                e.terrain.latitude,
-                e.terrain.longitude
-              ),
-            }))
-            .sort((a, b) => a.distance - b.distance);
-
-          setEvents(sorted);
-        } catch (err) {
-          console.error("Erreur chargement events :", err);
-        } finally {
-          setLoadingEvents(false);
-        }
-      };
-
       fetchTerrains();
-    }, [latitude, longitude])
+    }, [fetchTerrains])
   );
 
   if (!permissionGranted) {

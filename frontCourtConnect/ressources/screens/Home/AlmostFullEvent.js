@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -13,7 +13,7 @@ import { authFetch } from "../../utils/AuthFetch";
 import { getTerrainImageUri } from "../../utils/GetImage";
 import assets from "../../constants/assets";
 
-export default function AlmostFullEvents({ style }) {
+export default function AlmostFullEvents({ style, refreshKey }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
 
@@ -22,65 +22,69 @@ export default function AlmostFullEvents({ style }) {
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
   const [imagesUriMap, setImagesUriMap] = useState({});
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const res = await authFetch("api/getOnGoingEvents");
+      const data = await res.json();
+
+      setLoadingEventsIds(data.map((e) => e.id));
+
+      const eventsWithUsers = await Promise.all(
+        data.map(async (event) => {
+          try {
+            const userRes = await authFetch(
+              `api/getUsersOfThisEvent/${event.id}`
+            );
+            const users = await userRes.json();
+            return {
+              ...event,
+              currentPlayers: users.length,
+              fillingRate: users.length / event.max_joueurs,
+            };
+          } catch {
+            return {
+              ...event,
+              currentPlayers: 0,
+              fillingRate: 0,
+            };
+          } finally {
+            setLoadingEventsIds((prev) => prev.filter((id) => id !== event.id));
+          }
+        })
+      );
+
+      const sorted = eventsWithUsers.sort(
+        (a, b) => b.fillingRate - a.fillingRate
+      );
+
+      setEvents(sorted);
+
+      const imagesMap = {};
+      await Promise.all(
+        sorted.map(async (event) => {
+          const uri = await getTerrainImageUri(event.terrain.id);
+          imagesMap[event.id] = uri;
+        })
+      );
+      setImagesUriMap(imagesMap);
+    } catch (err) {
+      console.error("Erreur récupération events + users :", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const res = await authFetch("api/getOnGoingEvents");
-          const data = await res.json();
-
-          setLoadingEventsIds(data.map((e) => e.id));
-
-          const eventsWithUsers = await Promise.all(
-            data.map(async (event) => {
-              try {
-                const userRes = await authFetch(
-                  `api/getUsersOfThisEvent/${event.id}`
-                );
-                const users = await userRes.json();
-                return {
-                  ...event,
-                  currentPlayers: users.length,
-                  fillingRate: users.length / event.max_joueurs,
-                };
-              } catch {
-                return {
-                  ...event,
-                  currentPlayers: 0,
-                  fillingRate: 0,
-                };
-              } finally {
-                setLoadingEventsIds((prev) =>
-                  prev.filter((id) => id !== event.id)
-                );
-              }
-            })
-          );
-
-          const sorted = eventsWithUsers.sort(
-            (a, b) => b.fillingRate - a.fillingRate
-          );
-
-          setEvents(sorted);
-
-          const imagesMap = {};
-          await Promise.all(
-            sorted.map(async (event) => {
-              const uri = await getTerrainImageUri(event.terrain.id);
-              imagesMap[event.id] = uri;
-            })
-          );
-          setImagesUriMap(imagesMap);
-        } catch (err) {
-          console.error("Erreur récupération events + users :", err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
       fetchData();
     }, [])
   );
+
+  useEffect(() => {
+    fetchData();
+  }, [refreshKey]);
 
   if (loading && !events) {
     return (
