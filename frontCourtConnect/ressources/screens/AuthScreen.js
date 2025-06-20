@@ -92,6 +92,17 @@ const AuthScreen = ({ onLogin }) => {
           onChangeText={setPassword}
         />
       </View>
+      <Text
+        style={{
+          color: theme.text + "99",
+          marginBottom: 32,
+          fontSize: 12,
+          textAlign: "center",
+        }}
+      >
+        Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1
+        chiffre et 1 caractères spécial.
+      </Text>
 
       <Button
         title={isLogin ? "Se connecter" : "S'inscrire"}
