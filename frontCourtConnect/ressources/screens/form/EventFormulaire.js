@@ -16,6 +16,7 @@ import { ThemeContext } from "../../context/ThemeContext";
 import MapBox from "../../shared/MapBox";
 import Button from "../../shared/Button";
 import { authFetch } from "../../utils/AuthFetch";
+import SearchTerrain from "./SearchTerrain";
 
 export default function EventFormulaire({ navigation, route }) {
   const { data: event } = route.params || {};
@@ -180,24 +181,10 @@ export default function EventFormulaire({ navigation, route }) {
               },
             ]}
           >
-            <Picker
-              selectedValue={selectedTerrain}
-              onValueChange={(itemValue) => setSelectedTerrain(itemValue)}
-              dropdownIconColor={theme.text}
-              style={{
-                width: "100%",
-              }}
-              itemStyle={{ color: theme.text, height: 120 }}
-            >
-              <Picker.Item label="Choisir un terrain..." value={null} />
-              {terrains.map((terrain) => (
-                <Picker.Item
-                  key={terrain.id}
-                  label={terrain.nom}
-                  value={terrain.id}
-                />
-              ))}
-            </Picker>
+            <SearchTerrain
+              selectedTerrainId={selectedTerrain}
+              onSelect={setSelectedTerrain}
+            />
           </View>
         )}
 
