@@ -260,6 +260,13 @@ export default function EventDetailScreen({ route }) {
               <Text style={[styles.label, { color: theme.text }]}>
                 Type : {event.type_event.nom}
               </Text>
+              {event.description && (
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Description :
+                  {event.description || "Aucune description fournie."}
+                </Text>
+              )}
+
               <Text style={[styles.label, { color: theme.text + "99" }]}>
                 Créé par :{" "}
                 {event.created_by?.prenom && event.created_by?.nom
