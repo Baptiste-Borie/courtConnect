@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+
 import { ThemeContext } from "../../context/ThemeContext";
 import assets from "../../constants/assets";
 import AuthContext from "../../context/AuthContext";
@@ -49,7 +50,7 @@ export default function AccountScreenMainContent({ data }) {
       },
     },
     {
-      icon: assets.icons.time,
+      icon: assets.icons.calendar,
       label: "Mes événements",
       onPress: () => {
         navigation.navigate("MyEvents", {
