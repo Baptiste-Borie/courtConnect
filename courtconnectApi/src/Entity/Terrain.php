@@ -83,10 +83,6 @@ class Terrain
     #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?int $usure = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain'])]
-    private ?string $image_url = null;
-
     #[ORM\ManyToOne(inversedBy: 'terrains')]
     #[Groups(['terrain', 'all_events', 'createdByUser'])]
     #[ORM\JoinColumn(name: 'type_filet', referencedColumnName: 'id')]
@@ -344,18 +340,6 @@ class Terrain
     public function setUsure(int $usure): static
     {
         $this->usure = $usure;
-
-        return $this;
-    }
-
-    public function getImageUrl(): ?string
-    {
-        return $this->image_url;
-    }
-
-    public function setImageUrl(?string $image): static
-    {
-        $this->image_url = $image;
 
         return $this;
     }

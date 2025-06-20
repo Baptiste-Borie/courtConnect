@@ -33,7 +33,6 @@ class TerrainManager
         $newTerrain->setCreatedBy($terrainDTO->createdBy);
         $newTerrain->setEtat(0);
         $newTerrain->setRemarque($terrainDTO->remarque);
-        $newTerrain->setImageUrl($terrainDTO->image_url);
 
         try {
             $this->em->persist($newTerrain);
@@ -61,7 +60,6 @@ class TerrainManager
         $terrain->setSpectateur($terrainDTO->spectateur);
         $terrain->setCreatedBy($terrainDTO->createdBy);
         $terrain->setRemarque($terrainDTO->remarque);
-        $terrain->setImageUrl($terrainDTO->image_url);
 
         try {
             $this->em->persist($terrain);

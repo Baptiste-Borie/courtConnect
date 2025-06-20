@@ -11,7 +11,6 @@ class UserDTO
     public $nom;
     public $prenom;
     public $pseudo;
-    public $image_url;
     public $trustability;
 
 
