@@ -63,4 +63,14 @@ class EventRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findEventsJoinedByUser($user)
+    {
+        return $this->createQueryBuilder('e')
+            ->innerJoin('e.joueurs', 'j')
+            ->where('j = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
 }
