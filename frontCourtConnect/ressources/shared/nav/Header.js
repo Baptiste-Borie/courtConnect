@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
@@ -17,8 +24,12 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
   const [eventStatus, setEventStatus] = useState(editMode?.data?.etat);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");
-    onLogout();
+    try {
+      await AsyncStorage.clear();
+      onLogout();
+    } catch (err) {
+      console.error("Erreur lors du nettoyage du stockage :", err);
+    }
   };
 
   const handleStatusEvent = async () => {
@@ -45,6 +56,37 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
     return "Débuter l'événement";
   };
 
+  const handleCancelEvent = async () => {
+    if (!editMode?.data?.id) return;
+
+    Alert.alert(
+      "Annuler l’événement",
+      "Es-tu sûr de vouloir annuler cet événement ?",
+      [
+        {
+          text: "Non",
+          style: "cancel",
+        },
+        {
+          text: "Oui",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await authFetch(`/api/cancelEvent/${editMode.data.id}`, {
+                method: "POST",
+              });
+
+              if (onRefreshEvent) onRefreshEvent();
+              setEventStatus(3);
+            } catch (err) {
+              console.error("Erreur lors de l’annulation :", err);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.primary }]}>
       <ReturnButton onPress={() => navigation.goBack()} />
@@ -60,11 +102,11 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
           >
             <Image
               source={assets.icons.more}
-              style={{ width: 24, height: 24 }}
+              style={{ width: 24, height: 24, tintColor: theme.text }}
             />
           </TouchableOpacity>
 
-          {showMenu && (
+          {showMenu && eventStatus !== 3 && (
             <View
               style={[
                 styles.menu,
@@ -102,6 +144,18 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
                   </Text>
                 </TouchableOpacity>
               )}
+              {more.includes("cancelEvent") && eventStatus === 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    handleCancelEvent();
+                  }}
+                >
+                  <Text style={{ color: theme.text, padding: 8 }}>
+                    Annuler l'événement
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
@@ -113,7 +167,7 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
         >
           <Image
             source={assets.icons.logout}
-            style={{ width: 24, height: 24 }}
+            style={{ width: 24, height: 24, tintColor: theme.text }}
           />
         </TouchableOpacity>
       ) : null}
