@@ -194,6 +194,9 @@ class EventController extends AbstractController
     {
         $user = $this->getUser();
         $event = $this->eventRepository->find($id);
+        if ($event->getEtat() !== 0) {
+            return $this->json(['message' => 'Événement déjâ commencé ou terminé.'], 404);
+        }
         if (!$event) {
             return $this->json(['message' => 'Événement non trouvé.'], 404);
         }
