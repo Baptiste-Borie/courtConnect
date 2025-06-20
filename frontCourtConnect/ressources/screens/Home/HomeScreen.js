@@ -1,5 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, ScrollView, Alert, RefreshControl } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Alert,
+  RefreshControl,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PageLayout from "../../shared/PageLayout";
@@ -10,6 +16,7 @@ import PremiumSection from "./PremiumSection";
 import AlmostFullEvent from "./AlmostFullEvent";
 import { authFetch } from "../../utils/AuthFetch";
 import AuthContext from "../../context/AuthContext";
+import TerrainEventSearchBar from "../../shared/TerrainEventSearchBar";
 
 const CANCELLED_ALERTS_KEY = "cancelledEventAlerts";
 
@@ -84,7 +91,10 @@ export default function HomeScreen({ navigation }) {
       style={[styles.content, { backgroundColor: theme.background }]}
       showHeader={false}
     >
-      <ProfileButton style={{ position: "absolute", top: 50, right: 20 }} />
+      <View style={styles.topBar}>
+        <TerrainEventSearchBar theme={theme} />
+        <ProfileButton style={styles.profileButton} />
+      </View>
 
       <ScrollView
         style={styles.scroll}
@@ -114,6 +124,7 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     width: "100%",
+    marginTop: 20,
   },
   scrollContent: {
     paddingBottom: 80,
@@ -121,5 +132,18 @@ const styles = StyleSheet.create({
   },
   section: {
     marginHorizontal: 10,
+  },
+  topBar: {
+    position: "absolute",
+    top: 50,
+    left: 10,
+    right: 10,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    zIndex: 10,
+  },
+  profileButton: {
+    marginLeft: 10,
   },
 });
