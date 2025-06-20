@@ -50,10 +50,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['terrain', 'user', 'all_events', 'userOfEvent', 'createdByUser'])]
     private ?string $pseudo = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['terrain', 'user'])]
-    private ?string $image_url = null;
-
     /**
      * @var Collection<int, Terrain>
      */
@@ -204,18 +200,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPseudo(?string $pseudo): static
     {
         $this->pseudo = $pseudo;
-
-        return $this;
-    }
-
-    public function getImageUrl(): ?string
-    {
-        return $this->image_url;
-    }
-
-    public function setImageUrl(?string $image_url): static
-    {
-        $this->image_url = $image_url;
 
         return $this;
     }

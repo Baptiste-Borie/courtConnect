@@ -42,9 +42,17 @@ class UserController extends AbstractController
             return $this->json(['message' => 'Données invalides'], 400);
         }
 
+        if (!$this->isValidEmail($data['username'])) {
+            return $this->json(['message' => 'Adresse email invalide.'], 400);
+        }
+
         $existingUser = $this->userRepository->findOneBy(['username' => $data['username']]);
         if ($existingUser) {
             return $this->json(['message' => 'Adresse e-mail déjà utilisée.'], 400);
+        }
+
+        if (!$this->isStrongPassword($data['password'])) {
+            return $this->json(['message' => 'Mot de passe pas assez fort.'], 400);
         }
 
         $user = new User();
@@ -67,12 +75,14 @@ class UserController extends AbstractController
     {
         $user = $this->getUser();
         $data = json_decode($request->getContent(), true);
+        if (!$this->isValidEmail($data['username'])) {
+            return $this->json(['message' => 'Adresse email invalide.'], 400);
+        }
         $dto = new UserDTO();
         $dto->username = $data['username'];
         $dto->nom = $data['nom'];
         $dto->prenom = $data['prenom'];
         $dto->pseudo = $data['pseudo'];
-        $dto->image_url = $data['imageUrl'];
 
         $user = $userManager->updateUser($dto, $user);
 
@@ -264,6 +274,9 @@ class UserController extends AbstractController
             return $this->json(['message' => 'Mot de passe actuel incorrect'], 401);
         }
 
+        if (!$this->isStrongPassword($data['newPassword'])) {
+            return $this->json(['message' => 'Mot de passe pas assez fort.'], 400);
+        }
         $dto = new UserDTO();
         $dto->password = $passwordHasher->hashPassword($user, $data['newPassword']);
 
@@ -276,5 +289,18 @@ class UserController extends AbstractController
         return $this->json(['message' => 'Mot de passe modifié avec succès'], 200);
     }
 
+
+    public function isValidEmail(string $email): bool
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public function isStrongPassword(string $password): bool
+    {
+        // Minimum 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre, 1 caractère spécial
+        $pattern = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
+
+        return preg_match($pattern, $password) === 1;
+    }
 
 }

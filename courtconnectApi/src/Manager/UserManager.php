@@ -37,7 +37,6 @@ class UserManager
         $user->setNom($userDTO->nom);
         $user->setPrenom($userDTO->prenom);
         $user->setPseudo($userDTO->pseudo);
-        $user->setImageUrl($userDTO->image_url);
 
         try {
             $this->em->persist($user);
