@@ -92,4 +92,16 @@ class UserManager
         }
     }
 
+    public function changePassword(User $user, UserDTO $dto)
+    {
+        $user->setPassword($dto->password);
+        try {
+            $this->em->persist($user);
+            $this->em->flush();
+            return $user;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 }

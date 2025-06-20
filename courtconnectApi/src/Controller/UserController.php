@@ -254,4 +254,27 @@ class UserController extends AbstractController
         return $this->json(['message' => 'Utilisateur supprimé avec succès'], 200);
     }
 
+    #[Route('/api/changePassword', name: 'app_change_password', methods: ['POST'])]
+    public function changePassword(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $user = $this->getUser();
+
+        if (!$passwordHasher->isPasswordValid($user, $data['password'])) {
+            return $this->json(['message' => 'Mot de passe actuel incorrect'], 401);
+        }
+
+        $dto = new UserDTO();
+        $dto->password = $passwordHasher->hashPassword($user, $data['newPassword']);
+
+        $result = $this->userManager->changePassword($user, $dto);
+
+        if (!$result) {
+            return $this->json(['message' => 'Erreur lors du changement de mot de passe'], 500);
+        }
+
+        return $this->json(['message' => 'Mot de passe modifié avec succès'], 200);
+    }
+
+
 }
