@@ -11,8 +11,6 @@ export default function WaitingCourtsScreen() {
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
 
-  console.log("b:", user);
-
   const isUserTrusted =
     user?.roles?.includes("ROLE_TRUSTED") ||
     user?.roles?.includes("ROLE_PREMIUM");

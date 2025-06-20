@@ -109,7 +109,6 @@ export default function TerrainEventSearchBar({ theme, style = {} }) {
                   <TouchableOpacity
                     key={`terrain-${item.id}`}
                     onPress={() => {
-                      onSelectTerrain?.(item);
                       setQuery(item.nom);
                       setShowResults(false);
                       navigation.navigate("TerrainDetail", {
@@ -139,7 +138,6 @@ export default function TerrainEventSearchBar({ theme, style = {} }) {
                   <TouchableOpacity
                     key={`event-${item.id}`}
                     onPress={() => {
-                      onSelectEvent?.(item);
                       setQuery(item.nom);
                       setShowResults(false);
                       navigation.navigate("EventDetail", { eventId: item.id });
