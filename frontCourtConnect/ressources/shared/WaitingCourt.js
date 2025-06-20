@@ -10,7 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../context/ThemeContext";
 import { authFetch } from "../utils/AuthFetch";
 
-export default function WaitingCourtScreen({ style }) {
+export default function WaitingCourtScreen({ style}) {
     const { theme } = useContext(ThemeContext);
     const navigation = useNavigation();
 
@@ -63,55 +63,55 @@ export default function WaitingCourtScreen({ style }) {
                 Terrains en attente de validation ({courts.length})
             </Text>
             {courts.map((terrain) => (
-                <View
-                    key={terrain.id}
-                    style={[styles.card, { backgroundColor: theme.background_light }]}
+                <TouchableOpacity
+                    key={`terrain-${terrain.id}`}  
+                    onPress={() => navigation.navigate("TerrainDetail", { terrainId: terrain.id })}
                 >
-                    <View style={styles.headerRow}>
-                        <TouchableOpacity
-                            onPress={() =>
-                                navigation.navigate("CourtDetail", { terrainId: terrain.id })
-                            }
-                        >
+                    <View style={[styles.card, { backgroundColor: theme.background_light }]}>
+                        <View style={styles.headerRow}>
                             <Text style={[styles.name, { color: theme.text }]}>
                                 {terrain.nom}
                             </Text>
-                        </TouchableOpacity>
 
-                        <View style={styles.actions}>
-                            <TouchableOpacity
-                                style={styles.iconButton}
-                                onPress={() => handleValidation(terrain.id, "validate")}
-                            >
-                                <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
-                            </TouchableOpacity>
+                            <View style={styles.actions}>
+                                <TouchableOpacity
+                                    style={styles.iconButton}
+                                    onPress={(e) => {
+                                        e.stopPropagation();  
+                                        handleValidation(terrain.id, "validate");
+                                    }}
+                                >
+                                    <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
+                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={styles.iconButton}
-                                onPress={() => handleValidation(terrain.id, "refuse")}
-                            >
-                                <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
-                            </TouchableOpacity>
-
+                                <TouchableOpacity
+                                    style={styles.iconButton}
+                                    onPress={(e) => {
+                                        e.stopPropagation();  // Empêche la propagation du clic
+                                        handleValidation(terrain.id, "refuse");
+                                    }}
+                                >
+                                    <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
+
+                        <Text style={[styles.info, { color: theme.text + "99" }]}>
+                            {terrain.adresse || "Adresse inconnue"}
+                        </Text>
+                        {terrain.created_by && (
+                            <View style={{ alignItems: "flex-end" }}>
+                                <Text style={[styles.info, { color: theme.text + "99" }]}>
+                                    Ajouté par :{" "}
+                                    {terrain.created_by.prenom && terrain.created_by.nom
+                                        ? `${terrain.created_by.prenom} ${terrain.created_by.nom}`
+                                        : "Inconnu"}
+                                </Text>
+                            </View>
+                        )}
                     </View>
-                    <Text style={[styles.info, { color: theme.text + "99" }]}>
-                        {terrain.adresse || "Adresse inconnue"}
-                    </Text>
-                    {terrain.created_by && (
-                        <View style={{ alignItems: "flex-end" }}>
-                            <Text style={[styles.info, { color: theme.text + "99" }]}>
-                                Ajouté par :{" "}
-                                {terrain.created_by.prenom && terrain.created_by.nom
-                                    ? `${terrain.created_by.prenom} ${terrain.created_by.nom}`
-                                    : "Inconnu"}
-                            </Text>
-                        </View>
-                    )}
-
-                </View>
+                </TouchableOpacity>
             ))}
-
         </View>
     );
 }

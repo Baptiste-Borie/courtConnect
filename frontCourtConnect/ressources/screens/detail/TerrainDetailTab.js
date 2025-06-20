@@ -1,9 +1,35 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { TouchableOpacity } from "react-native";
 import assets from "../../constants/assets";
+import { authFetch } from "../../utils/AuthFetch";
+
 
 export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFavorite, user }) {
+  const [hasVoted, setHasVoted] = useState(false);
+
+  const handleVote = async (action) => {
+    if (hasVoted) {
+      Alert.alert("Vote déjà effectué", "Vous avez déjà voté pour ce terrain.");
+      return;
+    }
+
+    await handleValidation(terrain.id, action);
+    setHasVoted(true);
+  };
+
+  const [courts, setCourts] = useState([]);
+
+  const handleValidation = async (terrainId, action) => {
+    try {
+      await authFetch(`/api/terrain/${terrainId}/${action}`, {
+        method: "POST",
+      });
+      setCourts((prev) => prev.filter((t) => t.id !== terrainId));
+    } catch (err) {
+      console.error(`Erreur lors de la ${action} du terrain ${terrainId} :`, err);
+    }
+  };
   return (
     <View style={styles.card}>
       <View style={[styles.rowBetween, { marginBottom: 8 }]}>
@@ -28,18 +54,35 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
                 ? isFavorite
                   ? assets.icons.heart_filled
                   : assets.icons.heart
-                : assets.icons.heart // Toujours cœur vide si pas premium
+                : assets.icons.heart
             }
             style={[
               styles.heartIcon,
               {
-                tintColor: user?.roles?.includes("ROLE_PREMIUM")
-                  ? "#e74c3c" // Rouge si premium
-                  : theme.text // Couleur de texte normale si pas premium
+                tintColor: user?.roles?.includes("ROLE_TRUSTED")
+                  ? "#e74c3c"
+                  : theme.text
               }
             ]}
           />
         </TouchableOpacity>
+        {user?.roles?.includes("ROLE_TRUSTED") && !hasVoted && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => handleVote("validate")}
+            >
+              <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => handleVote("refuse")}
+            >
+              <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
 
