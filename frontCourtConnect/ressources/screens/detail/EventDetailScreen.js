@@ -101,6 +101,8 @@ export default function EventDetailScreen({ route }) {
         return "En cours";
       case "2":
         return "Terminée";
+      case "3":
+        return "Annulée";
       default:
         return;
     }
@@ -132,7 +134,7 @@ export default function EventDetailScreen({ route }) {
 
   return (
     <PageLayout
-      more={isOwner ? ["modify", "statusEvent"] : []}
+      more={isOwner ? ["modify", "statusEvent", "cancelEvent"] : []}
       editMode={
         isOwner
           ? {
@@ -168,13 +170,13 @@ export default function EventDetailScreen({ route }) {
                     style={[
                       styles.endLabel,
                       {
-                        color: event.etat === 2 ? theme.text : theme.primary,
+                        color: event.etat === 1 ? theme.primary : theme.text,
                         borderColor:
-                          event.etat === 2
-                            ? theme.background_light
-                            : theme.primary,
+                          event.etat === 1
+                            ? theme.primary
+                            : theme.background_light,
                         backgroundColor:
-                          event.etat === 2 ? theme.background_light : "",
+                          event.etat === 1 ? "" : theme.background_light,
                       },
                     ]}
                   >
