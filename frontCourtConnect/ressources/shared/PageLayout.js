@@ -13,6 +13,7 @@ const PageLayout = ({
   onLogout = null,
   style = {},
   editMode = false,
+  more = [],
 }) => {
   const { theme } = useContext(ThemeContext);
 
@@ -23,6 +24,8 @@ const PageLayout = ({
           content={headerContent}
           onLogout={onLogout}
           editMode={editMode}
+          more={more}
+          onRefreshEvent={editMode?.refresh}
         />
       )}
       <View
