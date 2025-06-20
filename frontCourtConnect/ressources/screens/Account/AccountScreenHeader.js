@@ -26,7 +26,7 @@ export default function AccountScreenHeader({ data }) {
     fetchImage();
   }, []);
 
-  if (!data) {
+  if (data === null) {
     return (
       <View
         style={[styles.container, { backgroundColor: theme.background_light }]}

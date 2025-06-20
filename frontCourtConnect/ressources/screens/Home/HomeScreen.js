@@ -1,5 +1,11 @@
-import { StyleSheet, View, ScrollView, Alert } from "react-native";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Alert,
+  RefreshControl,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PageLayout from "../../shared/PageLayout";
@@ -10,12 +16,22 @@ import PremiumSection from "./PremiumSection";
 import AlmostFullEvent from "./AlmostFullEvent";
 import { authFetch } from "../../utils/AuthFetch";
 import AuthContext from "../../context/AuthContext";
+import TerrainEventSearchBar from "../../shared/TerrainEventSearchBar";
 
 const CANCELLED_ALERTS_KEY = "cancelledEventAlerts";
 
 export default function HomeScreen({ navigation }) {
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // pour forcer le refresh des enfants
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshKey((prev) => prev + 1);
+    setTimeout(() => setRefreshing(false), 1000); // simule une attente
+  };
 
   useEffect(() => {
     const checkCancelledEventsForUser = async () => {
@@ -75,15 +91,26 @@ export default function HomeScreen({ navigation }) {
       style={[styles.content, { backgroundColor: theme.background }]}
       showHeader={false}
     >
-      <ProfileButton style={{ position: "absolute", top: 50, right: 20 }} />
+      <View style={styles.topBar}>
+        <TerrainEventSearchBar theme={theme} />
+        <ProfileButton style={styles.profileButton} />
+      </View>
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        }
       >
-        <NearestEventSection style={styles.section} />
-        <PremiumSection style={styles.section} />
-        <AlmostFullEvent style={[styles.section]} />
+        <NearestEventSection style={styles.section} refreshKey={refreshKey} />
+        <PremiumSection style={styles.section} refreshKey={refreshKey} />
+        <AlmostFullEvent style={[styles.section]} refreshKey={refreshKey} />
       </ScrollView>
     </PageLayout>
   );
@@ -97,6 +124,7 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     width: "100%",
+    marginTop: 20,
   },
   scrollContent: {
     paddingBottom: 80,
@@ -104,5 +132,18 @@ const styles = StyleSheet.create({
   },
   section: {
     marginHorizontal: 10,
+  },
+  topBar: {
+    position: "absolute",
+    top: 50,
+    left: 10,
+    right: 10,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    zIndex: 10,
+  },
+  profileButton: {
+    marginLeft: 10,
   },
 });

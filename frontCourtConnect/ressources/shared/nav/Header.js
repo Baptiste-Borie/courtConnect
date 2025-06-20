@@ -16,16 +16,20 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { authFetch } from "../../utils/AuthFetch";
 import ReturnButton from "../ReturnButton";
 import assets from "../../constants/assets";
+import AuthContext from "../../context/AuthContext";
 
 const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
+  const { setUser } = useContext(AuthContext);
+
   const [showMenu, setShowMenu] = useState(false);
   const [eventStatus, setEventStatus] = useState(editMode?.data?.etat);
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.clear();
+      setUser(null); // Réinitialiser l'utilisateur dans le contexte
       onLogout();
     } catch (err) {
       console.error("Erreur lors du nettoyage du stockage :", err);

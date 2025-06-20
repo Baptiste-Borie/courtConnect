@@ -27,7 +27,6 @@ export default function EditProfileScreen({ navigation, route }) {
 
   const [nom, setNom] = useState(user.nom || "");
   const [prenom, setPrenom] = useState(user.prenom || "");
-  const [username, setUsername] = useState(user.username || "");
   const [pseudo, setPseudo] = useState(user.pseudo || "");
   const [imageUrl, setImageUrl] = useState("");
 
@@ -41,14 +40,8 @@ export default function EditProfileScreen({ navigation, route }) {
   }, []);
 
   const handleSubmit = async () => {
-    if (!username.trim()) {
-      Alert.alert("Champ requis", "L'email ne peut pas être vide.");
-      return;
-    }
-
     try {
       const payload = {
-        username,
         pseudo,
         nom,
         prenom,
@@ -200,17 +193,6 @@ export default function EditProfileScreen({ navigation, route }) {
           placeholderTextColor={theme.text + "99"}
           value={nom}
           onChangeText={setNom}
-          style={[
-            styles.input,
-            { borderColor: theme.primary, color: theme.text },
-          ]}
-        />
-
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor={theme.text + "99"}
-          value={username}
-          onChangeText={setUsername}
           style={[
             styles.input,
             { borderColor: theme.primary, color: theme.text },
