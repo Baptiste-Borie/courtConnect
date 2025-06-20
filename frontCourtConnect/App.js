@@ -25,7 +25,6 @@ import { authFetch } from "./ressources/utils/AuthFetch";
 import SubscribeScreen from "./ressources/screens/SubscribeScreen";
 import MyEventsScreen from "./ressources/screens/detail/MyEventsScreen";
 
-
 const Stack = createNativeStackNavigator();
 
 function AppContent({ isAuthenticated, setIsAuthenticated }) {
@@ -79,10 +78,7 @@ function AppContent({ isAuthenticated, setIsAuthenticated }) {
                 name="SubscribeScreen"
                 component={SubscribeScreen}
               />
-              <Stack.Screen
-                name="MyEvents"
-                component={MyEventsScreen}
-              />
+              <Stack.Screen name="MyEvents" component={MyEventsScreen} />
             </>
           ) : (
             <Stack.Screen name="Auth">
@@ -135,7 +131,7 @@ export default function App() {
     };
 
     initAuth();
-  }, []);
+  }, [isAuthenticated]);
 
   if (loading) return null;
 
