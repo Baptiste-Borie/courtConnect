@@ -59,11 +59,11 @@ class UserController extends AbstractController
         }
 
         $user = new User();
-        $dto = new UserDTO();
-        $dto->username = $data['username'];
-        $dto->password = $this->passwordHasher->hashPassword($user, $data['password']);
+        $userDto = new UserDTO();
+        $userDto->username = $data['username'];
+        $userDto->password = $this->passwordHasher->hashPassword($user, $data['password']);
 
-        $user = $this->userManager->addUser($dto);
+        $user = $this->userManager->addUser($userDto);
         $refreshToken = new RefreshToken();
         $refreshToken->setUser($user);
         $refreshToken->setToken(bin2hex(random_bytes(64)));
