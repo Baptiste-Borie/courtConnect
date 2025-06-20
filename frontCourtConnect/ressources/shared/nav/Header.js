@@ -24,8 +24,12 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
   const [eventStatus, setEventStatus] = useState(editMode?.data?.etat);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");
-    onLogout();
+    try {
+      await AsyncStorage.clear();
+      onLogout();
+    } catch (err) {
+      console.error("Erreur lors du nettoyage du stockage :", err);
+    }
   };
 
   const handleStatusEvent = async () => {
@@ -83,7 +87,6 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
     );
   };
 
-  console.log("b:", eventStatus);
   return (
     <View style={[styles.container, { backgroundColor: theme.primary }]}>
       <ReturnButton onPress={() => navigation.goBack()} />
@@ -99,7 +102,7 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
           >
             <Image
               source={assets.icons.more}
-              style={{ width: 24, height: 24 }}
+              style={{ width: 24, height: 24, tintColor: theme.text }}
             />
           </TouchableOpacity>
 
@@ -164,7 +167,7 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
         >
           <Image
             source={assets.icons.logout}
-            style={{ width: 24, height: 24 }}
+            style={{ width: 24, height: 24, tintColor: theme.text }}
           />
         </TouchableOpacity>
       ) : null}
