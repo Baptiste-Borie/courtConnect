@@ -75,11 +75,8 @@ class UserController extends AbstractController
     {
         $user = $this->getUser();
         $data = json_decode($request->getContent(), true);
-        if (!$this->isValidEmail($data['username'])) {
-            return $this->json(['message' => 'Adresse email invalide.'], 400);
-        }
+
         $dto = new UserDTO();
-        $dto->username = $data['username'];
         $dto->nom = $data['nom'];
         $dto->prenom = $data['prenom'];
         $dto->pseudo = $data['pseudo'];

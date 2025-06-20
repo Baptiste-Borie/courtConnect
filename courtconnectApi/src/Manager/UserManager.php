@@ -33,7 +33,6 @@ class UserManager
 
     public function updateUser(UserDTO $userDTO, $user) {
 
-        $user->setUsername($userDTO->username);
         $user->setNom($userDTO->nom);
         $user->setPrenom($userDTO->prenom);
         $user->setPseudo($userDTO->pseudo);
