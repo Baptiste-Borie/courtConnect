@@ -21,7 +21,8 @@ const assets = {
     time: require("../../assets/Hourglass.png"),
     logout: require("../../assets/logout.png"),
     more: require("../../assets/more.png"),
-    calendar : require("../../assets/calendar.png")
+    calendar : require("../../assets/calendar.png"),
+    heart_filled : require("../../assets/heart_filled.png")
   },
   terrain: require("../../assets/terrain.png"),
   ballon: require("../../assets/ballon.png"),

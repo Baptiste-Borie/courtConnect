@@ -1,11 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, } from "react-native";
+import { TouchableOpacity } from "react-native";
 import assets from "../../constants/assets";
 
-export default function TerrainDetailTab({ terrain, theme }) {
+export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFavorite, user }) {
   return (
     <View style={styles.card}>
-      <View style={styles.infoRow}>
+      <View style={[styles.rowBetween, { marginBottom: 8 }]}>
         <Text style={[styles.sectionTitle, { color: theme.text }]}>Usure</Text>
         <View style={styles.starsRow}>
           {[1, 2, 3, 4, 5].map((i) => (
@@ -20,7 +21,28 @@ export default function TerrainDetailTab({ terrain, theme }) {
             />
           ))}
         </View>
+        <TouchableOpacity onPress={toggleFavorite}>
+          <Image
+            source={
+              user?.roles?.includes("ROLE_PREMIUM")
+                ? isFavorite
+                  ? assets.icons.heart_filled
+                  : assets.icons.heart
+                : assets.icons.heart // Toujours cœur vide si pas premium
+            }
+            style={[
+              styles.heartIcon,
+              {
+                tintColor: user?.roles?.includes("ROLE_PREMIUM")
+                  ? "#e74c3c" // Rouge si premium
+                  : theme.text // Couleur de texte normale si pas premium
+              }
+            ]}
+          />
+        </TouchableOpacity>
       </View>
+
+
 
       <View style={styles.infoRow}>
         <Text style={[styles.label, { color: theme.text }]}>Nom :</Text>
@@ -102,8 +124,8 @@ const styles = StyleSheet.create({
   },
   starsRow: {
     flexDirection: "row",
-    marginLeft: 8,
-    marginBottom: 16,
+    marginBottom: 10,
+    marginRight: 120,
   },
   starIcon: {
     width: 20,
@@ -131,5 +153,15 @@ const styles = StyleSheet.create({
   detailItem: {
     width: "48%",
     marginBottom: 12,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  heartIcon: {
+    width: 24,
+    height: 24,
+    tintColor: "#e74c3c",
   },
 });
