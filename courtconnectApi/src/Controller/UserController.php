@@ -163,6 +163,7 @@ class UserController extends AbstractController
         return $this->json(['terrains' => $terrains, 'events' => $events], 200, [], ['groups' => ['createdByUser']]);
     }
 
+
     /**
      * Attribue les rôles ROLE_TRUSTED et ROLE_PREMIUM à l'utilisateur connecté s'il ne les possède pas déjà.
      * Retourne un message indiquant le résultat de l'opération.

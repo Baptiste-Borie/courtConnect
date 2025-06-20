@@ -69,6 +69,16 @@ class EventController extends AbstractController
         return $this->json($users, 200, [], ['groups' => ['userOfEvent']]);
     }
 
+    #[Route('/api/getJoinedEvents', name: 'get_joined_events', methods: ['GET'])]
+    public function getJoinedEvents(): JsonResponse
+    {
+        $user = $this->getUser();
+        $events = $this->eventRepository->findEventsJoinedByUser($user);
+
+        return $this->json($events, 200, [], ['groups' => ['all_events']]);
+    }
+
+
     /**
      * Met à jour l'état des événements en fonction de leur date
      *
