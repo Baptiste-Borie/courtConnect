@@ -3,11 +3,14 @@
 namespace App\Controller;
 
 use App\Dto\UserDTO;
+use App\Entity\RefreshToken;
 use App\Entity\User;
 use App\Manager\UserManager;
 use App\Repository\EventRepository;
 use App\Repository\TerrainRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    public function __construct(private UserManager $userManager, private UserPasswordHasherInterface $passwordHasher, private UserRepository $userRepository)
+    public function __construct(private EntityManagerInterface $em, private JWTTokenManagerInterface $jwtManager, private UserManager $userManager, private UserPasswordHasherInterface $passwordHasher, private UserRepository $userRepository)
     {
 
     }
@@ -61,12 +64,25 @@ class UserController extends AbstractController
         $dto->password = $this->passwordHasher->hashPassword($user, $data['password']);
 
         $user = $this->userManager->addUser($dto);
+        $refreshToken = new RefreshToken();
+        $refreshToken->setUser($user);
+        $refreshToken->setToken(bin2hex(random_bytes(64)));
+        $refreshToken->setExpiresAt(new \DateTimeImmutable('+30 days'));
+
+        $this->em->persist($refreshToken);
+        $this->em->flush();
 
         if (!$user) {
             return $this->json(['message' => 'Erreur lors de la création du compte.'], 500);
         }
 
-        return $this->json($user, 200, [], ['groups' => ['user']]);
+        $jwt = $this->jwtManager->create($user);
+
+        return $this->json([
+            'message' => 'Utilisateur inscrit et connecté.',
+            'token' => $jwt,
+            'refresh_token' => $refreshToken->getToken()
+        ], 200);
     }
 
 
