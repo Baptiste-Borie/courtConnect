@@ -52,7 +52,6 @@ export default function TerrainDetailScreen({ route }) {
         : `api/addTerrainToFavorite/${terrainId}`;
 
       const res = await authFetch(route, { method: "POST" });
-      console.log(res)
       if (res.ok) {
         setIsFavorite(!isFavorite);
         Alert.alert(
