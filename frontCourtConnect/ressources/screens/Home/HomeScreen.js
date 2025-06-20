@@ -1,5 +1,5 @@
-import { StyleSheet, View, ScrollView, Alert } from "react-native";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { StyleSheet, ScrollView, Alert, RefreshControl } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PageLayout from "../../shared/PageLayout";
@@ -16,6 +16,15 @@ const CANCELLED_ALERTS_KEY = "cancelledEventAlerts";
 export default function HomeScreen({ navigation }) {
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // pour forcer le refresh des enfants
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshKey((prev) => prev + 1);
+    setTimeout(() => setRefreshing(false), 1000); // simule une attente
+  };
 
   useEffect(() => {
     const checkCancelledEventsForUser = async () => {
@@ -80,10 +89,18 @@ export default function HomeScreen({ navigation }) {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        }
       >
-        <NearestEventSection style={styles.section} />
-        <PremiumSection style={styles.section} />
-        <AlmostFullEvent style={[styles.section]} />
+        <NearestEventSection style={styles.section} refreshKey={refreshKey} />
+        <PremiumSection style={styles.section} refreshKey={refreshKey} />
+        <AlmostFullEvent style={[styles.section]} refreshKey={refreshKey} />
       </ScrollView>
     </PageLayout>
   );
