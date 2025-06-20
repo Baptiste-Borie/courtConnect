@@ -56,7 +56,10 @@ export default function TerrainDetailScreen({ route }) {
 
   const isOwner = user?.id === terrain?.created_by?.id;
   return (
-    <PageLayout editMode={isOwner ? { type: "terrain", data: terrain } : null}>
+    <PageLayout
+      more={isOwner ? ["modify"] : []}
+      editMode={isOwner ? { type: "terrain", data: terrain } : null}
+    >
       <ScrollView>
         <Image
           source={{ uri: imageUri }}

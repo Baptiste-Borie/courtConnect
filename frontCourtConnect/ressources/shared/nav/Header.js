@@ -6,20 +6,44 @@ import { useNavigation } from "@react-navigation/native";
 import { useContext } from "react";
 
 import { ThemeContext } from "../../context/ThemeContext";
+import { authFetch } from "../../utils/AuthFetch";
 import ReturnButton from "../ReturnButton";
 import assets from "../../constants/assets";
 
-const Header = ({ content, onLogout, editMode }) => {
+const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
   const [showMenu, setShowMenu] = useState(false);
+  const [eventStatus, setEventStatus] = useState(editMode?.data?.etat);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
     onLogout();
   };
 
+  const handleStatusEvent = async () => {
+    if (!editMode?.data?.id) return;
+
+    try {
+      await authFetch(`/api/changeState/${editMode.data.id}`, {
+        method: "POST",
+      });
+
+      if (onRefreshEvent) onRefreshEvent();
+      setEventStatus((prev) => prev + 1);
+    } catch (err) {
+      console.error("Erreur lors du changement d'état :", err);
+    }
+
+    setShowMenu(false);
+  };
+
   const toggleMenu = () => setShowMenu(!showMenu);
+
+  const getLabelChangeStatus = () => {
+    if (eventStatus === 1) return "Terminer l'événement";
+    return "Débuter l'événement";
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.primary }]}>
@@ -27,7 +51,7 @@ const Header = ({ content, onLogout, editMode }) => {
 
       <Text style={[styles.title, { color: theme.text }]}>{content}</Text>
 
-      {editMode ? (
+      {more.length >= 1 ? (
         <View>
           <TouchableOpacity
             style={styles.logoutTouchArea}
@@ -50,17 +74,34 @@ const Header = ({ content, onLogout, editMode }) => {
                 },
               ]}
             >
-              <TouchableOpacity
-                onPress={() => {
-                  setShowMenu(false);
-                  navigation.navigate(
-                    editMode.type === "event" ? "AddEvent" : "AddTerrain",
-                    { data: editMode.data }
-                  );
-                }}
-              >
-                <Text style={{ color: theme.text, padding: 8 }}>Modifier</Text>
-              </TouchableOpacity>
+              {more.includes("modify") && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    navigation.navigate(
+                      editMode.type === "event" ? "AddEvent" : "AddTerrain",
+                      { data: editMode.data }
+                    );
+                  }}
+                >
+                  <Text style={{ color: theme.text, padding: 8 }}>
+                    Modifier
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {more.includes("statusEvent") && eventStatus < 2 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowMenu(false);
+                    handleStatusEvent();
+                  }}
+                >
+                  <Text style={{ color: theme.text, padding: 8 }}>
+                    {getLabelChangeStatus()}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>

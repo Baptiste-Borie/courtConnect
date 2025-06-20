@@ -31,6 +31,8 @@ export default function EventDetailScreen({ route }) {
   const [loading, setLoading] = useState(true);
   const [imageUri, setImageUri] = useState(null);
 
+  const [refreshCount, setRefreshCount] = useState(0);
+
   useEffect(() => {
     if (!eventId) return;
 
@@ -40,7 +42,7 @@ export default function EventDetailScreen({ route }) {
         const data = await res.json();
         setEvent(data);
 
-        const image = await getTerrainImageUri(event?.terrain?.id);
+        const image = await getTerrainImageUri(data?.terrain?.id);
         setImageUri(image);
 
         const usersRes = await authFetch(`api/getUsersOfThisEvent/${eventId}`);
@@ -56,7 +58,7 @@ export default function EventDetailScreen({ route }) {
     };
 
     fetchData();
-  }, [eventId, user]);
+  }, [eventId, user, refreshCount]);
 
   const handleJoinOrLeave = async () => {
     try {
@@ -93,6 +95,17 @@ export default function EventDetailScreen({ route }) {
     }
   };
 
+  const getEtatLabel = (levelValue) => {
+    switch (levelValue?.toString()) {
+      case "1":
+        return "En cours";
+      case "2":
+        return "Terminée";
+      default:
+        return;
+    }
+  };
+
   const formatDate = (rawDate) => {
     const date = new Date(rawDate);
 
@@ -118,7 +131,18 @@ export default function EventDetailScreen({ route }) {
   const isOwner = user?.id === event?.created_by?.id;
 
   return (
-    <PageLayout editMode={isOwner ? { data: event, type: "event" } : null}>
+    <PageLayout
+      more={isOwner ? ["modify", "statusEvent"] : []}
+      editMode={
+        isOwner
+          ? {
+              data: event,
+              type: "event",
+              refresh: () => setRefreshCount((prev) => prev + 1),
+            }
+          : null
+      }
+    >
       <View style={[styles.container, { backgroundColor: theme.background }]}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -132,9 +156,32 @@ export default function EventDetailScreen({ route }) {
 
           <View style={[styles.header]}>
             <View style={styles.headerTop}>
-              <Text style={[styles.title, { color: theme.text }]}>
-                {event.nom}
-              </Text>
+              <View
+                style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+              >
+                <Text style={[styles.title, { color: theme.text }]}>
+                  {event.nom}
+                </Text>
+
+                {event.etat !== 0 && (
+                  <Text
+                    style={[
+                      styles.endLabel,
+                      {
+                        color: event.etat === 2 ? theme.text : theme.primary,
+                        borderColor:
+                          event.etat === 2
+                            ? theme.background_light
+                            : theme.primary,
+                        backgroundColor:
+                          event.etat === 2 ? theme.background_light : "",
+                      },
+                    ]}
+                  >
+                    {getEtatLabel(event.etat)}
+                  </Text>
+                )}
+              </View>
 
               <View style={styles.playersCount}>
                 <Text style={{ color: theme.primary, marginRight: 4 }}>
@@ -194,11 +241,11 @@ export default function EventDetailScreen({ route }) {
               <Text style={[styles.label, { color: theme.text }]}>
                 Type : {event.type_event.nom}
               </Text>
-
               <Text style={[styles.label, { color: theme.text + "99" }]}>
-                Crée par :
-                {" " + event.created_by.prenom + " " + event.created_by.nom ||
-                  event.created_by.username}
+                Créé par :{" "}
+                {event.created_by?.prenom && event.created_by?.nom
+                  ? `${event.created_by.prenom} ${event.created_by.nom}`
+                  : event.created_by?.username}
               </Text>
             </View>
           </View>
@@ -257,11 +304,19 @@ const styles = StyleSheet.create({
   labelRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 10,
   },
   label: {
     fontSize: 16,
     marginTop: 10,
+  },
+  endLabel: {
+    fontSize: 16,
+    marginTop: 2,
+    borderWidth: 1,
+    padding: 8,
+    borderRadius: 10,
   },
   buttonWrapper: {
     position: "absolute",
