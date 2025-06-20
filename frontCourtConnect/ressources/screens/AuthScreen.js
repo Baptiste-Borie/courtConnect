@@ -43,17 +43,9 @@ const AuthScreen = ({ onLogin }) => {
       }
 
       if (response.ok) {
-        if (isLogin) {
-          await AsyncStorage.setItem("token", data.token);
-          await AsyncStorage.setItem("refresh_token", data.refresh_token);
-          onLogin();
-        } else {
-          Alert.alert(
-            "Succès",
-            "Inscription réussie, connectez-vous maintenant."
-          );
-          setIsLogin(true);
-        }
+        await AsyncStorage.setItem("token", data.token);
+        await AsyncStorage.setItem("refresh_token", data.refresh_token);
+        onLogin();
       } else {
         Alert.alert("Erreur", data.message || "Une erreur est survenue.");
       }
