@@ -1,11 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
+import { TouchableOpacity } from "react-native";
 import assets from "../../constants/assets";
+import { authFetch } from "../../utils/AuthFetch";
 
-export default function TerrainDetailTab({ terrain, theme }) {
+
+export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFavorite, user }) {
+  const [hasVoted, setHasVoted] = useState(false);
+
+  const handleVote = async (action) => {
+    if (hasVoted) {
+      Alert.alert("Vote déjà effectué", "Vous avez déjà voté pour ce terrain.");
+      return;
+    }
+
+    if (terrain.etat !== 0) {
+      Alert.alert("Vote non autorisé", "Ce terrain n’est plus en attente de validation.");
+      return;
+    }
+
+    await handleValidation(terrain.id, action);
+    setHasVoted(true);
+  };
+
+
+  const [courts, setCourts] = useState([]);
+
+  const handleValidation = async (terrainId, action) => {
+    try {
+      await authFetch(`/api/terrain/${terrainId}/${action}`, {
+        method: "POST",
+      });
+      setCourts((prev) => prev.filter((t) => t.id !== terrainId));
+    } catch (err) {
+      console.error(`Erreur lors de la ${action} du terrain ${terrainId} :`, err);
+    }
+  };
   return (
     <View style={styles.card}>
-      <View style={styles.infoRow}>
+      <View style={[styles.rowBetween, { marginBottom: 8 }]}>
         <Text style={[styles.sectionTitle, { color: theme.text }]}>Usure</Text>
         <View style={styles.starsRow}>
           {[1, 2, 3, 4, 5].map((i) => (
@@ -20,7 +53,46 @@ export default function TerrainDetailTab({ terrain, theme }) {
             />
           ))}
         </View>
+        <TouchableOpacity onPress={toggleFavorite}>
+          <Image
+            source={
+              user?.roles?.includes("ROLE_PREMIUM")
+                ? isFavorite
+                  ? assets.icons.heart_filled
+                  : assets.icons.heart
+                : assets.icons.heart
+            }
+            style={[
+              styles.heartIcon,
+              {
+                tintColor: user?.roles?.includes("ROLE_TRUSTED")
+                  ? "#e74c3c"
+                  : theme.text
+              }
+            ]}
+          />
+        </TouchableOpacity>
+        {user?.roles?.includes("ROLE_TRUSTED") && !hasVoted && terrain.etat === 0 && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => handleVote("validate")}
+            >
+              <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => handleVote("refuse")}
+            >
+              <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
       </View>
+
+
 
       <View style={styles.infoRow}>
         <Text style={[styles.label, { color: theme.text }]}>Nom :</Text>
@@ -102,8 +174,8 @@ const styles = StyleSheet.create({
   },
   starsRow: {
     flexDirection: "row",
-    marginLeft: 8,
-    marginBottom: 16,
+    marginBottom: 10,
+    marginRight: 120,
   },
   starIcon: {
     width: 20,
@@ -131,5 +203,15 @@ const styles = StyleSheet.create({
   detailItem: {
     width: "48%",
     marginBottom: 12,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  heartIcon: {
+    width: 24,
+    height: 24,
+    tintColor: "#e74c3c",
   },
 });
