@@ -100,7 +100,7 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
       {more.length >= 1 ? (
         <View>
           <TouchableOpacity
-            style={styles.logoutTouchArea}
+            style={[styles.logoutTouchArea, { bottom: -5 }]}
             onPress={toggleMenu}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   menu: {
     position: "absolute",
-    top: -5,
+    top: 0,
     right: 0,
     borderWidth: 1,
     borderRadius: 6,
