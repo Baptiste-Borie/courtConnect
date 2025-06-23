@@ -42,12 +42,37 @@ class TerrainRepository extends ServiceEntityRepository
     //        ;
     //    }
 
+//    public function findTerrainsNotVotedByUser(User $user)
+//    {
+//        return $this->createQueryBuilder('t')
+//            ->leftJoin('t.votes', 'v', 'WITH', 'v.user = :user')
+//            ->where('t.etat = 0')
+//            ->andWhere('v.id IS NULL')
+//            ->setParameter('user', $user)
+//            ->orderBy('t.created_at', 'ASC')
+//            ->getQuery()
+//            ->getResult();
+//    }
+
     public function findTerrainsNotVotedByUser(User $user)
     {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.votes', 'v', 'WITH', 'v.user = :user')
-            ->where('t.etat = 0')
-            ->andWhere('v.id IS NULL')
+            ->where('v.id IS NULL')
+            ->andWhere('(t.etat = 0 OR (t.etat = 1 AND t.etat_delete = 0))')
+            ->setParameter('user', $user)
+            ->orderBy('t.created_at', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function findPendingTerrainsNotCreatedBy(User $user): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.etat = :etat')
+            ->andWhere('t.created_by != :user')
+            ->setParameter('etat', 0)
             ->setParameter('user', $user)
             ->orderBy('t.created_at', 'ASC')
             ->getQuery()

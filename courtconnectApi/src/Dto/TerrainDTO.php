@@ -24,5 +24,7 @@ class TerrainDTO
     public $voteValide;
     public $voteRefuse;
 
+    public $etatDelete;
+
 
 }

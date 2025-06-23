@@ -89,6 +89,7 @@ class EventController extends AbstractController
     {
         $events = $this->eventRepository->findAll();
         $now = new \DateTime('now');
+        $now->modify('+2 hours');
         $today = $now->format('Y-m-d');
 
         foreach ($events as $event) {

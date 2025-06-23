@@ -43,6 +43,7 @@ class Event
     private ?User $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
+    #[ORM\JoinColumn(onDelete:"SET NULL")]
     #[Groups(['all_events', 'createdByUser'])]
     private ?Terrain $terrain = null;
 

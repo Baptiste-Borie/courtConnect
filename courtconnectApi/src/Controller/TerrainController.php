@@ -8,6 +8,7 @@ use App\Entity\Terrain;
 use App\Entity\User;
 use App\Manager\TerrainManager;
 use App\Manager\VoteManager;
+use App\Repository\EventRepository;
 use App\Repository\TerrainRepository;
 use App\Repository\TypeFiletRepository;
 use App\Repository\TypePanierRepository;
@@ -29,6 +30,7 @@ class TerrainController extends AbstractController
                                 private VoteManager $voteManager,
                                 private TerrainManager $terrainManager,
                                 private VoteRepository $voteRepository,
+                                private EventRepository $eventRepository,
     )
     {
 
@@ -60,10 +62,12 @@ class TerrainController extends AbstractController
     #[Route('/api/getAllPendingTerrains', name: 'app_get_all_pending_terrains', methods: ['GET'])]
     public function getAllPendingTerrains(): Response
     {
-        $terrains = $this->terrainRepository->findBy(['etat' => 0], ['created_at' => 'ASC']);
+        $user = $this->getUser();
+        $terrains = $this->terrainRepository->findPendingTerrainsNotCreatedBy($user);
 
         return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
+
 
     /**
      * Récupère tous les terrains pour lesquels l'utilisateur connecté n'a pas encore voté
@@ -311,6 +315,9 @@ class TerrainController extends AbstractController
         }
 
         $dto = new TerrainDTO();
+        if ($terrain->getEtat() === 1 && ($terrain->getEtatDelete() !== 0 || $terrain->getEtatDelete() === null)) {
+            $dto->etatDelete = 0;
+        }
         if ($etat === 1) {
             $dto->voteValide = 1;
         } else {
@@ -340,6 +347,10 @@ class TerrainController extends AbstractController
      * - Valide le terrain (état = 1) si 3 votes valides ou plus
      * - Supprime le terrain si 3 votes refusés ou plus
      *
+     * - si le terrain est deja validé (etat = 1), les votes concerneront la suppression du terrain
+     * - Le terrain est supprimé si 3 votes valides
+     * - réinitialisation des votes si 3 votes refus
+     *
      * @param int $id ID du terrain à modifier
      * @param TerrainManager $terrainManager Service de gestion des terrains
      * @return JsonResponse
@@ -350,18 +361,27 @@ class TerrainController extends AbstractController
     {
         $terrain = $this->terrainRepository->find($id);
         if (!$terrain) {
-            return $this->json(['message' => "Terrain non trouvé."], 500);
+            return $this->json(['message' => "Terrain non trouvé."], 404);
         }
 
         $terrainDto = new TerrainDTO();
         $result = null;
 
-        if ($terrain->getVoteValide() >= 3) {
+        if ($terrain->getVoteValide() >= 3 && $terrain->getEtat() === 0) {
             $terrainDto->etat = 1;
             $result = $terrainManager->changeEtatTerrain($terrain, $terrainDto);
-        } elseif ($terrain->getVoteRefuse() >= 3) {
-            $terrainManager->deleteTerrain($terrain);
-            $result = true;
+            $this->deleteVote($terrain);
+        } elseif ($terrain->getVoteRefuse() >= 3 && $terrain->getEtat() === 0) {
+            $this->deleteVote($terrain);
+            $result = $terrainManager->deleteTerrain($terrain);
+        } elseif ($terrain->getVoteValide() >= 3 && $terrain->getEtat() === 1) {
+            $this->deleteVote($terrain);
+            $events = $this->eventRepository->findBy(['terrain' => $terrain, 'etat' => [0,1]]);
+            $result = $terrainManager->deleteTerrain($terrain, $events);
+        } elseif ($terrain->getVoteRefuse() >= 3 && $terrain->getEtat() === 1) {
+            $terrainDto->etatDelete = null;
+            $result = $terrainManager->changeEtatTerrain($terrain, $terrainDto);
+            $this->deleteVote($terrain);
         } else {
             return $this->json(['message' => "Le terrain n’a pas encore atteint le seuil de vote requis."], 200);
         }
@@ -369,9 +389,10 @@ class TerrainController extends AbstractController
         if (!$result) {
             return $this->json(['message' => "Erreur lors du changement d'état du terrain."], 500);
         }
-        $this->deleteVote($terrain);
+
         return $this->json(['message' => "L'état du terrain a été mis à jour avec succès."], 200);
     }
+
 
 
     /**
@@ -461,8 +482,7 @@ class TerrainController extends AbstractController
      */
     public function deleteVote(Terrain $terrain): JsonResponse
     {
-        $votes = $terrain->getVotes();
-        $result = $this->terrainManager->deleteVotes($votes);
+        $result = $this->terrainManager->deleteVotes($terrain);
         if (!$result) {
             return $this->json(['message' => 'Erreur lors de la suppression des votes.'], 404);
         }

@@ -107,8 +107,12 @@ class Terrain
     /**
      * @var Collection<int, Vote>
      */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'terrain', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'terrain', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $votes;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
+    private ?int $etat_delete = null;
 
     public function __construct()
     {
@@ -308,12 +312,12 @@ class Terrain
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): ?int
     {
         return $this->etat;
     }
 
-    public function setEtat(string $etat): static
+    public function setEtat(int $etat): static
     {
         $this->etat = $etat;
 
@@ -418,6 +422,18 @@ class Terrain
                 $vote->setTerrain(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEtatDelete(): ?int
+    {
+        return $this->etat_delete;
+    }
+
+    public function setEtatDelete(?int $etat_delete): static
+    {
+        $this->etat_delete = $etat_delete;
 
         return $this;
     }

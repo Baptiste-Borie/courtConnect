@@ -72,6 +72,9 @@ class TerrainManager
 
     public function incrementVote(TerrainDTO $terrainDto, Terrain $terrain)
     {
+        if (isset($terrainDto->etatDelete)) {
+            $terrain->setEtatDelete($terrainDto->etatDelete);
+        }
         if ($terrainDto->voteValide) {
             $terrain->setVoteValide($terrain->getVoteValide() + 1);
         }
@@ -91,7 +94,14 @@ class TerrainManager
 
     public function changeEtatTerrain(Terrain $terrain, TerrainDTO $terrainDTO)
     {
-        $terrain->setEtat($terrainDTO->etat);
+        if (isset($terrainDTO->etat)) {
+            $terrain->setEtat($terrainDTO->etat);
+        }
+
+        if (array_key_exists('etatDelete', get_object_vars($terrainDTO))) {
+            $terrain->setEtatDelete($terrainDTO->etatDelete);
+        }
+
         try {
             $this->em->persist($terrain);
             $this->em->flush();
@@ -101,25 +111,43 @@ class TerrainManager
         }
     }
 
-    public function deleteTerrain(Terrain $terrain)
+    public function deleteTerrain(Terrain $terrain, $events = null): bool
     {
-        $this->em->remove($terrain);
-        $this->em->flush();
-
-    }
-
-    public function deleteVotes($votes)
-    {
-        foreach ($votes as $vote) {
-            $this->em->remove($vote);
+        if ($events) {
+            foreach ($events as $event) {
+                $event->setEtat(3);
+            }
         }
         try {
+            $this->em->remove($terrain);
             $this->em->flush();
             return true;
         } catch (\Exception $e) {
-            return null;
+            dd('Erreur suppression : ' . $e->getMessage());
+            return false;
         }
     }
+
+
+    public function deleteVotes(Terrain $terrain): bool
+    {
+        $terrain->setVoteValide(null);
+        $terrain->setVoteRefuse(null);
+
+        try {
+            $terrain->getVotes()->clear();
+
+            $this->em->persist($terrain);
+            $this->em->flush();
+
+            return true;
+        } catch (\Exception $e) {
+            dd('Erreur suppression : ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
 
     public function addFavorite(Terrain $terrain, User $user)
     {
