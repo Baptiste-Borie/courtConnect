@@ -17,7 +17,7 @@ export default function EventCard({ event, distance, theme }) {
       setImageUri(uri);
     };
     fetchImage();
-  }, [event.terrain.id]);
+  }, [event?.terrain?.id]);
 
   return (
     <TouchableOpacity style={[styles.card]} onPress={handlePress}>

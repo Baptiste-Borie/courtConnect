@@ -34,8 +34,8 @@ export default function NearestEventSection({ style, refreshKey }) {
           distance: getDistance(
             latitude,
             longitude,
-            e.terrain.latitude,
-            e.terrain.longitude
+            e?.terrain?.latitude,
+            e?.terrain?.longitude
           ),
         }))
         .sort((a, b) => a.distance - b.distance);
@@ -95,7 +95,7 @@ export default function NearestEventSection({ style, refreshKey }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {events.map((event) => (
             <EventCard
-              key={event.id}
+              key={event?.id}
               event={event}
               distance={event.distance}
               theme={theme}

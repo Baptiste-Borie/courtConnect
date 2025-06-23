@@ -36,7 +36,9 @@ export default function MyEventsScreen() {
           const enriched = await Promise.all(
             data.map(async (event) => {
               try {
-                const res = await authFetch(`api/getUsersOfThisEvent/${event.id}`);
+                const res = await authFetch(
+                  `api/getUsersOfThisEvent/${event.id}`
+                );
                 const users = await res.json();
                 return {
                   ...event,
@@ -71,7 +73,11 @@ export default function MyEventsScreen() {
     <PageLayout headerContent={"Mes événements"}>
       <View style={styles.container}>
         {loading && (
-          <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 20 }} />
+          <ActivityIndicator
+            size="large"
+            color={theme.primary}
+            style={{ marginTop: 20 }}
+          />
         )}
 
         {!loading && (!events || events.length === 0) && (
@@ -89,18 +95,31 @@ export default function MyEventsScreen() {
             return (
               <TouchableOpacity
                 key={item.id}
-                onPress={() => navigation.navigate("EventDetail", { eventId: item.id })}
-                style={[styles.eventCard, { backgroundColor: theme.background_light }]}
+                onPress={() =>
+                  navigation.navigate("EventDetail", { eventId: item.id })
+                }
+                style={[
+                  styles.eventCard,
+                  { backgroundColor: theme.background_light },
+                ]}
                 activeOpacity={0.8}
               >
                 <View style={styles.iconPlaceholder} />
                 <View style={{ flex: 1 }}>
-                  <Text style={[{ color: theme.text, fontWeight: "bold" }]}>{item.nom}</Text>
-                  <Text style={{ color: theme.text + "99", fontSize: 12 }}>
-                    {item.terrain.nom}
+                  <Text style={[{ color: theme.text, fontWeight: "bold" }]}>
+                    {item.nom}
                   </Text>
-                  <Text style={{ color: theme.text + "99", fontSize: 12, marginTop: 4 }}>
-                    {item.type_event.nom}
+                  <Text style={{ color: theme.text + "99", fontSize: 12 }}>
+                    {item?.terrain.nom}
+                  </Text>
+                  <Text
+                    style={{
+                      color: theme.text + "99",
+                      fontSize: 12,
+                      marginTop: 4,
+                    }}
+                  >
+                    {item?.type_event.nom}
                   </Text>
                 </View>
 
@@ -112,7 +131,10 @@ export default function MyEventsScreen() {
                       <Text style={{ color: theme.primary, marginRight: 4 }}>
                         {item.currentPlayers}/{item.max_joueurs}
                       </Text>
-                      <Image source={assets.icons.person_active} style={{ width: 16, height: 16 }} />
+                      <Image
+                        source={assets.icons.person_active}
+                        style={{ width: 16, height: 16 }}
+                      />
                     </>
                   )}
                 </View>

@@ -24,11 +24,14 @@ import WaitingCourtsScreen from "./ressources/screens/WaitingCourtsScreen";
 import { authFetch } from "./ressources/utils/AuthFetch";
 import SubscribeScreen from "./ressources/screens/SubscribeScreen";
 import MyEventsScreen from "./ressources/screens/detail/MyEventsScreen";
+import { useContext } from "react";
 
 const Stack = createNativeStackNavigator();
 
-function AppContent({ isAuthenticated, setIsAuthenticated }) {
+function AppContent() {
   const { theme, themeName } = useTheme();
+
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
 
   return (
     <>
