@@ -14,52 +14,36 @@ class TerrainManager
     {
 
     }
-    public function addTerrain(TerrainDTO $terrainDTO) {
-        $newTerrain = new Terrain();
+    public function addTerrain(TerrainDTO $terrainDTO)
+    {
+        $terrain = new Terrain();
+        $terrain->setCreatedAt(new \DateTimeImmutable());
+        $terrain->setEtat(0);
 
-        $newTerrain->setNom($terrainDTO->nom);
-        $newTerrain->setAdresse($terrainDTO->adresse);
-        $newTerrain->setVille($terrainDTO->ville);
-        $newTerrain->setCodePostal($terrainDTO->codePostal);
-        $newTerrain->setLatitude($terrainDTO->latitude);
-        $newTerrain->setLongitude($terrainDTO->longitude);
-        $newTerrain->setCreatedAt(new \DateTimeImmutable());
-        $newTerrain->setTypeSol($terrainDTO->typeSol);
-        $newTerrain->setNbPanier($terrainDTO->nbPanier);
-        $newTerrain->setTypeFilet($terrainDTO->typeFilet);
-        $newTerrain->setTypePanier($terrainDTO->typePanier);
-        $newTerrain->setUsure($terrainDTO->usure);
-        $newTerrain->setSpectateur($terrainDTO->spectateur);
-        $newTerrain->setCreatedBy($terrainDTO->createdBy);
-        $newTerrain->setEtat(0);
-        $newTerrain->setRemarque($terrainDTO->remarque);
-
-        try {
-            $this->em->persist($newTerrain);
-            $this->em->flush();
-            return $newTerrain;
-        } catch (\Exception $e) {
-            return null;
-        }
-
+        return $this->saveOrUpdateTerrainFromDTO($terrain, $terrainDTO);
     }
 
-    public function updateTerrain(TerrainDTO $terrainDTO, Terrain $terrain) {
+    public function updateTerrain(TerrainDTO $terrainDTO, Terrain $terrain)
+    {
+        return $this->saveOrUpdateTerrainFromDTO($terrain, $terrainDTO);
+    }
 
-        $terrain->setNom($terrainDTO->nom);
-        $terrain->setAdresse($terrainDTO->adresse);
-        $terrain->setVille($terrainDTO->ville);
-        $terrain->setCodePostal($terrainDTO->codePostal);
-        $terrain->setLatitude($terrainDTO->latitude);
-        $terrain->setLongitude($terrainDTO->longitude);
-        $terrain->setTypeSol($terrainDTO->typeSol);
-        $terrain->setNbPanier($terrainDTO->nbPanier);
-        $terrain->setTypeFilet($terrainDTO->typeFilet);
-        $terrain->setTypePanier($terrainDTO->typePanier);
-        $terrain->setUsure($terrainDTO->usure);
-        $terrain->setSpectateur($terrainDTO->spectateur);
-        $terrain->setCreatedBy($terrainDTO->createdBy);
-        $terrain->setRemarque($terrainDTO->remarque);
+    private function saveOrUpdateTerrainFromDTO(Terrain $terrain, TerrainDTO $dto)
+    {
+        $terrain->setNom($dto->nom);
+        $terrain->setAdresse($dto->adresse);
+        $terrain->setVille($dto->ville);
+        $terrain->setCodePostal($dto->codePostal);
+        $terrain->setLatitude($dto->latitude);
+        $terrain->setLongitude($dto->longitude);
+        $terrain->setTypeSol($dto->typeSol);
+        $terrain->setNbPanier($dto->nbPanier);
+        $terrain->setTypeFilet($dto->typeFilet);
+        $terrain->setTypePanier($dto->typePanier);
+        $terrain->setUsure($dto->usure);
+        $terrain->setSpectateur($dto->spectateur);
+        $terrain->setCreatedBy($dto->createdBy);
+        $terrain->setRemarque($dto->remarque);
 
         try {
             $this->em->persist($terrain);
@@ -69,6 +53,7 @@ class TerrainManager
             return null;
         }
     }
+
 
     public function incrementVote(TerrainDTO $terrainDto, Terrain $terrain)
     {
