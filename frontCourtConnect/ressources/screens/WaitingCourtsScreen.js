@@ -7,7 +7,7 @@ import WaitingCourt from "../shared/WaitingCourt";
 import PageLayout from "../shared/PageLayout";
 import TrustabilityGauge from "../shared/TrustabilityGauge";
 
-export default function WaitingCourtsScreen( navigation ) {
+export default function WaitingCourtsScreen(navigation) {
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(AuthContext);
 
@@ -40,6 +40,12 @@ export default function WaitingCourtsScreen( navigation ) {
               </Text>
 
               <TrustabilityGauge value={user?.trustability ?? 0} />
+            </View>
+          )}
+
+          {isUserTrusted && (
+            <View>
+              <WaitingCourt></WaitingCourt>
             </View>
           )}
         </View>
