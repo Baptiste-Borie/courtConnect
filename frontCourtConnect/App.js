@@ -25,6 +25,7 @@ import { authFetch } from "./ressources/utils/AuthFetch";
 import SubscribeScreen from "./ressources/screens/SubscribeScreen";
 import MyEventsScreen from "./ressources/screens/detail/MyEventsScreen";
 import { useContext } from "react";
+import FavoriteCourtsScreen from "./ressources/screens/FavoriteCourtsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -53,7 +54,10 @@ function AppContent() {
                   />
                 )}
               </Stack.Screen>
-              <Stack.Screen name="EditAccount" component={EditProfileScreen} />
+              <Stack.Screen 
+                name="EditAccount" 
+                component={EditProfileScreen} 
+              />
               <Stack.Screen
                 name="AccountSettings"
                 component={AccountSettings}
@@ -68,7 +72,10 @@ function AppContent() {
                 name="AddEventSecond"
                 component={EventFormulaireSecondStep}
               />
-              <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+              <Stack.Screen 
+                name="EventDetail" 
+                component={EventDetailScreen} 
+              />
               <Stack.Screen
                 name="TerrainDetail"
                 component={TerrainDetailScreen}
@@ -81,7 +88,14 @@ function AppContent() {
                 name="SubscribeScreen"
                 component={SubscribeScreen}
               />
-              <Stack.Screen name="MyEvents" component={MyEventsScreen} />
+              <Stack.Screen 
+                name="MyEvents" 
+                component={MyEventsScreen} 
+              />
+              <Stack.Screen 
+                name="FavoriteCourts" 
+                component={FavoriteCourtsScreen} 
+              />
             </>
           ) : (
             <Stack.Screen name="Auth">

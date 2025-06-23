@@ -107,10 +107,10 @@ export default function MyEventsScreen() {
                 <View style={styles.iconPlaceholder} />
                 <View style={{ flex: 1 }}>
                   <Text style={[{ color: theme.text, fontWeight: "bold" }]}>
-                    {item.nom}
+                    {item.nom ?? "Nom inconnu"}
                   </Text>
                   <Text style={{ color: theme.text + "99", fontSize: 12 }}>
-                    {item?.terrain.nom}
+                    {item.terrain?.nom ?? "Terrain inconnu"}
                   </Text>
                   <Text
                     style={{
@@ -119,7 +119,7 @@ export default function MyEventsScreen() {
                       marginTop: 4,
                     }}
                   >
-                    {item?.type_event.nom}
+                    {item.type_event?.nom ?? "Type d’événement inconnu"}
                   </Text>
                 </View>
 
@@ -129,7 +129,7 @@ export default function MyEventsScreen() {
                   ) : (
                     <>
                       <Text style={{ color: theme.primary, marginRight: 4 }}>
-                        {item.currentPlayers}/{item.max_joueurs}
+                        {item.currentPlayers ?? 0}/{item.max_joueurs ?? 0}
                       </Text>
                       <Image
                         source={assets.icons.person_active}
@@ -141,6 +141,7 @@ export default function MyEventsScreen() {
               </TouchableOpacity>
             );
           })}
+
       </View>
     </PageLayout>
   );

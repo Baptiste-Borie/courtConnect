@@ -126,17 +126,17 @@ export default function WaitingCourtScreen({ style }) {
                   <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={(e) => {
-                    e.stopPropagation(); // Empêche la propagation du clic
-                    handleValidation(terrain.id, "refuse");
-                  }}
-                >
-                  <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+                                <TouchableOpacity
+                                    style={styles.iconButton}
+                                    onPress={(e) => {
+                                        e.stopPropagation();  
+                                        handleValidation(terrain.id, "refuse");
+                                    }}
+                                >
+                                    <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
 
             <Text style={[styles.info, { color: theme.text + "99" }]}>
               {terrain.adresse || "Adresse inconnue"}
