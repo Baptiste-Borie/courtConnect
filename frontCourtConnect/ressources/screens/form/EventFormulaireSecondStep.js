@@ -23,7 +23,11 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
   const { nom, terrainId, editMode } = route.params;
 
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(
+    new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
+  );
+
+  console.log("date:", date);
   const [maxJoueurs, setMaxJoueurs] = useState(10);
   const [niveau, setNiveau] = useState("1");
   const [typeEvent, setTypeEvent] = useState("");
@@ -33,9 +37,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
     if (editMode) {
       setDescription(editMode.description || "");
 
-      const rawDate = new Date(editMode.date_heure);
-      const adjustedDate = new Date(rawDate.getTime() + 2 * 60 * 60 * 1000);
-      setDate(adjustedDate);
+      setDate(editMode.date_heure);
 
       setMaxJoueurs(editMode.maxJoueurs || 10);
       setNiveau(String(editMode.niveau ?? "1"));
@@ -55,6 +57,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
     }
 
     try {
+      console.log("b:", date);
       const body = {
         nom,
         description,

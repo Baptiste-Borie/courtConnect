@@ -55,19 +55,19 @@ export default function HomeScreen({ navigation }) {
           const isParticipant = participants.some((p) => p.id === user?.id);
 
           const date = new Date(event.date_heure);
-          const dateWithOffset = new Date(date.getTime() + 2 * 60 * 60 * 1000);
 
           if (isParticipant) {
             Alert.alert(
               "Événement annulé",
-              `L’événement "${
-                event.nom
-              }" prévu le ${dateWithOffset.toLocaleString("fr-FR", {
-                day: "numeric",
-                month: "long",
-                hour: "2-digit",
-                minute: "2-digit",
-              })} a été annulé.`
+              `L’événement "${event.nom}" prévu le ${date.toLocaleString(
+                "fr-FR",
+                {
+                  day: "numeric",
+                  month: "long",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              )} a été annulé.`
             );
 
             await AsyncStorage.setItem(
