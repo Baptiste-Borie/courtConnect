@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { getTerrainImageUri } from "../../utils/GetImage";
+import { getTerrainImageUri, defaultTerrainImage } from "../../utils/GetImage";
 
 export default function EventCard({ event, distance, theme }) {
   const navigation = useNavigation();
@@ -14,6 +14,7 @@ export default function EventCard({ event, distance, theme }) {
   useEffect(() => {
     const fetchImage = async () => {
       const uri = await getTerrainImageUri(event.terrain.id);
+
       setImageUri(uri);
     };
     fetchImage();
@@ -22,7 +23,7 @@ export default function EventCard({ event, distance, theme }) {
   return (
     <TouchableOpacity style={[styles.card]} onPress={handlePress}>
       <Image
-        source={{ uri: imageUri }}
+        source={{ uri: imageUri || defaultTerrainImage }}
         style={{ height: 100, width: "100%" }}
         resizeMode="cover"
       />

@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
+
 import { TouchableOpacity } from "react-native";
 import assets from "../../constants/assets";
 import { authFetch } from "../../utils/AuthFetch";
+import Button from "../../shared/Button";
 
-
-export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFavorite, user }) {
+export default function TerrainDetailTab({
+  terrain,
+  theme,
+  isFavorite,
+  toggleFavorite,
+  user,
+}) {
   const [hasVoted, setHasVoted] = useState(false);
 
   const handleVote = async (action) => {
@@ -14,28 +21,23 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
       return;
     }
 
-    if (terrain.etat !== 0) {
-      Alert.alert("Vote non autorisé", "Ce terrain n’est plus en attente de validation.");
-      return;
-    }
-
     await handleValidation(terrain.id, action);
     setHasVoted(true);
   };
-
-
-  const [courts, setCourts] = useState([]);
 
   const handleValidation = async (terrainId, action) => {
     try {
       await authFetch(`/api/terrain/${terrainId}/${action}`, {
         method: "POST",
       });
-      setCourts((prev) => prev.filter((t) => t.id !== terrainId));
     } catch (err) {
-      console.error(`Erreur lors de la ${action} du terrain ${terrainId} :`, err);
+      console.error(
+        `Erreur lors de la ${action} du terrain ${terrainId} :`,
+        err
+      );
     }
   };
+
   return (
     <View style={styles.card}>
       <View style={[styles.rowBetween, { marginBottom: 8 }]}>
@@ -53,46 +55,28 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
             />
           ))}
         </View>
-        <TouchableOpacity onPress={toggleFavorite}>
-          <Image
-            source={
-              user?.roles?.includes("ROLE_PREMIUM")
-                ? isFavorite
-                  ? assets.icons.heart_filled
+        {terrain.etat !== 0 && terrain.etat_delete !== 0 && (
+          <TouchableOpacity onPress={toggleFavorite}>
+            <Image
+              source={
+                user?.roles?.includes("ROLE_PREMIUM")
+                  ? isFavorite
+                    ? assets.icons.heart_filled
+                    : assets.icons.heart
                   : assets.icons.heart
-                : assets.icons.heart
-            }
-            style={[
-              styles.heartIcon,
-              {
-                tintColor: user?.roles?.includes("ROLE_TRUSTED")
-                  ? "#e74c3c"
-                  : theme.text
               }
-            ]}
-          />
-        </TouchableOpacity>
-        {user?.roles?.includes("ROLE_TRUSTED") && !hasVoted && terrain.etat === 0 && (
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => handleVote("validate")}
-            >
-              <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.iconButton}
-              onPress={() => handleVote("refuse")}
-            >
-              <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
-            </TouchableOpacity>
-          </View>
+              style={[
+                styles.heartIcon,
+                {
+                  tintColor: user?.roles?.includes("ROLE_TRUSTED")
+                    ? "#e74c3c"
+                    : theme.text,
+                },
+              ]}
+            />
+          </TouchableOpacity>
         )}
-
       </View>
-
-
 
       <View style={styles.infoRow}>
         <Text style={[styles.label, { color: theme.text }]}>Nom :</Text>
@@ -158,6 +142,18 @@ export default function TerrainDetailTab({ terrain, theme, isFavorite, toggleFav
           </Text>
         </View>
       </View>
+
+      {(terrain.etat === 0 || terrain.etat_delete === 0) && !hasVoted && (
+        <View style={styles.voteRow}>
+          <Button
+            title={"Refuser"}
+            onPress={() => handleVote("refuse")}
+            color="background_light"
+            style={{ borderColor: theme.primary, borderWidth: 1 }}
+          />
+          <Button title={"Accepter"} onPress={() => handleVote("validate")} />
+        </View>
+      )}
     </View>
   );
 }
@@ -197,8 +193,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
-    marginTop: 16,
     justifyContent: "space-between",
+  },
+  voteRow: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginBottom: 16,
   },
   detailItem: {
     width: "48%",
