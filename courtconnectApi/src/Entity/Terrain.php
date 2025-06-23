@@ -107,7 +107,7 @@ class Terrain
     /**
      * @var Collection<int, Vote>
      */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'terrain', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'terrain', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $votes;
 
     #[ORM\Column(nullable: true)]
@@ -311,12 +311,12 @@ class Terrain
         return $this;
     }
 
-    public function getEtat(): ?string
+    public function getEtat(): ?int
     {
         return $this->etat;
     }
 
-    public function setEtat(string $etat): static
+    public function setEtat(int $etat): static
     {
         $this->etat = $etat;
 
