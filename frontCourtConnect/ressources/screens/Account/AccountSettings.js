@@ -17,10 +17,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AccountSettings = () => {
   const { theme, toggleTheme, themeName } = useContext(ThemeContext);
+  const { setUser, setIsAuthenticated } = useContext(AuthContext);
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [password, setPassword] = useState("");
-  const { setUser, setIsAuthenticated } = useContext(AuthContext);
+  const [showDeletePwd, setShowDeletePwd] = useState(false);
+
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showCurrentPwd, setShowCurrentPwd] = useState(false);
+  const [showNewPwd, setShowNewPwd] = useState(false);
+  const [showConfirmPwd, setShowConfirmPwd] = useState(false);
 
   const confirmDeletion = () => {
     Alert.alert(
@@ -47,14 +57,45 @@ const AccountSettings = () => {
         Alert.alert("Erreur", error.message || "Échec de la suppression.");
       }
     } catch (err) {
-      console.log("b:", err);
-      Alert.alert("Erreur", "Une erreur est survenue.", err.message);
+      Alert.alert("Erreur", "Une erreur est survenue.");
     } finally {
       setShowPasswordModal(false);
       setPassword("");
-      setUser(null); // Réinitialiser l'utilisateur dans le contexte
-      setIsAuthenticated(false); // Réinitialiser l'état d'authentification
-      AsyncStorage.clear(); // Effacer le stockage local
+      await AsyncStorage.clear();
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    try {
+      const response = await authFetch("/api/changePassword", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password: currentPassword,
+          newPassword: newPassword,
+        }),
+      });
+
+      const json = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Succès", "Mot de passe modifié avec succès.");
+        setShowChangePasswordModal(false);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        Alert.alert("Erreur", json.message || "Échec du changement.");
+      }
+    } catch (err) {
+      Alert.alert("Erreur", "Une erreur est survenue.");
     }
   };
 
@@ -62,7 +103,9 @@ const AccountSettings = () => {
     <PageLayout
       style={[styles.container, { backgroundColor: theme.background }]}
     >
-      <View style={styles.settingRow}>
+      <View
+        style={[styles.settingRow, { backgroundColor: theme.background_light }]}
+      >
         <Text style={[styles.label, { color: theme.text }]}>Mode sombre</Text>
         <Switch
           value={themeName === "dark"}
@@ -72,7 +115,22 @@ const AccountSettings = () => {
         />
       </View>
 
-      <View style={styles.settingRow}>
+      <View
+        style={[styles.settingRow, { backgroundColor: theme.background_light }]}
+      >
+        <Text style={[styles.label, { color: theme.text }]}>
+          Changer mon mot de passe
+        </Text>
+        <TouchableOpacity onPress={() => setShowChangePasswordModal(true)}>
+          <Text style={{ color: theme.primary, fontWeight: "bold" }}>
+            Modifier
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={[styles.settingRow, { backgroundColor: theme.background_light }]}
+      >
         <Text style={[styles.label, { color: theme.text }]}>
           Supprimer mon compte
         </Text>
@@ -81,6 +139,7 @@ const AccountSettings = () => {
         </TouchableOpacity>
       </View>
 
+      {/* Modal suppression */}
       <Modal visible={showPasswordModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View
@@ -98,11 +157,16 @@ const AccountSettings = () => {
                 { borderColor: theme.primary, color: theme.text },
               ]}
               placeholder="Mot de passe"
-              secureTextEntry
+              secureTextEntry={!showDeletePwd}
               placeholderTextColor="#888"
               value={password}
               onChangeText={setPassword}
             />
+            <TouchableOpacity onPress={() => setShowDeletePwd(!showDeletePwd)}>
+              <Text style={{ color: theme.primary, fontSize: 12 }}>
+                {showDeletePwd ? "Masquer" : "Afficher"} le mot de passe
+              </Text>
+            </TouchableOpacity>
             <View style={styles.modalButtons}>
               <TouchableOpacity onPress={() => setShowPasswordModal(false)}>
                 <Text style={{ color: theme.text }}>Annuler</Text>
@@ -110,6 +174,100 @@ const AccountSettings = () => {
               <TouchableOpacity onPress={handleDeleteAccount}>
                 <Text style={{ color: "red", fontWeight: "bold" }}>
                   Supprimer
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal changement mot de passe */}
+      <Modal
+        visible={showChangePasswordModal}
+        animationType="slide"
+        transparent
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalContainer,
+              { backgroundColor: theme.background },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: theme.text }]}>
+              Modifier votre mot de passe
+            </Text>
+
+            <View style={{ marginBottom: 16 }}>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: theme.primary, color: theme.text },
+                ]}
+                placeholder="Mot de passe actuel"
+                secureTextEntry={!showCurrentPwd}
+                placeholderTextColor="#888"
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowCurrentPwd(!showCurrentPwd)}
+              >
+                <Text style={{ color: theme.primary, fontSize: 12 }}>
+                  {showCurrentPwd ? "Masquer" : "Afficher"} le mot de passe
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginBottom: 16 }}>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: theme.primary, color: theme.text },
+                ]}
+                placeholder="Nouveau mot de passe"
+                secureTextEntry={!showNewPwd}
+                placeholderTextColor="#888"
+                value={newPassword}
+                onChangeText={setNewPassword}
+              />
+              <TouchableOpacity onPress={() => setShowNewPwd(!showNewPwd)}>
+                <Text style={{ color: theme.primary, fontSize: 12 }}>
+                  {showNewPwd ? "Masquer" : "Afficher"} le mot de passe
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginBottom: 16 }}>
+              <TextInput
+                style={[
+                  styles.input,
+                  { borderColor: theme.primary, color: theme.text },
+                ]}
+                placeholder="Confirmer le nouveau mot de passe"
+                secureTextEntry={!showConfirmPwd}
+                placeholderTextColor="#888"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowConfirmPwd(!showConfirmPwd)}
+              >
+                <Text style={{ color: theme.primary, fontSize: 12 }}>
+                  {showConfirmPwd ? "Masquer" : "Afficher"} le mot de passe
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                onPress={() => setShowChangePasswordModal(false)}
+              >
+                <Text style={{ color: theme.text }}>Annuler</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleChangePassword}>
+                <Text style={{ color: theme.primary, fontWeight: "bold" }}>
+                  Modifier
                 </Text>
               </TouchableOpacity>
             </View>
@@ -130,7 +288,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 16,
+    marginVertical: 8,
+    padding: 16,
+    borderRadius: 8,
   },
   label: {
     fontSize: 16,
@@ -155,11 +315,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 12,
   },
 });
 
