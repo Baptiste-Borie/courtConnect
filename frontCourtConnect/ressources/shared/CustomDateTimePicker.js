@@ -26,13 +26,19 @@ export default function CustomDateTimePicker({
   const [tempHour, setTempHour] = useState(value.getHours());
   const [tempMinute, setTempMinute] = useState(value.getMinutes());
 
-  console.log("tempDateTime:", tempDateTime);
+  const [days, setDays] = useState([]);
 
-  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  useEffect(() => {
+    const lastDay = new Date(tempYear, tempMonth, 0).getDate();
+    setDays(Array.from({ length: lastDay }, (_, i) => i + 1));
+
+    if (tempDay > lastDay) setTempDay(lastDay);
+  }, [tempMonth, tempYear]);
+
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const years = Array.from(
-    { length: 50 },
-    (_, i) => new Date().getFullYear() - 10 + i
+    { length: 30 },
+    (_, i) => new Date().getFullYear() + i
   );
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const minutes = Array.from({ length: 60 }, (_, i) => i);

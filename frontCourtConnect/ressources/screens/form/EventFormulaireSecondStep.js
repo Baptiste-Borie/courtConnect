@@ -27,7 +27,6 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
     new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
   );
 
-  console.log("date:", date);
   const [maxJoueurs, setMaxJoueurs] = useState(10);
   const [niveau, setNiveau] = useState("1");
   const [typeEvent, setTypeEvent] = useState("");
@@ -57,7 +56,6 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
     }
 
     try {
-      console.log("b:", date);
       const body = {
         nom,
         description,
