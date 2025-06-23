@@ -28,7 +28,6 @@ export default function TerrainDetailScreen({ route }) {
   const [activeTab, setActiveTab] = useState("details");
   const [imageUri, setImageUri] = useState(null);
 
-
   const navigation = useNavigation();
   const toggleFavorite = async () => {
     if (!user?.roles?.includes("ROLE_PREMIUM")) {
@@ -69,16 +68,14 @@ export default function TerrainDetailScreen({ route }) {
     }
   };
 
-
   useEffect(() => {
     const checkIfFavorite = async () => {
-
       if (!user?.roles?.includes("ROLE_PREMIUM")) {
         setIsFavorite(false);
         return;
       }
       try {
-        const res = await authFetch('/api/getAllFavoriteTerrains');
+        const res = await authFetch("/api/getAllFavoriteTerrains");
         if (res.ok) {
           const favorites = await res.json();
           const isTerrainFavorite = favorites.some(
@@ -99,8 +96,6 @@ export default function TerrainDetailScreen({ route }) {
       setIsFavorite(false);
     }
   }, [terrainId, user?.id]);
-
-
 
   useEffect(() => {
     const fetchTerrain = async () => {
@@ -129,11 +124,15 @@ export default function TerrainDetailScreen({ route }) {
     );
   }
 
-  const isOwner = user?.id === terrain?.created_by?.id;
+  const isTrusted =
+    user?.id === terrain?.created_by?.id ||
+    user?.roles?.includes("ROLE_TRUSTED") ||
+    user?.roles?.includes("ROLE_PREMIUM");
+
   return (
     <PageLayout
-      more={isOwner ? ["modify"] : []}
-      editMode={isOwner ? { type: "terrain", data: terrain } : null}
+      more={isTrusted ? ["modify"] : []}
+      editMode={isTrusted ? { type: "terrain", data: terrain } : null}
     >
       <ScrollView>
         <Image
@@ -184,7 +183,13 @@ export default function TerrainDetailScreen({ route }) {
           </TouchableOpacity>
         </View>
         {activeTab === "details" ? (
-          <TerrainDetailTab terrain={terrain} theme={theme} isFavorite={isFavorite} toggleFavorite={toggleFavorite} user={user} />
+          <TerrainDetailTab
+            terrain={terrain}
+            theme={theme}
+            isFavorite={isFavorite}
+            toggleFavorite={toggleFavorite}
+            user={user}
+          />
         ) : (
           <TerrainEventsTab terrainId={terrain.id} theme={theme} />
         )}

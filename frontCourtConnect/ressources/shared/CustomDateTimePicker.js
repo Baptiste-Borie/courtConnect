@@ -26,6 +26,8 @@ export default function CustomDateTimePicker({
   const [tempHour, setTempHour] = useState(value.getHours());
   const [tempMinute, setTempMinute] = useState(value.getMinutes());
 
+  console.log("tempDateTime:", tempDateTime);
+
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const years = Array.from(
@@ -58,7 +60,9 @@ export default function CustomDateTimePicker({
           ]}
         >
           <Text style={{ color: theme.text }}>
-            {tempDateTime.toLocaleDateString()}
+            {`${String(tempDateTime.getUTCDate()).padStart(2, "0")}/${String(
+              tempDateTime.getUTCMonth() + 1
+            ).padStart(2, "0")}/${tempDateTime.getUTCFullYear()}`}
           </Text>
         </TouchableOpacity>
 
@@ -73,10 +77,9 @@ export default function CustomDateTimePicker({
           ]}
         >
           <Text style={{ color: theme.text }}>
-            {tempDateTime.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {`${String(tempDateTime.getUTCHours()).padStart(2, "0")}:${String(
+              tempDateTime.getUTCMinutes()
+            ).padStart(2, "0")}`}{" "}
           </Text>
         </TouchableOpacity>
       </View>

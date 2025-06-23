@@ -108,12 +108,9 @@ export default function EventDetailScreen({ route }) {
     }
   };
 
-  const formatDate = (rawDate) => {
-    const date = new Date(rawDate);
-
-    const offsetDate = new Date(date.getTime() + 2 * 60 * 60 * 1000);
-
-    return offsetDate.toLocaleString("fr-FR", {
+  const formatDate = (date) => {
+    const parsedDate = new Date(date);
+    return parsedDate.toLocaleString("fr-FR", {
       weekday: "long",
       day: "numeric",
       month: "long",
