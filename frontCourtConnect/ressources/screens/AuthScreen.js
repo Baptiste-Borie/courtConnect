@@ -93,7 +93,7 @@ const AuthScreen = ({ onLogin }) => {
         }}
       >
         Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1
-        chiffre et 1 caractères spécial.
+        chiffre et 1 caractère spécial.
       </Text>
 
       <Button
