@@ -217,12 +217,12 @@ export default function EventDetailScreen({ route }) {
                   activeOpacity={0.8}
                   onPress={() =>
                     navigation.navigate("TerrainDetail", {
-                      terrainId: event.terrain.id,
+                      terrainId: event?.terrain?.id,
                     })
                   }
                 >
                   <Text style={[styles.label, { color: theme.text, flex: 1 }]}>
-                    Terrain : {event.terrain.nom}, {event.terrain.ville}
+                    Terrain : {event?.terrain?.nom}, {event?.terrain?.ville}
                   </Text>
                   <Image
                     source={assets.terrain}

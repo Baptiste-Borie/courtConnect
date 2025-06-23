@@ -106,12 +106,12 @@ export default function TerrainEventsTab({ terrainId, theme }) {
                 {item.nom}
               </Text>
               <Text style={{ color: theme.text + "99", fontSize: 12 }}>
-                {item.terrain.nom}
+                {item?.terrain.nom}
               </Text>
               <Text
                 style={{ color: theme.text + "99", fontSize: 12, marginTop: 4 }}
               >
-                {item.type_event.nom}
+                {item?.type_event.nom}
               </Text>
             </View>
 

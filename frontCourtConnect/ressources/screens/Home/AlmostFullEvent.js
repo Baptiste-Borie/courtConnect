@@ -64,8 +64,8 @@ export default function AlmostFullEvents({ style, refreshKey }) {
       const imagesMap = {};
       await Promise.all(
         sorted.map(async (event) => {
-          const uri = await getTerrainImageUri(event.terrain.id);
-          imagesMap[event.id] = uri;
+          const uri = await getTerrainImageUri(event?.terrain?.id);
+          imagesMap[event?.id] = uri;
         })
       );
       setImagesUriMap(imagesMap);
@@ -130,12 +130,12 @@ export default function AlmostFullEvents({ style, refreshKey }) {
                 {item.nom}
               </Text>
               <Text style={{ color: theme.text + "99", fontSize: 12 }}>
-                {item.terrain.nom}
+                {item?.terrain?.nom}
               </Text>
               <Text
                 style={{ color: theme.text + "99", fontSize: 12, marginTop: 4 }}
               >
-                {item.type_event.nom}
+                {item?.type_event?.nom}
               </Text>
             </View>
 
