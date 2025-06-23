@@ -60,8 +60,7 @@ class TerrainController extends AbstractController
     #[Route('/api/getAllPendingTerrains', name: 'app_get_all_pending_terrains', methods: ['GET'])]
     public function getAllPendingTerrains(): Response
     {
-        $user = $this->getUser();
-        $terrains = $this->terrainRepository->findPendingTerrainsNotCreatedByUser($user);
+        $terrains = $this->terrainRepository->findBy(['etat' => 0], ['created_at' => 'ASC']);
 
         return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
