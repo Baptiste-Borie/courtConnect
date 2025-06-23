@@ -131,7 +131,8 @@ export default function TerrainDetailScreen({ route }) {
 
   return (
     <PageLayout
-      more={isTrusted ? ["modify"] : []}
+      headerContent={terrain.etat_delete === 0 ? "Suppression" : "Validation"}
+      more={isTrusted ? ["modify", "supress"] : []}
       editMode={isTrusted ? { type: "terrain", data: terrain } : null}
     >
       <ScrollView>

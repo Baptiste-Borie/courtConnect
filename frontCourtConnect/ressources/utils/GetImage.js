@@ -1,6 +1,6 @@
 import { authFetch } from "./AuthFetch";
 
-const defaultTerrainImage =
+export const defaultTerrainImage =
   "https://courtconnect.alwaysdata.net/uploads/terrains/Default/image.jpg";
 
 const defaultUserImage =

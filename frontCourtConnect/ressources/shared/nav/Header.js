@@ -21,7 +21,7 @@ import AuthContext from "../../context/AuthContext";
 const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
-  const { setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
 
   const [showMenu, setShowMenu] = useState(false);
   const [eventStatus, setEventStatus] = useState(editMode?.data?.etat);
@@ -89,6 +89,20 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
         },
       ]
     );
+  };
+
+  const handleSupressTerrain = async () => {
+    if (!editMode?.data?.id) return;
+
+    try {
+      const res = await authFetch(`/api/terrain/${editMode.data.id}/validate`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      Alert.alert("Info", json.message || "Action effectuée.");
+    } catch (err) {
+      Alert.alert("Erreur", "Impossible d’envoyer la demande.");
+    }
   };
 
   return (
@@ -160,6 +174,20 @@ const Header = ({ content, onLogout, editMode, more, onRefreshEvent }) => {
                   </Text>
                 </TouchableOpacity>
               )}
+
+              {more.includes("supress") &&
+                user.roles.includes("ROLE_TRUSTED") && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowMenu(false);
+                      handleSupressTerrain();
+                    }}
+                  >
+                    <Text style={{ color: theme.text, padding: 8 }}>
+                      Demande de suppression
+                    </Text>
+                  </TouchableOpacity>
+                )}
             </View>
           )}
         </View>
