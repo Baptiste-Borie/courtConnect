@@ -65,16 +65,27 @@ export default function WaitingCourtScreen({ style }) {
     }, [refresh])
   );
 
-  if (loading) {
-    return (
-      <View style={[styles.container, style]}>
-        <Text style={[styles.title, { color: theme.text }]}>
-          Chargement des terrains en attente...
-        </Text>
-        <ActivityIndicator color={theme.primary} />
-      </View>
-    );
-  }
+    if (loading) {
+        return (
+            <View style={[styles.container, style]}>
+                <Text style={[styles.title, { color: theme.text }]}>
+                    Chargement des terrains en attente...
+                </Text>
+                <ActivityIndicator color={theme.primary} />
+            </View>
+        );
+    }
+
+    if (courts.length === 0) {
+        return (
+            <View style={[styles.container, style]}>
+                <Text style={[styles.title, { color: theme.text }]}>
+                    Aucun terrain en attente de validation pour le moment.
+                </Text>
+            </View>
+        );
+    }
+
 
   return (
     <View style={[styles.container, style]}>
