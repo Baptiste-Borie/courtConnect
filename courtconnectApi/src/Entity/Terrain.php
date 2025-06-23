@@ -111,6 +111,7 @@ class Terrain
     private Collection $votes;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['terrain', 'all_events', 'createdByUser'])]
     private ?int $etat_delete = null;
 
     public function __construct()
