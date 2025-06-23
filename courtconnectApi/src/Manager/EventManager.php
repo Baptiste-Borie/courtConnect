@@ -14,18 +14,10 @@ class EventManager
     {
 
     }
-    public function addEvent(EventDTO $eventDTO) {
+    public function addEvent(EventDTO $eventDTO)
+    {
         $newEvent = new Event();
-
-        $newEvent->setNom($eventDTO->nom);
-        $newEvent->setCreatedBy($eventDTO->created_by);
-        $newEvent->setTerrain($eventDTO->terrain);
-        $newEvent->setDescription($eventDTO->description);
-        $newEvent->setDateHeure(new \DateTimeImmutable($eventDTO->date_heure));
-        $newEvent->setMaxJoueurs($eventDTO->max_joueurs);
-        $newEvent->setNiveau($eventDTO->niveau);
-        $newEvent->setEtat($eventDTO->etat);
-        $newEvent->setTypeEvent($eventDTO->type_event);
+        $this->mapDtoToEvent($eventDTO, $newEvent);
 
         try {
             $this->em->persist($newEvent);
@@ -34,20 +26,11 @@ class EventManager
         } catch (\Exception $e) {
             return null;
         }
-
     }
 
-    public function updateEvent(EventDTO $eventDTO, Event $event) {
-
-        $event->setNom($eventDTO->nom);
-        $event->setCreatedBy($eventDTO->created_by);
-        $event->setTerrain($eventDTO->terrain);
-        $event->setDescription($eventDTO->description);
-        $event->setDateHeure(new \DateTimeImmutable($eventDTO->date_heure));
-        $event->setMaxJoueurs($eventDTO->max_joueurs);
-        $event->setNiveau($eventDTO->niveau);
-        $event->setEtat($eventDTO->etat);
-        $event->setTypeEvent($eventDTO->type_event);
+    public function updateEvent(EventDTO $eventDTO, Event $event)
+    {
+        $this->mapDtoToEvent($eventDTO, $event);
 
         try {
             $this->em->persist($event);
@@ -56,8 +39,21 @@ class EventManager
         } catch (\Exception $e) {
             return null;
         }
-
     }
+
+    private function mapDtoToEvent(EventDTO $dto, Event $event): void
+    {
+        $event->setNom($dto->nom);
+        $event->setCreatedBy($dto->created_by);
+        $event->setTerrain($dto->terrain);
+        $event->setDescription($dto->description);
+        $event->setDateHeure(new \DateTimeImmutable($dto->date_heure));
+        $event->setMaxJoueurs($dto->max_joueurs);
+        $event->setNiveau($dto->niveau);
+        $event->setEtat($dto->etat);
+        $event->setTypeEvent($dto->type_event);
+    }
+
 
     public function joinEvent(EventDTO $eventDTO, Event $event) {
         if ($event->getJoueurs()->contains($eventDTO->joueur)) {

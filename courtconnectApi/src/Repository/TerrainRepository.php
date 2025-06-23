@@ -54,4 +54,16 @@ class TerrainRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findPendingTerrainsNotCreatedByUser(User $user): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.etat = :etat')
+            ->andWhere('t.created_by != :user')
+            ->setParameter('etat', 0)
+            ->setParameter('user', $user)
+            ->orderBy('t.created_at', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

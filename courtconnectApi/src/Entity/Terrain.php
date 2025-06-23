@@ -110,6 +110,9 @@ class Terrain
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'terrain', cascade: ['persist', 'remove'])]
     private Collection $votes;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $etat_delete = null;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -418,6 +421,18 @@ class Terrain
                 $vote->setTerrain(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEtatDelete(): ?int
+    {
+        return $this->etat_delete;
+    }
+
+    public function setEtatDelete(?int $etat_delete): static
+    {
+        $this->etat_delete = $etat_delete;
 
         return $this;
     }
