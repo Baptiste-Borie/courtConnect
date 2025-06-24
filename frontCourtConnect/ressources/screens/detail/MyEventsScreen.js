@@ -12,16 +12,17 @@ import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
 import { ThemeContext } from "../../context/ThemeContext";
 import PageLayout from "../../shared/PageLayout";
-import AuthContext from "../../context/AuthContext";
+import { getTerrainImageUri } from "../../utils/GetImage";
+
 
 export default function MyEventsScreen() {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
-  const { user } = useContext(AuthContext);
 
   const [events, setEvents] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
+  const [imagesUriMap, setImagesUriMap] = useState({});
 
   useFocusEffect(
     useCallback(() => {
@@ -58,6 +59,14 @@ export default function MyEventsScreen() {
           );
 
           setEvents(enriched);
+          const imagesMap = {};
+          await Promise.all(
+            enriched.map(async (event) => {
+              const uri = await getTerrainImageUri(event?.terrain?.id);
+              imagesMap[event?.id] = uri;
+            })
+          );
+          setImagesUriMap(imagesMap);
         } catch (err) {
           console.error("Erreur chargement événements rejoints :", err);
         } finally {
@@ -91,7 +100,7 @@ export default function MyEventsScreen() {
         {!loading &&
           events?.map((item) => {
             const isLoading = loadingEventsIds.includes(item.id);
-
+            const imageUri = imagesUriMap[item.id];
             return (
               <TouchableOpacity
                 key={item.id}
@@ -104,13 +113,21 @@ export default function MyEventsScreen() {
                 ]}
                 activeOpacity={0.8}
               >
-                <View style={styles.iconPlaceholder} />
+                <View style={styles.iconPlaceholder}>
+                  {imageUri && (
+                    <Image
+                      source={{ uri: imageUri }}
+                      style={{ width: 80, height: 80, borderRadius: 6 }}
+                      resizeMode="cover"
+                    />
+                  )}
+                </View>
                 <View style={{ flex: 1 }}>
                   <Text style={[{ color: theme.text, fontWeight: "bold" }]}>
-                    {item.nom}
+                    {item.nom ?? "Nom inconnu"}
                   </Text>
                   <Text style={{ color: theme.text + "99", fontSize: 12 }}>
-                    {item?.terrain.nom}
+                    {item.terrain?.nom ?? "Terrain inconnu"}
                   </Text>
                   <Text
                     style={{
@@ -119,7 +136,7 @@ export default function MyEventsScreen() {
                       marginTop: 4,
                     }}
                   >
-                    {item?.type_event.nom}
+                    {item.type_event?.nom ?? "Type d’événement inconnu"}
                   </Text>
                 </View>
 
@@ -129,7 +146,7 @@ export default function MyEventsScreen() {
                   ) : (
                     <>
                       <Text style={{ color: theme.primary, marginRight: 4 }}>
-                        {item.currentPlayers}/{item.max_joueurs}
+                        {item.currentPlayers ?? 0}/{item.max_joueurs ?? 0}
                       </Text>
                       <Image
                         source={assets.icons.person_active}
@@ -141,6 +158,7 @@ export default function MyEventsScreen() {
               </TouchableOpacity>
             );
           })}
+
       </View>
     </PageLayout>
   );

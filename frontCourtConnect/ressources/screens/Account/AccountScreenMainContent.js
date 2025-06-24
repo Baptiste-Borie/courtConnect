@@ -38,7 +38,9 @@ export default function AccountScreenMainContent({ data }) {
     {
       icon: assets.icons.heart,
       label: "Terrains favoris",
-      onPress: () => { },
+      onPress: () => {
+        navigation.navigate("FavoriteCourts");
+      },
     },
     {
       icon: assets.icons.time,

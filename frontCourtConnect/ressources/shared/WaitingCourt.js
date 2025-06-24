@@ -76,6 +76,17 @@ export default function WaitingCourtScreen({ style }) {
     );
   }
 
+  if (courts.length === 0) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Aucun terrain en attente de validation pour le moment.
+        </Text>
+      </View>
+    );
+  }
+
+
   return (
     <View style={[styles.container, style]}>
       <Text style={[styles.title, { color: theme.text }]}>
@@ -118,7 +129,7 @@ export default function WaitingCourtScreen({ style }) {
                 <TouchableOpacity
                   style={styles.iconButton}
                   onPress={(e) => {
-                    e.stopPropagation(); // Empêche la propagation du clic
+                    e.stopPropagation();
                     handleValidation(terrain.id, "refuse");
                   }}
                 >
