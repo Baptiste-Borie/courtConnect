@@ -127,6 +127,16 @@ class EventController extends AbstractController
         return $this->json($event, Response::HTTP_OK, [], ['groups' => ['all_events']]);
     }
 
+    #[Route('/api/getEventCreatedByUser', name: 'app_get_event_created_by_user', methods: ['GET'])]
+    public function getEventCreatedByUser(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        $events = $this->eventRepository->findBy(['created_by' => $user]);
+        $eventCount = count($events);
+
+        return $this->json($eventCount, 200);
+    }
+
 
     #[Route('/api/addEvent', name: 'app_add_event', methods: ['POST'])]
     public function addEvent(Request $request): JsonResponse

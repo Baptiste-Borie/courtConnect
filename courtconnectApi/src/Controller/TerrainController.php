@@ -116,6 +116,16 @@ class TerrainController extends AbstractController
         return $this->json($terrains, 200, [], ['groups' => ['terrain']]);
     }
 
+    #[Route('/api/getTerrainCreatedByUser', name: 'app_get_terrain_created_by_user', methods: ['GET'])]
+    public function getTerrainCreatedByUser(): JsonResponse
+    {
+        $user = $this->getUser();
+        $terrains = $this->terrainRepository->findBy(['created_by' => $user]);
+        $terrainsCount = count($terrains);
+
+        return $this->json($terrainsCount, 200);
+    }
+
     /**
      * Ajoute un terrain aux favoris de l'utilisateur connecté.
      * Accessible uniquement aux utilisateurs ayant le rôle ROLE_PREMIUM.
