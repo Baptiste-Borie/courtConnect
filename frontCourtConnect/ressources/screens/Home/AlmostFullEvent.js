@@ -103,7 +103,7 @@ export default function AlmostFullEvents({ style, refreshKey }) {
         Soyez parmi les derniers à rejoindre !!
       </Text>
 
-      {events.map((item) => {
+      {events.slice(0,20).map((item) => {
         const isLoading = loadingEventsIds.includes(item.id);
         const imageUri = imagesUriMap[item.id];
 
