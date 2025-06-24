@@ -22,8 +22,8 @@ export default function AddModal({ visible, onClose, onAddTerrain, onAddEvent })
   const [terrainCount, setTerrainCount] = useState(0);
   const [eventCount, setEventCount] = useState(0);
 
-  const MAX_TERRAINS = null;
-  const MAX_EVENTS = null;
+  let MAX_TERRAINS = null;
+  let MAX_EVENTS = null;
 
   if (user?.roles?.includes("ROLE_PREMIUM")) {
     MAX_TERRAINS = null;
