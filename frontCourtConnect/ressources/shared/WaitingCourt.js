@@ -5,13 +5,14 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
-
 import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../context/ThemeContext";
 import { authFetch } from "../utils/AuthFetch";
+import { getTerrainImageUri } from "../utils/GetImage";
 
 export default function WaitingCourtScreen({ style }) {
   const { theme } = useContext(ThemeContext);
@@ -20,6 +21,7 @@ export default function WaitingCourtScreen({ style }) {
   const [loading, setLoading] = useState(true);
   const [courts, setCourts] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [imagesUriMap, setImagesUriMap] = useState({});
 
   const handleValidation = async (terrainId, action) => {
     try {
@@ -47,6 +49,20 @@ export default function WaitingCourtScreen({ style }) {
 
           if (isActive) {
             setCourts(data);
+            
+            const imagesMap = {};
+            await Promise.all(
+              data.map(async (terrain) => {
+                try {
+                  const uri = await getTerrainImageUri(terrain.id);
+                  imagesMap[terrain.id] = uri;
+                } catch (error) {
+                  console.error("Error loading terrain image:", error);
+                  imagesMap[terrain.id] = null;
+                }
+              })
+            );
+            setImagesUriMap(imagesMap);
           }
         } catch (err) {
           console.error("Erreur récupération terrains :", err);
@@ -60,7 +76,7 @@ export default function WaitingCourtScreen({ style }) {
       fetchCourts();
 
       return () => {
-        isActive = false; // Pour éviter un setState après un unmount
+        isActive = false;
       };
     }, [refresh])
   );
@@ -86,7 +102,6 @@ export default function WaitingCourtScreen({ style }) {
     );
   }
 
-
   return (
     <View style={[styles.container, style]}>
       <Text style={[styles.title, { color: theme.text }]}>
@@ -111,9 +126,21 @@ export default function WaitingCourtScreen({ style }) {
             ]}
           >
             <View style={styles.headerRow}>
-              <Text style={[styles.name, { color: theme.text }]}>
-                {terrain.nom}
-              </Text>
+              <View style={styles.terrainInfo}>
+                <Image
+                  source={{ uri: imagesUriMap[terrain.id] }}
+                  style={styles.terrainImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.terrainText}>
+                  <Text style={[styles.name, { color: theme.text }]}>
+                    {terrain.nom}
+                  </Text>
+                  <Text style={[styles.info, { color: theme.text + "99" }]}>
+                    {terrain.adresse || "Adresse inconnue"}
+                  </Text>
+                </View>
+              </View>
 
               <View style={styles.actions}>
                 <TouchableOpacity
@@ -138,9 +165,6 @@ export default function WaitingCourtScreen({ style }) {
               </View>
             </View>
 
-            <Text style={[styles.info, { color: theme.text + "99" }]}>
-              {terrain.adresse || "Adresse inconnue"}
-            </Text>
             {terrain.created_by && (
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={[styles.info, { color: theme.text + "99" }]}>
@@ -172,6 +196,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     elevation: 2,
+    marginBottom: 12,
+  },
+  terrainInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  terrainImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+  terrainText: {
+    flex: 1,
   },
   name: {
     fontWeight: "bold",
@@ -180,7 +219,6 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 12,
     marginTop: 4,
-    justifyContent: "flex-end",
   },
   headerRow: {
     flexDirection: "row",
