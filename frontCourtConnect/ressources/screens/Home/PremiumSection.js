@@ -1,40 +1,49 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { View, StyleSheet, Text, ActivityIndicator, TouchableOpacity, Image } from "react-native";
 import { authFetch } from "../../utils/AuthFetch";
 import { useTheme } from "../../context/ThemeContext";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AuthContext from "../../context/AuthContext";
 import Button from "../../shared/Button";
 import assets from "../../constants/assets";
 
-export default function PremiumSection({ style }) {
+export default function PremiumSection({ style, refreshKey }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const { user } = useContext(AuthContext);
 
   const [favorites, setFavorites] = useState(null);
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const res = await authFetch("api/getAllFavoriteTerrains");
-        if (res.ok) {
-          const data = await res.json();
-          setFavorites(data);
-        } else {
-          console.error("Erreur fetch favorites:", res.status);
-        }
-      } catch (err) {
-        console.error("Erreur fetch favorites:", err);
+  const fetchFavorites = async () => {
+    try {
+      const res = await authFetch("api/getAllFavoriteTerrains");
+      if (res.ok) {
+        const data = await res.json();
+        setFavorites(data);
+      } else {
+        console.error("Erreur fetch favorites:", res.status);
       }
-    };
-
+    } catch (err) {
+      console.error("Erreur fetch favorites:", err);
+    } 
+  };
+  
+  useEffect(() => {
     if (user?.roles?.includes("ROLE_PREMIUM")) {
       fetchFavorites();
     } else {
       setFavorites([]);
     }
-  }, [user]);
+  }, [user, refreshKey]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.roles?.includes("ROLE_PREMIUM")) {
+        fetchFavorites();
+      }
+    }, [user])
+  );
+
 
   if (!user) {
     return (
@@ -95,7 +104,7 @@ export default function PremiumSection({ style }) {
         </Text>
         <Image
           source={assets.icons.heart_filled}
-          style={[styles.heartIcon, {tintColor: theme.text}]}
+          style={[styles.heartIcon, { tintColor: theme.text }]}
         />
       </View>
 
@@ -166,7 +175,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-    titleContainer: {
+  titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,

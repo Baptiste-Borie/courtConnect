@@ -76,15 +76,15 @@ export default function AlmostFullEvents({ style, refreshKey }) {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [refreshKey]);
+
   useFocusEffect(
     useCallback(() => {
       fetchData();
     }, [])
   );
-
-  useEffect(() => {
-    fetchData();
-  }, [refreshKey]);
 
   if (loading && !events) {
     return (
