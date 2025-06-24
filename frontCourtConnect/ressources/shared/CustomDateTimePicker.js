@@ -14,26 +14,18 @@ export default function CustomDateTimePicker({
   onChange,
   theme,
 }) {
-  const [tempDateTime, setTempDateTime] = useState(value);
+  const utcDate = new Date(value);
+
+  const [tempDateTime, setTempDateTime] = useState(utcDate);
+  const [tempDay, setTempDay] = useState(utcDate.getUTCDate());
+  const [tempMonth, setTempMonth] = useState(utcDate.getUTCMonth() + 1);
+  const [tempYear, setTempYear] = useState(utcDate.getUTCFullYear());
+  const [tempHour, setTempHour] = useState(utcDate.getUTCHours());
+  const [tempMinute, setTempMinute] = useState(utcDate.getUTCMinutes());
 
   const [showDateModal, setShowDateModal] = useState(false);
   const [showTimeModal, setShowTimeModal] = useState(false);
-
-  const [tempDay, setTempDay] = useState(value.getDate());
-  const [tempMonth, setTempMonth] = useState(value.getMonth() + 1);
-  const [tempYear, setTempYear] = useState(value.getFullYear());
-
-  const [tempHour, setTempHour] = useState(value.getHours());
-  const [tempMinute, setTempMinute] = useState(value.getMinutes());
-
   const [days, setDays] = useState([]);
-
-  useEffect(() => {
-    const lastDay = new Date(tempYear, tempMonth, 0).getDate();
-    setDays(Array.from({ length: lastDay }, (_, i) => i + 1));
-
-    if (tempDay > lastDay) setTempDay(lastDay);
-  }, [tempMonth, tempYear]);
 
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const years = Array.from(
@@ -44,12 +36,19 @@ export default function CustomDateTimePicker({
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   useEffect(() => {
-    setTempDateTime(value);
-    setTempDay(value.getDate());
-    setTempMonth(value.getMonth() + 1);
-    setTempYear(value.getFullYear());
-    setTempHour(value.getHours());
-    setTempMinute(value.getMinutes());
+    const lastDay = new Date(tempYear, tempMonth, 0).getDate();
+    setDays(Array.from({ length: lastDay }, (_, i) => i + 1));
+    if (tempDay > lastDay) setTempDay(lastDay);
+  }, [tempMonth, tempYear]);
+
+  useEffect(() => {
+    const d = new Date(value);
+    setTempDateTime(d);
+    setTempDay(d.getUTCDate());
+    setTempMonth(d.getUTCMonth() + 1);
+    setTempYear(d.getUTCFullYear());
+    setTempHour(d.getUTCHours());
+    setTempMinute(d.getUTCMinutes());
   }, [value]);
 
   return (
@@ -85,7 +84,7 @@ export default function CustomDateTimePicker({
           <Text style={{ color: theme.text }}>
             {`${String(tempDateTime.getUTCHours()).padStart(2, "0")}:${String(
               tempDateTime.getUTCMinutes()
-            ).padStart(2, "0")}`}{" "}
+            ).padStart(2, "0")}`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -106,7 +105,7 @@ export default function CustomDateTimePicker({
                 <View style={styles.pickerRow}>
                   <Picker
                     selectedValue={tempDay}
-                    onValueChange={(itemValue) => setTempDay(itemValue)}
+                    onValueChange={setTempDay}
                     style={styles.picker}
                     itemStyle={{ fontSize: 14, color: theme.text }}
                   >
@@ -120,7 +119,7 @@ export default function CustomDateTimePicker({
                   </Picker>
                   <Picker
                     selectedValue={tempMonth}
-                    onValueChange={(itemValue) => setTempMonth(itemValue)}
+                    onValueChange={setTempMonth}
                     style={styles.picker}
                     itemStyle={{ fontSize: 14, color: theme.text }}
                   >
@@ -134,7 +133,7 @@ export default function CustomDateTimePicker({
                   </Picker>
                   <Picker
                     selectedValue={tempYear}
-                    onValueChange={(itemValue) => setTempYear(itemValue)}
+                    onValueChange={setTempYear}
                     style={styles.picker}
                     itemStyle={{ fontSize: 14, color: theme.text }}
                   >
@@ -145,10 +144,15 @@ export default function CustomDateTimePicker({
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    const newDate = new Date(tempDateTime);
-                    newDate.setFullYear(tempYear);
-                    newDate.setMonth(tempMonth - 1);
-                    newDate.setDate(tempDay);
+                    const newDate = new Date(
+                      Date.UTC(
+                        tempYear,
+                        tempMonth - 1,
+                        tempDay,
+                        tempHour,
+                        tempMinute
+                      )
+                    );
                     setTempDateTime(newDate);
                     onChange?.(newDate);
                     setShowDateModal(false);
@@ -182,7 +186,7 @@ export default function CustomDateTimePicker({
                 <View style={styles.pickerRow}>
                   <Picker
                     selectedValue={tempHour}
-                    onValueChange={(itemValue) => setTempHour(itemValue)}
+                    onValueChange={setTempHour}
                     style={styles.picker}
                   >
                     {hours.map((h) => (
@@ -195,7 +199,7 @@ export default function CustomDateTimePicker({
                   </Picker>
                   <Picker
                     selectedValue={tempMinute}
-                    onValueChange={(itemValue) => setTempMinute(itemValue)}
+                    onValueChange={setTempMinute}
                     style={styles.picker}
                   >
                     {minutes.map((m) => (
@@ -209,9 +213,15 @@ export default function CustomDateTimePicker({
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    const newDate = new Date(tempDateTime);
-                    newDate.setHours(tempHour);
-                    newDate.setMinutes(tempMinute);
+                    const newDate = new Date(
+                      Date.UTC(
+                        tempYear,
+                        tempMonth - 1,
+                        tempDay,
+                        tempHour,
+                        tempMinute
+                      )
+                    );
                     setTempDateTime(newDate);
                     onChange?.(newDate);
                     setShowTimeModal(false);

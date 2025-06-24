@@ -36,7 +36,7 @@ export default function EventFormulaireSecondStep({ route, navigation }) {
     if (editMode) {
       setDescription(editMode.description || "");
 
-      setDate(editMode.date_heure);
+      setDate(new Date(editMode.date_heure).getTime() + 2 * 60 * 60 * 1000); // Convertir en UTC+2
 
       setMaxJoueurs(editMode.maxJoueurs || 10);
       setNiveau(String(editMode.niveau ?? "1"));

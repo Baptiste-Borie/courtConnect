@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, use } from "react";
 import {
   StyleSheet,
   View,
@@ -18,34 +18,45 @@ import { ThemeContext } from "../../context/ThemeContext";
 import MapBox from "../../shared/MapBox";
 import assets from "../../constants/assets";
 import Button from "../../shared/Button";
+import useLocation from "../../customHooks/useLocation";
 
 export default function TerrainFormulaire({ navigation, route }) {
   const { theme } = useContext(ThemeContext);
   const { data: terrain } = route.params || {};
 
   const debounceTimer = useRef(null);
+  const [selectedCoords, setSelectedCoords] = useState(null);
 
   const [nom, setNom] = useState("");
   const [adresse, setAdresse] = useState("");
-  const [selectedCoords, setSelectedCoords] = useState({
-    latitude: 48.8566,
-    longitude: 2.3522,
-  });
   const [usure, setUsure] = useState(3);
   const [photo, setPhoto] = useState(null);
+
+  const location = useLocation();
+  const userLatitude = location.latitude;
+  const userLongitude = location.longitude;
+
+  useEffect(() => {
+    if (userLatitude && userLongitude) {
+      setSelectedCoords({
+        latitude: userLatitude,
+        longitude: userLongitude,
+      });
+    }
+  }, [userLatitude, userLongitude]);
 
   useEffect(() => {
     if (terrain) {
       setNom(terrain.nom || "");
       setAdresse(terrain.adresse || "");
       setSelectedCoords({
-        latitude: terrain.coords?.latitude || 48.8566,
-        longitude: terrain.coords?.longitude || 2.3522,
+        latitude: terrain?.latitude || 48.8566,
+        longitude: terrain?.longitude || 2.3522,
       });
       setUsure(terrain.usure || 3);
       fetchAddress({
-        latitude: terrain.coords?.latitude || 48.8566,
-        longitude: terrain.coords?.longitude || 2.3522,
+        latitude: terrain?.latitude || 48.8566,
+        longitude: terrain?.longitude || 2.3522,
       });
     }
   }, [terrain]);
@@ -182,29 +193,31 @@ export default function TerrainFormulaire({ navigation, route }) {
           Placer le marqueur sur la carte pour définir l'adresse
         </Text>
 
-        <MapBox
-          style={{ width: "100%", height: 250 }}
-          centerMaker={true}
-          initalRegion={{
-            ...selectedCoords,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-          onRegionChange={(region) => {
-            setSelectedCoords({
-              latitude: region.latitude,
-              longitude: region.longitude,
-            });
+        {selectedCoords && (
+          <MapBox
+            style={{ width: "100%", height: 250 }}
+            centerMaker={true}
+            region={{
+              ...selectedCoords,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+            onRegionChange={(region) => {
+              setSelectedCoords({
+                latitude: region.latitude,
+                longitude: region.longitude,
+              });
 
-            if (debounceTimer.current) {
-              clearTimeout(debounceTimer.current);
-            }
+              if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+              }
 
-            debounceTimer.current = setTimeout(() => {
-              fetchAddress(region);
-            }, 600);
-          }}
-        />
+              debounceTimer.current = setTimeout(() => {
+                fetchAddress(region);
+              }, 600);
+            }}
+          />
+        )}
 
         <Text style={[styles.label, { color: theme.text, marginTop: 16 }]}>
           Usure du terrain

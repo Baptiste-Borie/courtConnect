@@ -1,4 +1,10 @@
-import React, { forwardRef, useContext, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import MapView, { Callout, Marker } from "react-native-maps";
 
@@ -34,23 +40,10 @@ const MapBox = forwardRef(
           ref={ref}
           style={StyleSheet.absoluteFill}
           userInterfaceStyle={themeName}
-          key={
-            region?.latitude +
-            "-" +
-            region?.longitude +
-            "-" +
-            terrainMarkers
-              .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
-              .join("|")
-          }
-          region={
-            region || {
-              latitude: 48.8566,
-              longitude: 2.3522,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }
-          }
+          key={terrainMarkers
+            .map((m) => m.coordinate.latitude + "," + m.coordinate.longitude)
+            .join("|")}
+          initialRegion={region}
           onRegionChangeComplete={onRegionChange}
         >
           {userLocation && (

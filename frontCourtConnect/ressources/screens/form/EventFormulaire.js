@@ -40,16 +40,6 @@ export default function EventFormulaire({ navigation, route }) {
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
         });
-        setMapMarkers([
-          {
-            coordinate: {
-              latitude: event.terrain.latitude,
-              longitude: event.terrain.longitude,
-            },
-            title: event.terrain.nom,
-            description: event.terrain.adresse || "",
-          },
-        ]);
       }
     }
   }, [event]);
@@ -98,6 +88,16 @@ export default function EventFormulaire({ navigation, route }) {
 
         const data = await res.json();
         setTerrains(data);
+        setMapMarkers(
+          data.map((terrain) => ({
+            coordinate: {
+              latitude: terrain.latitude,
+              longitude: terrain.longitude,
+            },
+            title: terrain.nom,
+            description: terrain.adresse || "",
+          }))
+        );
       } catch (error) {
         console.error("Erreur récupération terrains :", error);
       } finally {
