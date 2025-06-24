@@ -152,7 +152,7 @@ export default function TerrainFormulaireSecondStep({ route, navigation }) {
       const data = await response.json();
       await uploadTerrainImage(data.id);
 
-      Alert.alert("Succès", "Le terrain a été ajouté avec succès !");
+      Alert.alert("Succès", "Le terrain a été ajouté avec succès aux terrains en attente !");
       navigation.navigate("Home");
     } catch (err) {
       console.error("Erreur :", err);
