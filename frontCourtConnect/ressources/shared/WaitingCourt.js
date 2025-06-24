@@ -65,26 +65,26 @@ export default function WaitingCourtScreen({ style }) {
     }, [refresh])
   );
 
-    if (loading) {
-        return (
-            <View style={[styles.container, style]}>
-                <Text style={[styles.title, { color: theme.text }]}>
-                    Chargement des terrains en attente...
-                </Text>
-                <ActivityIndicator color={theme.primary} />
-            </View>
-        );
-    }
+  if (loading) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Chargement des terrains en attente...
+        </Text>
+        <ActivityIndicator color={theme.primary} />
+      </View>
+    );
+  }
 
-    if (courts.length === 0) {
-        return (
-            <View style={[styles.container, style]}>
-                <Text style={[styles.title, { color: theme.text }]}>
-                    Aucun terrain en attente de validation pour le moment.
-                </Text>
-            </View>
-        );
-    }
+  if (courts.length === 0) {
+    return (
+      <View style={[styles.container, style]}>
+        <Text style={[styles.title, { color: theme.text }]}>
+          Aucun terrain en attente de validation pour le moment.
+        </Text>
+      </View>
+    );
+  }
 
 
   return (
@@ -126,17 +126,17 @@ export default function WaitingCourtScreen({ style }) {
                   <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.iconButton}
-                                    onPress={(e) => {
-                                        e.stopPropagation();  
-                                        handleValidation(terrain.id, "refuse");
-                                    }}
-                                >
-                                    <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+                <TouchableOpacity
+                  style={styles.iconButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleValidation(terrain.id, "refuse");
+                  }}
+                >
+                  <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <Text style={[styles.info, { color: theme.text + "99" }]}>
               {terrain.adresse || "Adresse inconnue"}

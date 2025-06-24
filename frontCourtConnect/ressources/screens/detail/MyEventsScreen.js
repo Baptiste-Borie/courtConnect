@@ -114,15 +114,9 @@ export default function MyEventsScreen() {
                 activeOpacity={0.8}
               >
                 <View style={styles.iconPlaceholder}>
-                  {imageUri ? (
+                  {imageUri && (
                     <Image
                       source={{ uri: imageUri }}
-                      style={{ width: 80, height: 80, borderRadius: 6 }}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <Image
-                      source={assets.icons.court}
                       style={{ width: 80, height: 80, borderRadius: 6 }}
                       resizeMode="cover"
                     />
