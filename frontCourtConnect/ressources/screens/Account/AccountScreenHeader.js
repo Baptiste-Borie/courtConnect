@@ -48,7 +48,9 @@ export default function AccountScreenHeader({ data }) {
         <View style={styles.content}>
           <View style={styles.info}>
             <Text style={[styles.name, { color: theme.text }]}>
-              {data.nom} {data.prenom}
+              {data.nom && data.prenom
+                ? `${data.nom} ${data.prenom}`
+                : data.pseudo}
             </Text>
           </View>
 
