@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { authFetch } from "../../utils/AuthFetch";
 import assets from "../../constants/assets";
+import { getTerrainImageUri } from "../../utils/GetImage";
 
 export default function TerrainEventsTab({ terrainId, theme }) {
   const navigation = useNavigation();
@@ -17,6 +18,7 @@ export default function TerrainEventsTab({ terrainId, theme }) {
   const [events, setEvents] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingEventsIds, setLoadingEventsIds] = useState([]);
+  const [imagesUriMap, setImagesUriMap] = useState({});
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -26,12 +28,29 @@ export default function TerrainEventsTab({ terrainId, theme }) {
 
         setLoadingEventsIds(data.map((e) => e.id));
 
+
+        const imagesMap = {};
+        await Promise.all(
+          data.map(async (event) => {
+            const terrainId = event.terrain.id;
+            if (!imagesMap[terrainId]) {
+              try {
+                const uri = await getTerrainImageUri(terrainId);
+                imagesMap[terrainId] = uri;
+              } catch (error) {
+                console.error("Erreur image terrain:", error);
+                imagesMap[terrainId] = null;
+              }
+            }
+          })
+        );
+        setImagesUriMap(imagesMap);
+
+
         const enriched = await Promise.all(
           data.map(async (event) => {
             try {
-              const res = await authFetch(
-                `api/getUsersOfThisEvent/${event.id}`
-              );
+              const res = await authFetch(`api/getUsersOfThisEvent/${event.id}`);
               const users = await res.json();
               return {
                 ...event,
@@ -60,6 +79,7 @@ export default function TerrainEventsTab({ terrainId, theme }) {
 
     if (terrainId) fetchEvents();
   }, [terrainId]);
+
 
   if (loading && !events) {
     return (
@@ -100,7 +120,14 @@ export default function TerrainEventsTab({ terrainId, theme }) {
             ]}
             activeOpacity={0.8}
           >
-            <View style={styles.iconPlaceholder} />
+            <View style={styles.iconPlaceholder} >
+              {imagesUriMap[item?.terrain?.id] ? (
+                <Image
+                  source={{ uri: imagesUriMap[item.terrain.id] }}
+                  style={styles.image}
+                />
+              ) : null}
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={[{ color: theme.text, fontWeight: "bold" }]}>
                 {item.nom}
@@ -169,4 +196,10 @@ const styles = StyleSheet.create({
     minWidth: 40,
     justifyContent: "flex-end",
   },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 6,
+  },
+
 });
