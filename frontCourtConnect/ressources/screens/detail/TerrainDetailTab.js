@@ -12,6 +12,7 @@ export default function TerrainDetailTab({
   isFavorite,
   toggleFavorite,
   user,
+  buttonActivated,
 }) {
   const [hasVoted, setHasVoted] = useState(false);
 
@@ -143,17 +144,19 @@ export default function TerrainDetailTab({
         </View>
       </View>
 
-      {(terrain.etat === 0 || terrain.etat_delete === 0) && !hasVoted && (
-        <View style={styles.voteRow}>
-          <Button
-            title={"Refuser"}
-            onPress={() => handleVote("refuse")}
-            color="background_light"
-            style={{ borderColor: theme.primary, borderWidth: 1 }}
-          />
-          <Button title={"Accepter"} onPress={() => handleVote("validate")} />
-        </View>
-      )}
+      {(terrain.etat === 0 || terrain.etat_delete === 0) &&
+        buttonActivated &&
+        !hasVoted && (
+          <View style={styles.voteRow}>
+            <Button
+              title={"Refuser"}
+              onPress={() => handleVote("refuse")}
+              color="background_light"
+              style={{ borderColor: theme.primary, borderWidth: 1 }}
+            />
+            <Button title={"Accepter"} onPress={() => handleVote("validate")} />
+          </View>
+        )}
     </View>
   );
 }

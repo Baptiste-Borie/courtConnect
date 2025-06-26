@@ -23,6 +23,7 @@ export default function TerrainDetailScreen({ route }) {
   const { user } = useContext(AuthContext);
   const [isFavorite, setIsFavorite] = useState(null);
   const terrainId = route.params?.terrainId;
+  const buttonActivated = route.params?.buttonActivated || false;
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("details");
@@ -132,7 +133,7 @@ export default function TerrainDetailScreen({ route }) {
   return (
     <PageLayout
       headerContent={
-        terrain.etat_delete === 0
+        terrain.etat_delete === 0 && buttonActivated
           ? "Suppression"
           : terrain.etat === 0
           ? "Validation"
@@ -196,6 +197,7 @@ export default function TerrainDetailScreen({ route }) {
             isFavorite={isFavorite}
             toggleFavorite={toggleFavorite}
             user={user}
+            buttonActivated={buttonActivated}
           />
         ) : (
           <TerrainEventsTab terrainId={terrain.id} theme={theme} />

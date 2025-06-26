@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,22 +6,23 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../context/ThemeContext";
 import { authFetch } from "../utils/AuthFetch";
 import { getTerrainImageUri } from "../utils/GetImage";
+import ValidationCourtsTab from "./ValidationCourtsTab";
+import SuppressionCourtsTab from "./SuppressionCourtsTab";
 
 export default function WaitingCourtScreen({ style }) {
   const { theme } = useContext(ThemeContext);
   const navigation = useNavigation();
-
   const [loading, setLoading] = useState(true);
   const [courts, setCourts] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [imagesUriMap, setImagesUriMap] = useState({});
+  const [activeTab, setActiveTab] = useState("validation");
 
   const handleValidation = async (terrainId, action) => {
     try {
@@ -40,16 +41,13 @@ export default function WaitingCourtScreen({ style }) {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
-
       const fetchCourts = async () => {
         try {
           setLoading(true);
           const res = await authFetch("/api/getAllNoVotedTerrains");
           const data = await res.json();
-
           if (isActive) {
             setCourts(data);
-            
             const imagesMap = {};
             await Promise.all(
               data.map(async (terrain) => {
@@ -67,14 +65,10 @@ export default function WaitingCourtScreen({ style }) {
         } catch (err) {
           console.error("Erreur récupération terrains :", err);
         } finally {
-          if (isActive) {
-            setLoading(false);
-          }
+          if (isActive) setLoading(false);
         }
       };
-
       fetchCourts();
-
       return () => {
         isActive = false;
       };
@@ -103,134 +97,71 @@ export default function WaitingCourtScreen({ style }) {
   }
 
   return (
-    <View style={[styles.container, style]}>
+    <ScrollView style={[styles.container, style]}>
       <Text style={[styles.title, { color: theme.text }]}>
-        Terrains en attente de validation ({courts.length})
+        Terrains en attente ({courts.length})
       </Text>
-      {courts.map((terrain) => (
-        <TouchableOpacity
-          key={`terrain-${terrain.id}`}
-          onPress={() =>
-            navigation.navigate("TerrainDetail", { terrainId: terrain.id })
-          }
-        >
-          <View
+      <View style={styles.tabContainer}>
+        <TouchableOpacity onPress={() => setActiveTab("validation")}>
+          <Text
             style={[
-              styles.card,
+              styles.tabText,
               {
-                backgroundColor:
-                  terrain.etat_delete === 0
-                    ? "#e74c3c"
-                    : theme.background_light,
+                color: activeTab === "validation" ? theme.primary : theme.text,
               },
             ]}
           >
-            <View style={styles.headerRow}>
-              <View style={styles.terrainInfo}>
-                <Image
-                  source={{ uri: imagesUriMap[terrain.id] }}
-                  style={styles.terrainImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.terrainText}>
-                  <Text style={[styles.name, { color: theme.text }]}>
-                    {terrain.nom}
-                  </Text>
-                  <Text style={[styles.info, { color: theme.text + "99" }]}>
-                    {terrain.adresse || "Adresse inconnue"}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.actions}>
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleValidation(terrain.id, "validate");
-                  }}
-                >
-                  <Text style={{ color: "green", fontSize: 18 }}>✓</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.iconButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleValidation(terrain.id, "refuse");
-                  }}
-                >
-                  <Text style={{ color: "red", fontSize: 18 }}>✗</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {terrain.created_by && (
-              <View style={{ alignItems: "flex-end" }}>
-                <Text style={[styles.info, { color: theme.text + "99" }]}>
-                  Ajouté par :{" "}
-                  {terrain.created_by.prenom && terrain.created_by.nom
-                    ? `${terrain.created_by.prenom} ${terrain.created_by.nom}`
-                    : "Inconnu"}
-                </Text>
-              </View>
-            )}
-          </View>
+            Validation
+          </Text>
         </TouchableOpacity>
-      ))}
-    </View>
+        <TouchableOpacity onPress={() => setActiveTab("suppression")}>
+          <Text
+            style={[
+              styles.tabText,
+              {
+                color: activeTab === "suppression" ? theme.primary : theme.text,
+              },
+            ]}
+          >
+            Suppression
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {activeTab === "validation" ? (
+        <ValidationCourtsTab
+          courts={courts}
+          imagesUriMap={imagesUriMap}
+          onValidate={handleValidation}
+        />
+      ) : (
+        <SuppressionCourtsTab
+          courts={courts}
+          imagesUriMap={imagesUriMap}
+          onValidate={handleValidation}
+        />
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    gap: 12,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
-    textAlign:"center"
+    textAlign: "center",
   },
-  card: {
-    padding: 12,
-    borderRadius: 8,
-    elevation: 2,
-    marginBottom: 12,
-  },
-  terrainInfo: {
+  tabContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
+    justifyContent: "space-around",
+    marginVertical: 12,
   },
-  terrainImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 6,
-    marginRight: 12,
-  },
-  terrainText: {
-    flex: 1,
-  },
-  name: {
-    fontWeight: "bold",
+  tabText: {
     fontSize: 16,
-  },
-  info: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  iconButton: {
-    padding: 4,
+    fontWeight: "bold",
   },
 });
