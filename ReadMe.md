@@ -40,6 +40,8 @@ composer install
 
 Utilisateur standard :
 
+nassim@gmail.com - Admin77!
+
 Utilisateur de confiance :
 
 Baptiste@gmail.com - @Baptiste24
