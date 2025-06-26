@@ -12,6 +12,8 @@ Court Connect est une application déstiné à tous les amateurs (ou non) de bas
 
 # Dépôt :
 
+https://github.com/Baptiste-Borie/courtConnect.git
+
 ## Front :
 
 https://github.com/Baptiste-Borie/courtConnect/tree/master/frontCourtConnect
